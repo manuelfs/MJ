@@ -54,7 +54,7 @@ void h2cosmetic(TH2F* &h2, char* title, TString Xvar="", TString Yvar="", TStrin
 //
 void Make1DPlots(TString HistName, char* Region, int NMergeBins=1) 
 { 
-    gInterpreter->ExecuteMacro("~/macros/JaeStyle.C");
+  //gInterpreter->ExecuteMacro("~/macros/JaeStyle.C");
 
     TFile* HistFile = TFile::Open(Form("HistFiles/Hist_%s.root", Region));
    

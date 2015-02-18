@@ -5,7 +5,7 @@
 void DoAnalysis(bool OnlyDraw=false) 
 {
     // Style
-    gROOT->ProcessLine(".L /Users/jaehyeok/macros/rootlogon.C");
+    //gROOT->ProcessLine(".L /Users/jaehyeok/macros/rootlogon.C");
     // Load macros 
     gROOT->LoadMacro("MakeHists.C+");
     gROOT->LoadMacro("Make1DPlots.C+");
@@ -24,7 +24,8 @@ void DoAnalysis(bool OnlyDraw=false)
     TChain *ch_f1500_100    = new TChain("tree", "T1tttt_f1500_100");
     TChain *ch_f1200_800    = new TChain("tree", "T1tttt_f1200_800");
   
-    TString BabyDir = "/Users/jaehyeok/Research/Tools/fastjet-3.0.6/example/babies/13TeV/HT750MET250/";
+    TString BabyDir = "/net/cms26/cms26r0/jaehyeok/baby/Fatjet/13TeV/Phys14/HT750MET250/";
+      //"/Users/jaehyeok/Research/Tools/fastjet-3.0.6/example/babies/13TeV/HT750MET250/";
     
     // Data
     //ch_data->Add(BabyDir+"baby_MuHad_*.root");                            
@@ -42,8 +43,8 @@ void DoAnalysis(bool OnlyDraw=false)
     ch_t->Add(BabyDir+"baby_*channel*_f*.root");
 
     // Signal
-    ch_f1500_100->Add(BabyDir+"baby_*f1500_100.root");
-    ch_f1200_800->Add(BabyDir+"baby_*f1200_800.root");
+    ch_f1500_100->Add(BabyDir+"baby_*mGl-1500_mLSP-100*.root");
+    ch_f1200_800->Add(BabyDir+"baby_*mGl-1200_mLSP-800*.root");
     
     
     // ----------------------------------------
@@ -62,9 +63,9 @@ void DoAnalysis(bool OnlyDraw=false)
     //
     // Loop over SR and CR : make sure that these regions exist in "PassSelection.h"
     //
-    char* Region[] = {"SR0", "SR1"}; 
-
-    for(int iregion=0; iregion<2; iregion++)
+    char* Region[] = {"SR0", "SR1","1BSR1","1BSR0","1BCR0","1B2lCR0","1BCRincl","1B2lCRincl"}; 
+    
+    for(int iregion=2; iregion<8; iregion++)
     {
         if(!OnlyDraw) 
         {
