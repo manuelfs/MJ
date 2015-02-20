@@ -1,7 +1,7 @@
 
 //
 // main 
-//
+// top pt branch
 void DoAnalysis(bool OnlyDraw=false) 
 {
     // Style
@@ -64,7 +64,9 @@ void DoAnalysis(bool OnlyDraw=false)
     //
     // Loop over SR and CR : make sure that these regions exist in "PassSelection.h"
     //
-    char* Region[] = {"SR0", "SR1","SRincl","1BSR1","1BSR0","1BCR0","1B2lCR0","1BCRincl","1B2lCRincl","1B2lCRincl_loose","AllBCRincl"}; 
+    
+    char* Region[] = {"SRincl","1BCRincl"
+    // char* Region[] = {"SR0", "SR1","SRincl","1BSR1","1BSR0","1BCR0","1B2lCR0","1BCRincl","1B2lCRincl","1B2lCRincl_loose","AllBCRincl"}; 
     //remember loose requires full babies
     for(int iregion=10; iregion<11; iregion++)
     {
