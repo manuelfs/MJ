@@ -118,7 +118,7 @@ void Make1DPlots(TString HistName, char* Region,  bool DoLog=1,int NMergeBins=1)
     THStack *st[7];
     bool corr1=false;
     bool corr2=false;
-    TString c_region[2] = {"1BCRincl","1BCRincl"};
+    TString c_region[2] = {"1BCRincl","1B4SJCRincl"};
     if(HistName.Contains("corr1")){
       corr1=true;
       HistName="MJ";
