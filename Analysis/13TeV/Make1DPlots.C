@@ -90,6 +90,8 @@ void Make1DPlots(TString HistName, char* Region, int NMergeBins=1)
     if(HistName=="HT")                  	var=(char*)"H_{T} [GeV]";    
     if(HistName=="toppT1")                  	var=(char*)"top 1 p_{T} [GeV]"; 
     if(HistName=="toppT2")                  	var=(char*)"top 2 p_{T} [GeV]"; 
+    if(HistName=="toppT")                  	var=(char*)"top p_{T} [GeV]"; 
+    if(HistName=="toppT_incl")                	var=(char*)"top p_{T} [GeV]"; 
     if(HistName=="MJ")                  	var=(char*)"M_{J} [GeV]";                        
     if(HistName=="mj")                  	var=(char*)"m_{j} [GeV]";                        
     if(HistName=="mT")                  	var=(char*)"m_{T} [GeV]";                        
@@ -115,6 +117,20 @@ void Make1DPlots(TString HistName, char* Region, int NMergeBins=1)
     c->Divide(3,2);
     for(int i=2; i<7; i++) 
     {
+
+      if(HistName=="toppT_incl"){
+	if(i>2) break;
+	h1_T[i]         = (TH1F*)HistFile->Get(Form("h1_T_%s", HistName.Data()));
+        h1_TT_sl[i]     = (TH1F*)HistFile->Get(Form("h1_TT_sl_%s", HistName.Data()));
+        h1_TT_ll[i]     = (TH1F*)HistFile->Get(Form("h1_TT_ll_%s", HistName.Data()));
+	h1_TT_sys[i]     = (TH1F*)HistFile->Get(Form("h1_TT_sys_%s", HistName.Data()));
+        h1_WJets[i]     = (TH1F*)HistFile->Get(Form("h1_WJets_%s", HistName.Data()));
+        h1_DY[i]        = (TH1F*)HistFile->Get(Form("h1_DY_%s", HistName.Data())); 
+        h1_f1500_100[i] = (TH1F*)HistFile->Get(Form("h1_T1tttt_f1500_100_%s", HistName.Data())); 
+        h1_f1200_800[i] = (TH1F*)HistFile->Get(Form("h1_T1tttt_f1200_800_%s", HistName.Data())); 
+
+      }
+      else{
       // h1_DATA[i]      = (TH1F*)HistFile->Get(Form("h1_DATA_%s_%ifatjet", HistName.Data(), i)); 
         h1_T[i]         = (TH1F*)HistFile->Get(Form("h1_T_%s_%ifatjet", HistName.Data(), i));
         h1_TT_sl[i]     = (TH1F*)HistFile->Get(Form("h1_TT_sl_%s_%ifatjet", HistName.Data(), i));
@@ -124,7 +140,7 @@ void Make1DPlots(TString HistName, char* Region, int NMergeBins=1)
         h1_DY[i]        = (TH1F*)HistFile->Get(Form("h1_DY_%s_%ifatjet", HistName.Data(), i)); 
         h1_f1500_100[i] = (TH1F*)HistFile->Get(Form("h1_T1tttt_f1500_100_%s_%ifatjet", HistName.Data(), i)); 
         h1_f1200_800[i] = (TH1F*)HistFile->Get(Form("h1_T1tttt_f1200_800_%s_%ifatjet", HistName.Data(), i)); 
-
+      }
         // merge bins
         //h1_DATA[i]->Rebin(NMergeBins);
         h1_T[i]->Rebin(NMergeBins);
@@ -141,6 +157,12 @@ void Make1DPlots(TString HistName, char* Region, int NMergeBins=1)
 	h1_DATA[i]->Add(h1_WJets[i]);
         h1_DATA[i]->Add(h1_T[i]);
         h1_DATA[i]->Add(h1_DY[i]);
+	
+	//restore poisson errors on data
+	for(int b=0;b<((int)h1_DATA[i]->GetXaxis()->GetNbins()+1);b++){
+	  h1_DATA[i]->SetBinError(b,pow(h1_DATA[i]->GetBinContent(b),0.5));
+
+	}
 	
 	
         h1_MC[i] = (TH1F*)h1_TT_sl[i]->Clone(Form("h1_MC_%s_%ifatjet", HistName.Data(), i));

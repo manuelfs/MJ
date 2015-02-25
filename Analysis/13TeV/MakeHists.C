@@ -176,6 +176,7 @@ void MakeHists(TChain *ch, char* Region)
     // Define histograms
     //
     TH1F *h1_yields[7];
+   
     TH1F *h1_MJ[7], *h1_mT[7], *h1_Nskinnyjet[7], *h1_Ncsvm[7], 
          *h1_muspT[7], *h1_muspTminusMET[7], *h1_musEta[7], *h1_musPhi[7], 
          *h1_elspT[7], *h1_elspTminusMET[7], *h1_elsEta[7], *h1_elsPhi[7], 
@@ -192,6 +193,23 @@ void MakeHists(TChain *ch, char* Region)
     TH2F *h2_HTmT[7], *h2_MJMET[7];
     TH2F *h2_HTMJ[7], *h2_METmT[7];
     TH1F *h1_toppT1[7], *h1_toppT2[7];
+    TH1F *h1_toppT[7];
+    TH1F *h1_toppT1_incl, *h1_toppT2_incl;
+    TH1F *h1_toppT_incl;
+    h1_toppT1_incl = InitTH1F( Form("h1_%s_toppT1_incl", ch->GetTitle()), 
+			       Form("h1_%s_toppT1_incl", ch->GetTitle()), 
+			       //20, 350, 1350);
+			       30, 0, 1500);
+
+    h1_toppT2_incl = InitTH1F( Form("h1_%s_toppT2_incl", ch->GetTitle()), 
+			       Form("h1_%s_toppT2_incl", ch->GetTitle()), 
+			       //20, 350, 1350);
+			       30, 0, 1500);
+    
+    h1_toppT_incl = InitTH1F( Form("h1_%s_toppT_incl", ch->GetTitle()), 
+			       Form("h1_%s_toppT_incl", ch->GetTitle()), 
+			       //20, 350, 1350);
+			       30, 0, 1500);
 
     for(int i=0; i<7; i++) 
     {   
@@ -259,12 +277,17 @@ void MakeHists(TChain *ch, char* Region)
 	h1_toppT1[i] = InitTH1F( Form("h1_%s_toppT1_%ifatjet", ch->GetTitle(), i), 
                              Form("h1_%s_toppT1_%ifatjet", ch->GetTitle(), i), 
                              //20, 350, 1350);
-			     28, 500, 4000);
+			     30, 0, 1500);
 
 	h1_toppT2[i] = InitTH1F( Form("h1_%s_toppT2_%ifatjet", ch->GetTitle(), i), 
                              Form("h1_%s_toppT2_%ifatjet", ch->GetTitle(), i), 
                              //20, 350, 1350);
-                             28, 500, 4000);
+                             30, 0, 1500);
+	h1_toppT[i] = InitTH1F( Form("h1_%s_toppT_%ifatjet", ch->GetTitle(), i), 
+                             Form("h1_%s_toppT_%ifatjet", ch->GetTitle(), i), 
+                             //20, 350, 1350);
+                             30, 0, 1500);
+      
       
         h1_MET[i] = InitTH1F( Form("h1_%s_MET_%ifatjet", ch->GetTitle(), i), 
                              Form("h1_%s_MET_%ifatjet", ch->GetTitle(), i), 
@@ -406,6 +429,9 @@ void MakeHists(TChain *ch, char* Region)
     float Ntt=0.;
     float Nltl=0.;
     float Nlth=0.;
+
+    float N_pre_toppT=0;
+    float N_post_toppT=0;
     //
     //
     //
@@ -459,17 +485,30 @@ void MakeHists(TChain *ch, char* Region)
             EventWeight_ = EventWeight_*806.1/832.; // I used 832 pb while M used 806.1 pb.
         }
 
+	N_pre_toppT+=EventWeight_;
+
+	
 	if(ChainName.Contains("TT_sys"))
 	{
-	  
-	   if(top1pT_>400) top1pT_=400;
-           if(top2pT_>400) top2pT_=400;
-           float weight_top1pT = TMath::Exp(0.159-0.00141*top1pT_);
-           float weight_top2pT = TMath::Exp(0.159-0.00141*top2pT_);
-           EventWeight_ = EventWeight_ / TMath::Sqrt(weight_top1pT*weight_top2pT);
-           EventWeight_ = EventWeight_ / 1.01;
+	  float t1pT,t2pT;
+	   if(top1pT_>400) t1pT=400;
+	   else t1pT=top1pT_;
+
+           if(top2pT_>400) t2pT=400;
+	   else t2pT=top2pT_;
+           float weight_top1pT = TMath::Exp(0.159-0.00141*t1pT);
+           float weight_top2pT = TMath::Exp(0.159-0.00141*t2pT);
+	    EventWeight_ = EventWeight_ / TMath::Sqrt(weight_top1pT*weight_top2pT);
+	    //  EventWeight_ = EventWeight_ / 1.01;
 	  
         }
+	N_post_toppT+=EventWeight_;
+
+	FillTH1F(h1_toppT_incl, top1pT_, EventWeight_);
+	FillTH1F(h1_toppT_incl, top2pT_, EventWeight_);
+	FillTH1F(h1_toppT1_incl, top1pT_, EventWeight_);
+	FillTH1F(h1_toppT2_incl, top2pT_, EventWeight_);
+
         // Pileup 
 
         // 
@@ -599,7 +638,12 @@ void MakeHists(TChain *ch, char* Region)
 	
 	if(ChainName.Contains("TT")) {
 	FillTH1FAll(h1_toppT1, NFJbin, top1pT_, EventWeight_);
-	FillTH1FAll(h1_toppT2, NFJbin, top2pT_, EventWeight_);}
+	FillTH1FAll(h1_toppT2, NFJbin, top2pT_, EventWeight_);
+	
+	FillTH1FAll(h1_toppT, NFJbin, top1pT_, EventWeight_);
+	FillTH1FAll(h1_toppT, NFJbin, top2pT_, EventWeight_);
+
+	}
         //
         // Fill histogams 
         //
@@ -721,6 +765,11 @@ void MakeHists(TChain *ch, char* Region)
         cout << "Nltl : " << Nltl << endl;
         cout << "---------------------------------" << endl;
     }
+    
+    float ptscale;
+    if(N_post_toppT>0.1) ptscale= N_pre_toppT/N_post_toppT;
+    else ptscale=0;
+    cout<<"TOP PT REWEIGHT pre: "<<N_pre_toppT<<"   post: "<<N_post_toppT<<"    Ratio: "<<ptscale<<endl;
 
     TString HistFileName = ch->GetTitle();
     HistFileName = Form("HistFiles/%s_%s.root", HistFileName.Data(), Region);
@@ -729,11 +778,15 @@ void MakeHists(TChain *ch, char* Region)
     gROOT->cd();
     HistFile->cd();
     // write histograms
+    h1_toppT1_incl->SetDirectory(0);                      h1_toppT1_incl->Write();
+    h1_toppT2_incl->SetDirectory(0);                      h1_toppT2_incl->Write();
+    h1_toppT_incl->SetDirectory(0);                      h1_toppT_incl->Write();
     for(int i=0; i<7; i++)  
     {
         h1_yields[i]->SetDirectory(0);                      h1_yields[i]->Write();
         h1_MJ[i]->SetDirectory(0);                          h1_MJ[i]->Write();
         h1_HT[i]->SetDirectory(0);                          h1_HT[i]->Write();
+	h1_toppT[i]->SetDirectory(0);                       h1_toppT[i]->Write();
 	h1_toppT1[i]->SetDirectory(0);                      h1_toppT1[i]->Write();
 	h1_toppT2[i]->SetDirectory(0);                      h1_toppT2[i]->Write();
         h1_MET[i]->SetDirectory(0);                         h1_MET[i]->Write();

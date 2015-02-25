@@ -109,8 +109,10 @@ void DoAnalysis(bool OnlyDraw=false)
         Make1DPlots("mj",           Region[iregion]);
         Make1DPlots("MJ",           Region[iregion]);
         Make1DPlots("HT",           Region[iregion]);
-	Make1DPlots("toppT1",       Region[iregion]);
-	Make1DPlots("toppT2",       Region[iregion]);
+	Make1DPlots("toppT",       Region[iregion]);
+	Make1DPlots("toppT_incl",       Region[iregion]);
+	//Make1DPlots("toppT1",       Region[iregion]);
+	//Make1DPlots("toppT2",       Region[iregion]);
         Make1DPlots("Nfatjet",      Region[iregion]);
         Make1DPlots("Nskinnyjet",   Region[iregion]);
         Make1DPlots("Ncsvm",        Region[iregion]);
