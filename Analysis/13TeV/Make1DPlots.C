@@ -16,9 +16,10 @@
 #include "TInterpreter.h"
 #include "TLatex.h"
 #include "TMath.h"
+#include "TGraphErrors.h"
 
 using namespace std;
-bool DoLog          = 1;
+//bool DoLog          = 1;
 bool doData         = 1;
 bool SignalScale    = 1;
 
@@ -52,11 +53,13 @@ void h2cosmetic(TH2F* &h2, char* title, TString Xvar="", TString Yvar="", TStrin
 //
 // Stacks
 //
-void Make1DPlots(TString HistName, char* Region, int NMergeBins=1) 
+void Make1DPlots(TString HistName, char* Region,  bool DoLog=1,int NMergeBins=1) 
 { 
   //gInterpreter->ExecuteMacro("~/macros/JaeStyle.C");
 
-    TFile* HistFile = TFile::Open(Form("HistFiles/Hist_%s.root", Region));
+  
+
+    
    
     char *var; 
     if(HistName=="MET")                 	var=(char*)"MET [GeV]";
@@ -92,7 +95,9 @@ void Make1DPlots(TString HistName, char* Region, int NMergeBins=1)
     if(HistName=="toppT2")                  	var=(char*)"top 2 p_{T} [GeV]"; 
     if(HistName=="toppT")                  	var=(char*)"top p_{T} [GeV]"; 
     if(HistName=="toppT_incl")                	var=(char*)"top p_{T} [GeV]"; 
-    if(HistName=="MJ")                  	var=(char*)"M_{J} [GeV]";                        
+    if(HistName=="MJ")                  	var=(char*)"M_{J} [GeV]";  
+    if(HistName=="MJ_corr1")                  	var=(char*)"M_{J} [GeV]";  
+    if(HistName=="MJ_corr2")                  	var=(char*)"M_{J} [GeV]";  
     if(HistName=="mj")                  	var=(char*)"m_{j} [GeV]";                        
     if(HistName=="mT")                  	var=(char*)"m_{T} [GeV]";                        
     if(HistName=="muspT")               	var=(char*)"p_{T}(muon) [GeV]";                  
@@ -111,6 +116,29 @@ void Make1DPlots(TString HistName, char* Region, int NMergeBins=1)
     TH1F *h1_DATA[7], *h1_T[7], *h1_TT_sl[7], *h1_TT_ll[7], *h1_TT_sys[7], *h1_TT[7], *h1_WJets[7], *h1_DY[7], *h1_MC[7]; 
     TH1F *h1_f1500_100[7], *h1_f1200_800[7];
     THStack *st[7];
+    bool corr1=false;
+    bool corr2=false;
+    TString c_region[2] = {"1BCRincl","1BCRincl"};
+    if(HistName.Contains("corr1")){
+      corr1=true;
+      HistName="MJ";
+    }
+    if(HistName.Contains("corr2")){
+      corr2=true;
+      HistName="MJ";
+    }
+    TGraphErrors *MJ_SF[7];
+    if(corr1||corr2){
+      TFile* SFFile;
+      if(corr1) SFFile = TFile::Open(Form("HistFiles/MJ_SF_%s.root", c_region[0].Data()));
+      else SFFile = TFile::Open(Form("HistFiles/MJ_SF_%s.root", c_region[1].Data()));  
+      for(int j=2;j<7;j++){
+	MJ_SF[j] = (TGraphErrors*)SFFile->Get(Form("SF_%i",j));
+      }
+      SFFile->Close();
+    }
+
+    TFile* HistFile = TFile::Open(Form("HistFiles/Hist_%s.root", Region));
     //TCanvas *c = new TCanvas("c","c",1500,300);  
     //c->Divide(5,1);
     TCanvas *c = new TCanvas("c","c",1200,800);  
@@ -119,7 +147,7 @@ void Make1DPlots(TString HistName, char* Region, int NMergeBins=1)
     {
 
       if(HistName=="toppT_incl"){
-	if(i>2) break;
+	if(i>3) break;
 	h1_T[i]         = (TH1F*)HistFile->Get(Form("h1_T_%s", HistName.Data()));
         h1_TT_sl[i]     = (TH1F*)HistFile->Get(Form("h1_TT_sl_%s", HistName.Data()));
         h1_TT_ll[i]     = (TH1F*)HistFile->Get(Form("h1_TT_ll_%s", HistName.Data()));
@@ -163,7 +191,20 @@ void Make1DPlots(TString HistName, char* Region, int NMergeBins=1)
 	  h1_DATA[i]->SetBinError(b,pow(h1_DATA[i]->GetBinContent(b),0.5));
 
 	}
-	
+	if(corr1||corr2){
+	  Int_t nSF = MJ_SF[i]->GetN();
+	  for(int p=0;p<nSF;p++){
+	    Double_t xx=-1; Double_t yy = -1;
+	    MJ_SF[i]->GetPoint(p,xx,yy);
+	    cout<<"p  x  y:   "<<p<<" "<<xx<<" "<<yy<<" "<<endl;
+	    if(yy>0.4 && xx>0.4){
+	      // cout<<"Found bin  ,  content     new content  "<<h1_TT_sl[i]->FindBin(xx)<<"  "<<h1_TT_sl[i]->GetBinContent(xx)<<"  "<<yy*1_TT_sl[i]->GetBinContent(xx)<<endl;
+	      h1_TT_sl[i]->SetBinContent( h1_TT_sl[i]->FindBin(xx),yy*(float)h1_TT_sl[i]->GetBinContent(h1_TT_sl[i]->FindBin(xx)));
+	      h1_TT_ll[i]->SetBinContent( h1_TT_ll[i]->FindBin(xx),yy*(float)h1_TT_ll[i]->GetBinContent(h1_TT_ll[i]->FindBin(xx)));
+	    }
+	  }
+
+	}
 	
         h1_MC[i] = (TH1F*)h1_TT_sl[i]->Clone(Form("h1_MC_%s_%ifatjet", HistName.Data(), i));
         h1_MC[i]->Add(h1_TT_ll[i]);
@@ -187,6 +228,7 @@ void Make1DPlots(TString HistName, char* Region, int NMergeBins=1)
         h1cosmetic(h1_f1200_800[i],     Form("T1tttt(1200,800) %ifatjet", i),   kBlue,  1, 0,           var);
 
         bool DoLogOne = (DoLog && h1_MC[i]->Integral()>0);
+	if(HistName=="toppT_incl" && i==3) DoLogOne=false; 
         c->cd(i-1);
         if(DoLogOne) c->cd(i-1)->SetLogy(1);
         //c->cd(i-1)->SetLeftMargin(0.15);
@@ -207,7 +249,8 @@ void Make1DPlots(TString HistName, char* Region, int NMergeBins=1)
          st[i]->Add(h1_TT_sl[i]);
         st[i]->SetMaximum(h1_MC[i]->GetMaximum()*(DoLogOne?200:1.6));
         //st[i]->SetMinimum(h1_MC[i]->GetMinimum()*(DoLogOne?1:0));
-        st[i]->SetMinimum((DoLogOne?0.05:0));
+        if(HistName!="toppT_incl") st[i]->SetMinimum((DoLogOne?0.05:0));
+	else st[i]->SetMinimum((DoLogOne?1:0));
         st[i]->Draw("HIST"); 
 
         ///* needs to be in JaeStyle : FIXME  
@@ -289,7 +332,9 @@ void Make1DPlots(TString HistName, char* Region, int NMergeBins=1)
 
     // 
     if(HistName=="mj") HistName="JetMass";
-    c->Print( Form("Figures/sys_CompareDataMC_%s_%s%s.pdf", HistName.Data(), Region, DoLog?"_log":"") ); 
+    if(corr1) c->Print( Form("Figures/corr_%s_sys_CompareDataMC_%s_%s%s.pdf", c_region[0].Data(),HistName.Data(), Region, DoLog?"_log":"") );
+    else if(corr2)c->Print( Form("Figures/corr_%s_sys_CompareDataMC_%s_%s%s.pdf", c_region[1].Data(),HistName.Data(), Region, DoLog?"_log":"") );
+    else c->Print( Form("Figures/sys_CompareDataMC_%s_%s%s.pdf", HistName.Data(), Region, DoLog?"_log":"") ); 
     
     // 
     HistFile->Close();
