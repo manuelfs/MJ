@@ -191,6 +191,7 @@ void MakeHists(TChain *ch, char* Region)
     TH2F *h2_HTMET[7], *h2_MJmT[7];
     TH2F *h2_HTmT[7], *h2_MJMET[7];
     TH2F *h2_HTMJ[7], *h2_METmT[7];
+    TH1F *h1_toppT1[7], *h1_toppT2[7];
 
     for(int i=0; i<7; i++) 
     {   
@@ -254,6 +255,17 @@ void MakeHists(TChain *ch, char* Region)
                              Form("h1_%s_HT_%ifatjet", ch->GetTitle(), i), 
                              //20, 350, 1350);
                              28, 500, 4000);
+
+	h1_toppT1[i] = InitTH1F( Form("h1_%s_toppT1_%ifatjet", ch->GetTitle(), i), 
+                             Form("h1_%s_toppT1_%ifatjet", ch->GetTitle(), i), 
+                             //20, 350, 1350);
+			     28, 500, 4000);
+
+	h1_toppT2[i] = InitTH1F( Form("h1_%s_toppT2_%ifatjet", ch->GetTitle(), i), 
+                             Form("h1_%s_toppT2_%ifatjet", ch->GetTitle(), i), 
+                             //20, 350, 1350);
+                             28, 500, 4000);
+      
         h1_MET[i] = InitTH1F( Form("h1_%s_MET_%ifatjet", ch->GetTitle(), i), 
                              Form("h1_%s_MET_%ifatjet", ch->GetTitle(), i), 
                              //20, 0, 500);
@@ -446,6 +458,18 @@ void MakeHists(TChain *ch, char* Region)
         { 
             EventWeight_ = EventWeight_*806.1/832.; // I used 832 pb while M used 806.1 pb.
         }
+
+	if(ChainName.Contains("TT_sys"))
+	{
+	  
+	   if(top1pT_>400) top1pT_=400;
+           if(top2pT_>400) top2pT_=400;
+           float weight_top1pT = TMath::Exp(0.159-0.00141*top1pT_);
+           float weight_top2pT = TMath::Exp(0.159-0.00141*top2pT_);
+           EventWeight_ = EventWeight_ / TMath::Sqrt(weight_top1pT*weight_top2pT);
+           EventWeight_ = EventWeight_ / 1.01;
+	  
+        }
         // Pileup 
 
         // 
@@ -572,7 +596,10 @@ void MakeHists(TChain *ch, char* Region)
         if( Nt==2 )                                                                 Ntt  = Ntt + EventWeight_; 
         if( (Ne==1 || Nm==1) && Nt==1 && (Ntn==1 && (Nen==1 || Nmn==1)) )           Nltl = Nltl + EventWeight_; 
         if( (Ne==1 || Nm==1) && Nt==1 && (Ntn==1 && (Nen==0 && Nmn==0)) )           Nlth = Nlth + EventWeight_; 
-
+	
+	if(ChainName.Contains("TT")) {
+	FillTH1FAll(h1_toppT1, NFJbin, top1pT_, EventWeight_);
+	FillTH1FAll(h1_toppT2, NFJbin, top2pT_, EventWeight_);}
         //
         // Fill histogams 
         //
@@ -612,7 +639,7 @@ void MakeHists(TChain *ch, char* Region)
         FillTH2FAll(h2_METmT, NFJbin, MET_, mT, EventWeight_);           
         FillTH1FAll(h1_mT,  NFJbin, mT, EventWeight_);                 
         FillTH1FAll(h1_WpT, NFJbin, WpT, EventWeight_);               
-        FillTH1FAll(h1_HT, NFJbin, HT_, EventWeight_);                
+        FillTH1FAll(h1_HT, NFJbin, HT_, EventWeight_);   
         FillTH1FAll(h1_MJ, NFJbin, MJ_thres, EventWeight_); 
         FillTH1FAll(h1_MET, NFJbin, MET_, EventWeight_);              
         FillTH1FAll(h1_METPhi, NFJbin, METPhi_, EventWeight_);        
@@ -707,6 +734,8 @@ void MakeHists(TChain *ch, char* Region)
         h1_yields[i]->SetDirectory(0);                      h1_yields[i]->Write();
         h1_MJ[i]->SetDirectory(0);                          h1_MJ[i]->Write();
         h1_HT[i]->SetDirectory(0);                          h1_HT[i]->Write();
+	h1_toppT1[i]->SetDirectory(0);                      h1_toppT1[i]->Write();
+	h1_toppT2[i]->SetDirectory(0);                      h1_toppT2[i]->Write();
         h1_MET[i]->SetDirectory(0);                         h1_MET[i]->Write();
         h1_METPhi[i]->SetDirectory(0);                      h1_METPhi[i]->Write();
         h1_METx[i]->SetDirectory(0);                        h1_METx[i]->Write();

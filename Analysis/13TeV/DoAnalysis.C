@@ -18,6 +18,7 @@ void DoAnalysis(bool OnlyDraw=false)
     TChain *ch_data         = new TChain("tree", "DATA");
     TChain *ch_ttbar_sl     = new TChain("tree", "TT_sl");
     TChain *ch_ttbar_ll     = new TChain("tree", "TT_ll");
+    TChain *ch_ttbar_sys     = new TChain("tree", "TT_sys");
     TChain *ch_wjets        = new TChain("tree", "WJets");
     TChain *ch_dy           = new TChain("tree", "DY");
     TChain *ch_t            = new TChain("tree", "T");
@@ -34,6 +35,7 @@ void DoAnalysis(bool OnlyDraw=false)
     // TT 
     ch_ttbar_sl->Add(BabyDir+"baby_TTJets*.root");
     ch_ttbar_ll->Add(BabyDir+"baby_TTJets*.root");
+    ch_ttbar_sys->Add(BabyDir+"baby_TTJets*.root"); 
     // WJets 
     //ch_wjets->Add(BabyDir+"baby_WJetsToLNu*f1To*.root");
     ch_wjets->Add(BabyDir+"baby_WJetsToLNu*.root");
@@ -65,10 +67,11 @@ void DoAnalysis(bool OnlyDraw=false)
     // Loop over SR and CR : make sure that these regions exist in "PassSelection.h"
     //
     
-    char* Region[] = {"SRincl","1BCRincl"
+    char* Region[] = {"SRincl","1BCRincl"};
+    int nregion = 2;
     // char* Region[] = {"SR0", "SR1","SRincl","1BSR1","1BSR0","1BCR0","1B2lCR0","1BCRincl","1B2lCRincl","1B2lCRincl_loose","AllBCRincl"}; 
     //remember loose requires full babies
-    for(int iregion=10; iregion<11; iregion++)
+    for(int iregion=0; iregion<nregion; iregion++)
     {
         if(!OnlyDraw) 
         {
@@ -78,6 +81,7 @@ void DoAnalysis(bool OnlyDraw=false)
             MakeHists(ch_data,	    Region[iregion]); 
             MakeHists(ch_ttbar_sl,  Region[iregion]); 
             MakeHists(ch_ttbar_ll,  Region[iregion]); 
+	    MakeHists(ch_ttbar_sys, Region[iregion]);
             MakeHists(ch_wjets,     Region[iregion]); 
             MakeHists(ch_dy,	    Region[iregion]); 
             MakeHists(ch_t,         Region[iregion]); 
@@ -105,6 +109,8 @@ void DoAnalysis(bool OnlyDraw=false)
         Make1DPlots("mj",           Region[iregion]);
         Make1DPlots("MJ",           Region[iregion]);
         Make1DPlots("HT",           Region[iregion]);
+	Make1DPlots("toppT1",       Region[iregion]);
+	Make1DPlots("toppT2",       Region[iregion]);
         Make1DPlots("Nfatjet",      Region[iregion]);
         Make1DPlots("Nskinnyjet",   Region[iregion]);
         Make1DPlots("Ncsvm",        Region[iregion]);

@@ -128,10 +128,10 @@ void InitBaby(TChain *ch)
     ch->SetBranchAddress("GenId",           &GenId_,         &b_GenId);
     ch->SetBranchAddress("GenMId",          &GenMId_,        &b_GenMId);
     ch->SetBranchAddress("GenGMId",         &GenGMId_,       &b_GenGMId);
-    //ch->SetBranchAddress("top1pT",        &top1pT_, &b_top1pT);
-    //ch->SetBranchAddress("top1Phi",       &top1Phi_, &b_top1Phi);
-    //ch->SetBranchAddress("top2pT",        &top2pT_, &b_top2pT);
-    //ch->SetBranchAddress("top2Phi",       &top2Phi_, &b_top2Phi);
+    ch->SetBranchAddress("top1pT",        &top1pT_, &b_top1pT);
+    ch->SetBranchAddress("top1Phi",       &top1Phi_, &b_top1Phi);
+    ch->SetBranchAddress("top2pT",        &top2pT_, &b_top2pT);
+    ch->SetBranchAddress("top2Phi",       &top2Phi_, &b_top2Phi);
     //ch->SetBranchAddress("TrigMuon",      &TrigMuon_, &b_TrigMuon);
     //ch->SetBranchAddress("TrigSingleMuon", &TrigSingleMuon_, &b_TrigSingleMuon);
 }

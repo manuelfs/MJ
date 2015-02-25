@@ -19,7 +19,7 @@
 
 using namespace std;
 bool DoLog          = 1;
-bool doData         = 0;
+bool doData         = 1;
 bool SignalScale    = 1;
 
 //
@@ -87,7 +87,9 @@ void Make1DPlots(TString HistName, char* Region, int NMergeBins=1)
     if(HistName=="dRFJ")                	var=(char*)"min #Delta R(FJ,FJ)";                  
     if(HistName=="dPhiFJ")                	var=(char*)"min #Delta #phi(FJ,FJ)";                  
     if(HistName=="dEtaFJ")                	var=(char*)"min #Delta #eta(FJ,FJ)";                  
-    if(HistName=="HT")                  	var=(char*)"H_{T} [GeV]";                        
+    if(HistName=="HT")                  	var=(char*)"H_{T} [GeV]";    
+    if(HistName=="toppT1")                  	var=(char*)"top 1 p_{T} [GeV]"; 
+    if(HistName=="toppT2")                  	var=(char*)"top 2 p_{T} [GeV]"; 
     if(HistName=="MJ")                  	var=(char*)"M_{J} [GeV]";                        
     if(HistName=="mj")                  	var=(char*)"m_{j} [GeV]";                        
     if(HistName=="mT")                  	var=(char*)"m_{T} [GeV]";                        
@@ -104,7 +106,7 @@ void Make1DPlots(TString HistName, char* Region, int NMergeBins=1)
     if(HistName=="Ncsvm")          	        var=(char*)"N_{CSVM}";
     if(HistName=="WpT")                 	var=(char*)"p_{T}(W) [GeV]";
 
-    TH1F *h1_DATA[7], *h1_T[7], *h1_TT_sl[7], *h1_TT_ll[7], *h1_TT[7], *h1_WJets[7], *h1_DY[7], *h1_MC[7]; 
+    TH1F *h1_DATA[7], *h1_T[7], *h1_TT_sl[7], *h1_TT_ll[7], *h1_TT_sys[7], *h1_TT[7], *h1_WJets[7], *h1_DY[7], *h1_MC[7]; 
     TH1F *h1_f1500_100[7], *h1_f1200_800[7];
     THStack *st[7];
     //TCanvas *c = new TCanvas("c","c",1500,300);  
@@ -113,25 +115,34 @@ void Make1DPlots(TString HistName, char* Region, int NMergeBins=1)
     c->Divide(3,2);
     for(int i=2; i<7; i++) 
     {
-        h1_DATA[i]      = (TH1F*)HistFile->Get(Form("h1_DATA_%s_%ifatjet", HistName.Data(), i)); 
+      // h1_DATA[i]      = (TH1F*)HistFile->Get(Form("h1_DATA_%s_%ifatjet", HistName.Data(), i)); 
         h1_T[i]         = (TH1F*)HistFile->Get(Form("h1_T_%s_%ifatjet", HistName.Data(), i));
         h1_TT_sl[i]     = (TH1F*)HistFile->Get(Form("h1_TT_sl_%s_%ifatjet", HistName.Data(), i));
         h1_TT_ll[i]     = (TH1F*)HistFile->Get(Form("h1_TT_ll_%s_%ifatjet", HistName.Data(), i));
+	h1_TT_sys[i]     = (TH1F*)HistFile->Get(Form("h1_TT_sys_%s_%ifatjet", HistName.Data(), i));
         h1_WJets[i]     = (TH1F*)HistFile->Get(Form("h1_WJets_%s_%ifatjet", HistName.Data(), i));
         h1_DY[i]        = (TH1F*)HistFile->Get(Form("h1_DY_%s_%ifatjet", HistName.Data(), i)); 
         h1_f1500_100[i] = (TH1F*)HistFile->Get(Form("h1_T1tttt_f1500_100_%s_%ifatjet", HistName.Data(), i)); 
         h1_f1200_800[i] = (TH1F*)HistFile->Get(Form("h1_T1tttt_f1200_800_%s_%ifatjet", HistName.Data(), i)); 
 
         // merge bins
-        h1_DATA[i]->Rebin(NMergeBins);
+        //h1_DATA[i]->Rebin(NMergeBins);
         h1_T[i]->Rebin(NMergeBins);
         h1_TT_sl[i]->Rebin(NMergeBins);
         h1_TT_ll[i]->Rebin(NMergeBins);
+	h1_TT_sys[i]->Rebin(NMergeBins);
         h1_WJets[i]->Rebin(NMergeBins);
         h1_DY[i]->Rebin(NMergeBins);
         h1_f1500_100[i]->Rebin(NMergeBins);
         h1_f1200_800[i]->Rebin(NMergeBins);
         
+	//put sys-varied into data path
+	h1_DATA[i]=(TH1F*)h1_TT_sys[i]->Clone(Form("h1_sys_data_%s_%ifatjet", HistName.Data(), i));
+	h1_DATA[i]->Add(h1_WJets[i]);
+        h1_DATA[i]->Add(h1_T[i]);
+        h1_DATA[i]->Add(h1_DY[i]);
+	
+	
         h1_MC[i] = (TH1F*)h1_TT_sl[i]->Clone(Form("h1_MC_%s_%ifatjet", HistName.Data(), i));
         h1_MC[i]->Add(h1_TT_ll[i]);
         h1_MC[i]->Add(h1_WJets[i]);
@@ -146,6 +157,7 @@ void Make1DPlots(TString HistName, char* Region, int NMergeBins=1)
         h1cosmetic(h1_TT_sl[i],         Form("TT(l) %ifatjet", i),              kBlack, 1, kYellow,     var);
         //h1cosmetic(h1_TT_ll[i],         Form("TT(ll) %ifatjet", i),             kBlack, 1, kYellow-6,   var);
         h1cosmetic(h1_TT_ll[i],         Form("TT(ll) %ifatjet", i),             kBlack, 1, kOrange-3,   var);
+	h1cosmetic(h1_TT_sys[i],         Form("TT(sys) %ifatjet", i),             kBlack, 1, 0,   var);
         h1cosmetic(h1_T[i],             Form("t+tW %ifatjet", i),               kBlack, 1, kGreen+2,    var);
         h1cosmetic(h1_WJets[i],         Form("WJets %ifatjet", i),              kBlack, 1, kGray+1,     var);
         h1cosmetic(h1_DY[i],            Form("DYJets %ifatjet", i),             kBlack, 1, kAzure-9,    var);
@@ -251,7 +263,7 @@ void Make1DPlots(TString HistName, char* Region, int NMergeBins=1)
 
     // 
     if(HistName=="mj") HistName="JetMass";
-    c->Print( Form("Figures/CompareDataMC_%s_%s%s.pdf", HistName.Data(), Region, DoLog?"_log":"") ); 
+    c->Print( Form("Figures/sys_CompareDataMC_%s_%s%s.pdf", HistName.Data(), Region, DoLog?"_log":"") ); 
     
     // 
     HistFile->Close();
