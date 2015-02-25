@@ -193,9 +193,11 @@ void Make1DPlots(TString HistName, char* Region, int NMergeBins=1)
         //c->cd(i-1)->SetRightMargin(0.07);
         //c->cd(i-1)->SetBottomMargin(0.15);
         //c->cd(i-1)->SetTopMargin(0.1);
-        TString StackTitle = Form("%i fatjets", i);
+        TString StackTitle;
+	if( HistName != "toppT_incl"){ StackTitle = Form("%i fatjets", i);
         if(i==6) StackTitle = "All fatjets";
-        if(i==5) StackTitle = "5+ fatjets";
+        if(i==5) StackTitle = "5+ fatjets";}
+	else StackTitle = "";
         st[i] = new THStack( Form("Stack %ifatjet", i), StackTitle);
         st[i]->Add(h1_DY[i]);
         st[i]->Add(h1_WJets[i]);
@@ -236,7 +238,7 @@ void Make1DPlots(TString HistName, char* Region, int NMergeBins=1)
         l1->SetFillColor(kWhite);
         l1->SetLineColor(kWhite);
         l1->SetShadowColor(kWhite);
-        if(doData) l1->AddEntry(h1_DATA[i],        " Data",  "lp");
+        if(doData) l1->AddEntry(h1_DATA[i],        "Toy Data",  "lp");
 //        l1->AddEntry(h1_TT[i],          " TT",    "f");
 //        l1->AddEntry(h1_TT_sl[i],        " ",    "");
         l1->AddEntry(h1_TT_sl[i],        " TT(l)",    "f");
@@ -272,7 +274,9 @@ void Make1DPlots(TString HistName, char* Region, int NMergeBins=1)
         // FIXME : need to add lepton flavor
         TString LabelExt = Form("N_{fatjet} = %i", i);
         if(i==5) LabelExt="N_{fatjet} >= 5";
-        TLatex *TexExt = new TLatex(0.85,0.7,LabelExt);
+	TLatex *TexExt;
+	if(!doData) TexExt = new TLatex(0.85,0.7,LabelExt);
+	else TexExt = new TLatex(0.85,0.65,LabelExt);
         TexExt->SetTextAlign (31);
         TexExt->SetNDC();
         TexExt->SetTextSize(textSize);
@@ -280,7 +284,7 @@ void Make1DPlots(TString HistName, char* Region, int NMergeBins=1)
         
         TexEnergyLumi->Draw("SAME");
         TexCMS->Draw("SAME");
-        if(i!=6) TexExt->Draw("SAME");
+        if(i!=6 && HistName != "toppT_incl") TexExt->Draw("SAME");
     }
 
     // 

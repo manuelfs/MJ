@@ -498,17 +498,17 @@ void MakeHists(TChain *ch, char* Region)
 	   else t2pT=top2pT_;
            float weight_top1pT = TMath::Exp(0.159-0.00141*t1pT);
            float weight_top2pT = TMath::Exp(0.159-0.00141*t2pT);
-	    EventWeight_ = EventWeight_ / TMath::Sqrt(weight_top1pT*weight_top2pT);
+	    EventWeight_ = EventWeight_ * TMath::Sqrt(weight_top1pT*weight_top2pT);
 	    //  EventWeight_ = EventWeight_ / 1.01;
 	  
         }
 	N_post_toppT+=EventWeight_;
-
+	if(ChainName.Contains("TT")) {
 	FillTH1F(h1_toppT_incl, top1pT_, EventWeight_);
 	FillTH1F(h1_toppT_incl, top2pT_, EventWeight_);
 	FillTH1F(h1_toppT1_incl, top1pT_, EventWeight_);
 	FillTH1F(h1_toppT2_incl, top2pT_, EventWeight_);
-
+	}
         // Pileup 
 
         // 
