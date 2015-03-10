@@ -28,6 +28,13 @@ TH1F* InitTH1F(char* Name, char* Title, int Nbins, double XMin, double XMax)
     h1->Sumw2();
     return h1;
 }
+
+TH1F* InitTH1FVarBin(char* Name, char* Title, int Nbins, const Float_t* xbins)
+{
+    TH1F *h1 = new TH1F(Name, Title, Nbins, xbins);
+    h1->Sumw2();
+    return h1;
+}
 //
 //TH2F initialization
 //
@@ -196,6 +203,8 @@ void MakeHists(TChain *ch, char* Region)
     TH1F *h1_toppT[7];
     TH1F *h1_toppT1_incl, *h1_toppT2_incl;
     TH1F *h1_toppT_incl;
+    TH1F *h1_MJ_coarse[7];
+    
     h1_toppT1_incl = InitTH1F( Form("h1_%s_toppT1_incl", ch->GetTitle()), 
 			       Form("h1_%s_toppT1_incl", ch->GetTitle()), 
 			       //20, 350, 1350);
@@ -225,6 +234,12 @@ void MakeHists(TChain *ch, char* Region)
         h1_MJ[i] = InitTH1F( Form("h1_%s_MJ_%ifatjet", ch->GetTitle(), i), 
                              Form("h1_%s_MJ_%ifatjet", ch->GetTitle(), i), 
                              20, 0, 2000);
+
+	Float_t xbins[] = {0,100,200,300,400,500,2000};
+	int nbin = 6;
+	h1_MJ_coarse[i] = InitTH1FVarBin( Form("h1_%s_MJ_coarse_%ifatjet", ch->GetTitle(), i), 
+                             Form("h1_%s_MJ_%ifatjet", ch->GetTitle(), i), 
+                             nbin,xbins);
         h1_mj[i] = InitTH1F( Form("h1_%s_mj_%ifatjet", ch->GetTitle(), i), 
                              Form("h1_%s_mj_%ifatjet", ch->GetTitle(), i), 
                              40, 0, 800);
@@ -684,7 +699,8 @@ void MakeHists(TChain *ch, char* Region)
         FillTH1FAll(h1_mT,  NFJbin, mT, EventWeight_);                 
         FillTH1FAll(h1_WpT, NFJbin, WpT, EventWeight_);               
         FillTH1FAll(h1_HT, NFJbin, HT_, EventWeight_);   
-        FillTH1FAll(h1_MJ, NFJbin, MJ_thres, EventWeight_); 
+        FillTH1FAll(h1_MJ, NFJbin, MJ_thres, EventWeight_);
+	FillTH1FAll(h1_MJ_coarse, NFJbin, MJ_thres, EventWeight_); 
         FillTH1FAll(h1_MET, NFJbin, MET_, EventWeight_);              
         FillTH1FAll(h1_METPhi, NFJbin, METPhi_, EventWeight_);        
         FillTH1FAll(h1_METx, NFJbin, MET_*TMath::Cos(METPhi_), EventWeight_);           
@@ -785,6 +801,7 @@ void MakeHists(TChain *ch, char* Region)
     {
         h1_yields[i]->SetDirectory(0);                      h1_yields[i]->Write();
         h1_MJ[i]->SetDirectory(0);                          h1_MJ[i]->Write();
+	h1_MJ_coarse[i]->SetDirectory(0);                   h1_MJ_coarse[i]->Write();
         h1_HT[i]->SetDirectory(0);                          h1_HT[i]->Write();
 	h1_toppT[i]->SetDirectory(0);                       h1_toppT[i]->Write();
 	h1_toppT1[i]->SetDirectory(0);                      h1_toppT1[i]->Write();

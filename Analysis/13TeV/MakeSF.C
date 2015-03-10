@@ -20,14 +20,14 @@
 
 using namespace std;
 
-void MakeSF( char* Region)
+void MakeSF( char* Region, TString HistName)
 {
   int NMergeBins=1;
   TFile* HistFile = TFile::Open(Form("HistFiles/Hist_%s.root", Region));
    
  
 
-  TString HistName = "MJ";
+  //TString HistName = "MJ";
   TH1F *h1_DATA[7], *h1_T[7], *h1_TT_sl[7], *h1_TT_ll[7], *h1_TT_sys[7], *h1_TT[7], *h1_WJets[7], *h1_DY[7]; 
   TH1F *h1_f1500_100[7], *h1_f1200_800[7];
   
@@ -149,16 +149,19 @@ void MakeSF( char* Region)
     // 
   HistFile->Close();
   delete c; 
-  TString HistFileName = "MJ_SF";
-  HistFileName = Form("HistFiles/%s_%s.root", HistFileName.Data(), Region);
+  //TString HistFileName = Form("%s_SF",HistName.Data());
+  TString HistFileName = Form("HistFiles/%s_SF_%s.root", HistName.Data(), Region);
   TFile *HistFile2 = new TFile(HistFileName, "RECREATE");
   gROOT->cd();
   HistFile2->cd();
+  cout<<"got here"<<endl;
   // write histograms
   for(int j =2;j<7;j++){
-    //g1_SF[j]->SetDirectory(0);       
-              g1_SF[j]->Write();
+    //g1_SF[j]->SetDirectory(0);
+    cout<<j<<endl;
+    g1_SF[j]->Write();
   }
   HistFile2->Close();
+  cout<<"finished"<<endl;
 
 }

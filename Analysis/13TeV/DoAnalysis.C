@@ -26,8 +26,8 @@ void DoAnalysis(bool OnlyDraw=false)
   TChain *ch_f1500_100    = new TChain("tree", "T1tttt_f1500_100");
   TChain *ch_f1200_800    = new TChain("tree", "T1tttt_f1200_800");
   
-  TString BabyDir = "/Users/heller/Jae/ntuples/HT750MET250/";
-  //"/net/cms26/cms26r0/jaehyeok/baby/Fatjet/13TeV/Phys14/HT750MET250/";
+  TString BabyDir = //"/Users/heller/Jae/ntuples/HT750MET250/";
+  "/net/cms26/cms26r0/jaehyeok/baby/Fatjet/13TeV/Phys14/HT750MET250/";
   //"/Users/jaehyeok/Research/Tools/fastjet-3.0.6/example/babies/13TeV/HT750MET250/";
     
   // Data
@@ -100,7 +100,8 @@ void DoAnalysis(bool OnlyDraw=false)
       // ----------------------------------------
       //  Draw histograms 
       // ---------------------------------------- 
-      MakeSF(Region[iregion]);
+      MakeSF(Region[iregion],"MJ");
+      MakeSF(Region[iregion],"MJ_coarse");
       for(int bo=0; bo<2;bo++){
 	if(!OnlyDraw){ Make1DPlots("muspT",        Region[iregion],bo);
 	  Make1DPlots("musPhi",       Region[iregion],bo);
@@ -111,8 +112,9 @@ void DoAnalysis(bool OnlyDraw=false)
 	  Make1DPlots("mT",           Region[iregion],bo);
 	  Make1DPlots("mj",           Region[iregion],bo);}
         Make1DPlots("MJ",           Region[iregion],bo);
+      	Make1DPlots("MJ_coarse",           Region[iregion],bo);
        	Make1DPlots("MJ_corr1",           Region[iregion],bo);
-	Make1DPlots("MJ_corr2",           Region[iregion],bo);
+       	Make1DPlots("MJ_corr2",           Region[iregion],bo);
         Make1DPlots("HT",           Region[iregion],bo);
 	Make1DPlots("toppT",       Region[iregion],bo);
 	Make1DPlots("toppT_incl",       Region[iregion],bo);

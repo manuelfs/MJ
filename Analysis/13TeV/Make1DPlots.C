@@ -95,9 +95,12 @@ void Make1DPlots(TString HistName, char* Region,  bool DoLog=1,int NMergeBins=1)
     if(HistName=="toppT2")                  	var=(char*)"top 2 p_{T} [GeV]"; 
     if(HistName=="toppT")                  	var=(char*)"top p_{T} [GeV]"; 
     if(HistName=="toppT_incl")                	var=(char*)"top p_{T} [GeV]"; 
-    if(HistName=="MJ")                  	var=(char*)"M_{J} [GeV]";  
+    if(HistName=="MJ")                  	var=(char*)"M_{J} [GeV]";
+    if(HistName=="MJ_coarse")                  	var=(char*)"M_{J} [GeV]";
     if(HistName=="MJ_corr1")                  	var=(char*)"M_{J} [GeV]";  
-    if(HistName=="MJ_corr2")                  	var=(char*)"M_{J} [GeV]";  
+    if(HistName=="MJ_corr2")                  	var=(char*)"M_{J} [GeV]";
+    if(HistName=="MJ_corr1_coarse")            	var=(char*)"M_{J} [GeV]";  
+    if(HistName=="MJ_corr2_coarse")            	var=(char*)"M_{J} [GeV]";  
     if(HistName=="mj")                  	var=(char*)"m_{j} [GeV]";                        
     if(HistName=="mT")                  	var=(char*)"m_{T} [GeV]";                        
     if(HistName=="muspT")               	var=(char*)"p_{T}(muon) [GeV]";                  
@@ -127,11 +130,14 @@ void Make1DPlots(TString HistName, char* Region,  bool DoLog=1,int NMergeBins=1)
       corr2=true;
       HistName="MJ";
     }
+    if(HistName.Contains("corr") && HistName.Contains("coarse")){
+	HistName+="_coarse";
+    }
     TGraphErrors *MJ_SF[7];
     if(corr1||corr2){
       TFile* SFFile;
-      if(corr1) SFFile = TFile::Open(Form("HistFiles/MJ_SF_%s.root", c_region[0].Data()));
-      else SFFile = TFile::Open(Form("HistFiles/MJ_SF_%s.root", c_region[1].Data()));  
+      if(corr1) SFFile = TFile::Open(Form("HistFiles/%s_SF_%s.root",HistName.Data() ,c_region[0].Data()));
+      else SFFile = TFile::Open(Form("HistFiles/%s_SF_%s.root",HistName.Data() ,c_region[1].Data()));  
       for(int j=2;j<7;j++){
 	MJ_SF[j] = (TGraphErrors*)SFFile->Get(Form("SF_%i",j));
       }
@@ -338,6 +344,7 @@ void Make1DPlots(TString HistName, char* Region,  bool DoLog=1,int NMergeBins=1)
     
     // 
     HistFile->Close();
-    delete c; 
+    delete c;
+    cout<<"finished 1D"<<endl;
 
 }
