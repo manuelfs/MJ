@@ -77,21 +77,21 @@ void MakeSF( char* Region, TString HistName)
         h1_DATA[i]->Add(h1_T[i],-1);
         h1_DATA[i]->Add(h1_DY[i],-1);
 	
-	Int_t nbins = h1_DATA[i]->GetXaxis()->GetNbins();
-	
+	Int_t nbins = h1_DATA[i]->GetXaxis()->GetNbins()+1;
+	cout<<"nbins = "<<nbins<<endl;
 	Double_t x[nbins];
 	Double_t y[nbins];
 	Double_t ex[nbins];
 	Double_t ey[nbins];
 	
-	for(int b=0;b<nbins;b++){
+	for(int b=0;b<(nbins+1);b++){
 	  x[b] = h1_DATA[i]->GetBinCenter(b);
 	  ex[b] = 0.5* h1_DATA[i]->GetBinWidth(b);
 	  y[b] = -1; ey[b]=0;
 	  
 	  if(h1_TT[i]->GetBinContent(b)>1 && h1_DATA[i]->GetBinContent(b)>1){ y[b] = h1_DATA[i]->GetBinContent(b)/h1_TT[i]->GetBinContent(b);
 	    ey[b] = y[b]*pow(pow(h1_TT[i]->GetBinError(b)/h1_TT[i]->GetBinContent(b),2)+pow(h1_DATA[i]->GetBinError(b)/h1_DATA[i]->GetBinContent(b),2),0.5);
-
+	    if(b==(nbins-1) || b ==7) cout<<"SF NFJ = "<<i<<" x ex y ey  "<<x[b]<<" "<<ex[b]<<" "<<y[b]<<" "<<ey[b]<<endl; 
 	  }
 	  
 	}
@@ -102,7 +102,7 @@ void MakeSF( char* Region, TString HistName)
 	g1_SF[i]->SetLineColor(kBlue);
 	g1_SF[i]->SetMinimum(0);
 	g1_SF[i]->SetMaximum(1.5);
-       	g1_SF[i]->GetXaxis()->SetRangeUser(0,1200);
+       	g1_SF[i]->GetXaxis()->SetRangeUser(0,2000);
 	TString StackTitle = Form("%i fatjets", i);
         if(i==6) StackTitle = "All fatjets";
         if(i==5) StackTitle = "5+ fatjets";

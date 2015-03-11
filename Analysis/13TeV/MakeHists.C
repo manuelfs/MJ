@@ -235,8 +235,8 @@ void MakeHists(TChain *ch, char* Region)
                              Form("h1_%s_MJ_%ifatjet", ch->GetTitle(), i), 
                              20, 0, 2000);
 
-	Float_t xbins[] = {0,100,200,300,400,500,2000};
-	int nbin = 6;
+	Float_t xbins[] = {0,100,200,300,400,500,600,2000};
+	int nbin = 7;
 	h1_MJ_coarse[i] = InitTH1FVarBin( Form("h1_%s_MJ_coarse_%ifatjet", ch->GetTitle(), i), 
                              Form("h1_%s_MJ_%ifatjet", ch->GetTitle(), i), 
                              nbin,xbins);

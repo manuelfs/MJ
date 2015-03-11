@@ -202,7 +202,7 @@ void Make1DPlots(TString HistName, char* Region,  bool DoLog=1,int NMergeBins=1)
 	  for(int p=0;p<nSF;p++){
 	    Double_t xx=-1; Double_t yy = -1;
 	    MJ_SF[i]->GetPoint(p,xx,yy);
-	    cout<<"p  x  y:   "<<p<<" "<<xx<<" "<<yy<<" "<<endl;
+	    // cout<<"p  x  y:   "<<p<<" "<<xx<<" "<<yy<<" "<<endl;
 	    if(yy>0.4 && xx>0.4){
 	      // cout<<"Found bin  ,  content     new content  "<<h1_TT_sl[i]->FindBin(xx)<<"  "<<h1_TT_sl[i]->GetBinContent(xx)<<"  "<<yy*1_TT_sl[i]->GetBinContent(xx)<<endl;
 	      h1_TT_sl[i]->SetBinContent( h1_TT_sl[i]->FindBin(xx),yy*(float)h1_TT_sl[i]->GetBinContent(h1_TT_sl[i]->FindBin(xx)));
