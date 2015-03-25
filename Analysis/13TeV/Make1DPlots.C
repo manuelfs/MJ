@@ -121,7 +121,11 @@ void Make1DPlots(TString HistName, char* Region,  bool DoLog=1,int NMergeBins=1)
     THStack *st[7];
     bool corr1=false;
     bool corr2=false;
+    bool coarse = false;
     TString c_region[2] = {"1BCRincl","1B4SJCRincl"};
+    if(HistName.Contains("coarse")){
+      coarse=true;
+      }
     if(HistName.Contains("corr1")){
       corr1=true;
       HistName="MJ";
@@ -130,9 +134,10 @@ void Make1DPlots(TString HistName, char* Region,  bool DoLog=1,int NMergeBins=1)
       corr2=true;
       HistName="MJ";
     }
-    if(HistName.Contains("corr") && HistName.Contains("coarse")){
+    if((corr1 || corr2) && coarse){
 	HistName+="_coarse";
     }
+    
     TGraphErrors *MJ_SF[7];
     if(corr1||corr2){
       TFile* SFFile;

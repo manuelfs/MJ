@@ -27,7 +27,8 @@ void DoAnalysis(bool OnlyDraw=false)
   TChain *ch_f1200_800    = new TChain("tree", "T1tttt_f1200_800");
   
   TString BabyDir = //"/Users/heller/Jae/ntuples/HT750MET250/";
-  "/net/cms26/cms26r0/jaehyeok/baby/Fatjet/13TeV/Phys14/HT750MET250/";
+    "/net/cms26/cms26r0/jaehyeok/baby/Fatjet/13TeV/Phys14NoSkim/";
+    // "/net/cms26/cms26r0/jaehyeok/baby/Fatjet/13TeV/Phys14/HT750MET250/";
   //"/Users/jaehyeok/Research/Tools/fastjet-3.0.6/example/babies/13TeV/HT750MET250/";
     
   // Data
@@ -68,8 +69,8 @@ void DoAnalysis(bool OnlyDraw=false)
   // Loop over SR and CR : make sure that these regions exist in "PassSelection.h"
   //
     
-  char* Region[] = {"1BCRincl","1B4SJCRincl","SRincl"};
-  int nregion = 3;
+  char* Region[] = {/*"1BCRincl",*/"1B4SJCRincl"/*,"SRincl"*/};
+  int nregion =1;
   // char* Region[] = {"SR0", "SR1","SRincl","1BSR1","1BSR0","1BCR0","1B2lCR0","1BCRincl","1B2lCRincl","1B2lCRincl_loose","AllBCRincl"}; 
   //remember loose requires full babies
   for(int iregion=0; iregion<nregion; iregion++)
