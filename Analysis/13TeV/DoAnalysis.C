@@ -102,7 +102,7 @@ void DoAnalysis(bool OnlyDraw=false)
 	  // ----------------------------------------
 	  cout << "[MJ Analysis] Merging result files" << endl;
 	  gSystem->Exec(Form("rm Out/v%i/HistFiles/Hist_%s_v%i.root",version, Region[iregion],version));
-	  gSystem->Exec(Form("hadd -f Out/v%i/HistFiles/Hist_%s_v%i.root HistFiles/v%i/*_%s_v%i.root",version, Region[iregion],version, version, Region[iregion],version));
+	  gSystem->Exec(Form("hadd -f Out/v%i/HistFiles/Hist_%s_v%i.root Out/v%i/HistFiles/*_%s_v%i.root",version, Region[iregion],version, version, Region[iregion],version));
         }
 
       // ----------------------------------------
