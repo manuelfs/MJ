@@ -172,7 +172,7 @@ float getDR(float eta1, float eta2, float phi1, float phi2)
 //
 // per process
 //
-void MakeHists(TChain *ch, char* Region) 
+void MakeHists(int version, TChain *ch, char* Region) 
 { 
 
     InitBaby(ch); 
@@ -489,7 +489,7 @@ void MakeHists(TChain *ch, char* Region)
         }
         if(ChainName.Contains("TT_sl") && Ngenlep!=1) continue;  
         if(ChainName.Contains("TT_ll") && Ngenlep!=2) continue;  
-
+	if(ChainName.Contains("TT_sys") && !(Ngenlep==2 || Ngenlep==1)) continue;  
         // 
         // weights 
         // 
@@ -514,9 +514,10 @@ void MakeHists(TChain *ch, char* Region)
            float weight_top1pT = TMath::Exp(0.159-0.00141*t1pT);
            float weight_top2pT = TMath::Exp(0.159-0.00141*t2pT);
 	    EventWeight_ = EventWeight_ * TMath::Sqrt(weight_top1pT*weight_top2pT);
-	    //  EventWeight_ = EventWeight_ / 1.01;
+	    EventWeight_ = EventWeight_ * 0.959;
 	  
         }
+	
 	N_post_toppT+=EventWeight_;
 	if(ChainName.Contains("TT")) {
 	FillTH1F(h1_toppT_incl, top1pT_, EventWeight_);
@@ -788,7 +789,7 @@ void MakeHists(TChain *ch, char* Region)
     cout<<"TOP PT REWEIGHT pre: "<<N_pre_toppT<<"   post: "<<N_post_toppT<<"    Ratio: "<<ptscale<<endl;
 
     TString HistFileName = ch->GetTitle();
-    HistFileName = Form("HistFiles/%s_%s.root", HistFileName.Data(), Region);
+    HistFileName = Form("Out/v%i/HistFiles/%s_%s_v%i.root", version,HistFileName.Data(), Region,version);
     cout << "[MJ Analysis] Writing " << HistFileName << endl;
     TFile *HistFile = new TFile(HistFileName, "RECREATE");
     gROOT->cd();

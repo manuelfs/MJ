@@ -53,7 +53,7 @@ void h2cosmetic(TH2F* &h2, char* title, TString Xvar="", TString Yvar="", TStrin
 //
 // Stacks
 //
-void Make1DPlots(TString HistName, char* Region,  bool DoLog=1,int NMergeBins=1) 
+void Make1DPlots(int version, TString HistName, char* Region,  bool DoLog=1,int NMergeBins=1) 
 { 
   //gInterpreter->ExecuteMacro("~/macros/JaeStyle.C");
 
@@ -119,37 +119,49 @@ void Make1DPlots(TString HistName, char* Region,  bool DoLog=1,int NMergeBins=1)
     TH1F *h1_DATA[7], *h1_T[7], *h1_TT_sl[7], *h1_TT_ll[7], *h1_TT_sys[7], *h1_TT[7], *h1_WJets[7], *h1_DY[7], *h1_MC[7]; 
     TH1F *h1_f1500_100[7], *h1_f1200_800[7];
     THStack *st[7];
-    bool corr1=false;
-    bool corr2=false;
+    // bool corr1=false;
+    // bool corr2=false;
+    bool corr=false;
     bool coarse = false;
     TString c_region[2] = {"1BCRincl","1B4SJCRincl"};
+    char* Regions[] = {"1BCRincl","1B4SJCRincl","SRincl"};
+    int nregion = 3;
+    TString corr_region = "";
     if(HistName.Contains("coarse")){
       coarse=true;
       }
-    if(HistName.Contains("corr1")){
+
+    for(int i=0;i<nregion;i++){
+      if(HistName.Contains(Form("corr%i",i)))
+	{ corr=true;
+	  corr_region = Regions[i];
+	  HistName = "MJ";
+	}
+    }
+    /* if(HistName.Contains("corr1")){
       corr1=true;
       HistName="MJ";
     }
     if(HistName.Contains("corr2")){
       corr2=true;
       HistName="MJ";
-    }
-    if((corr1 || corr2) && coarse){
+      }*/
+    if(corr && coarse){
 	HistName+="_coarse";
     }
     
     TGraphErrors *MJ_SF[7];
-    if(corr1||corr2){
+    if(corr){
       TFile* SFFile;
-      if(corr1) SFFile = TFile::Open(Form("HistFiles/%s_SF_%s.root",HistName.Data() ,c_region[0].Data()));
-      else SFFile = TFile::Open(Form("HistFiles/%s_SF_%s.root",HistName.Data() ,c_region[1].Data()));  
+      SFFile = TFile::Open(Form("Out/v%i/HistFiles/%s_SF_%s_v%i.root",version,HistName.Data() ,corr_region.Data(),version));
+      // else SFFile = TFile::Open(Form("HistFiles/v%i/%s_SF_%s_v%i.root",version,HistName.Data() ,c_region[1].Data(),version));  
       for(int j=2;j<7;j++){
 	MJ_SF[j] = (TGraphErrors*)SFFile->Get(Form("SF_%i",j));
       }
       SFFile->Close();
     }
 
-    TFile* HistFile = TFile::Open(Form("HistFiles/Hist_%s.root", Region));
+    TFile* HistFile = TFile::Open(Form("Out/v%i/HistFiles/Hist_%s_v%i.root",version,Region,version));
     //TCanvas *c = new TCanvas("c","c",1500,300);  
     //c->Divide(5,1);
     TCanvas *c = new TCanvas("c","c",1200,800);  
@@ -202,7 +214,7 @@ void Make1DPlots(TString HistName, char* Region,  bool DoLog=1,int NMergeBins=1)
 	  h1_DATA[i]->SetBinError(b,pow(h1_DATA[i]->GetBinContent(b),0.5));
 
 	}
-	if(corr1||corr2){
+	if(corr){
 	  Int_t nSF = MJ_SF[i]->GetN();
 	  for(int p=0;p<nSF;p++){
 	    Double_t xx=-1; Double_t yy = -1;
@@ -343,9 +355,10 @@ void Make1DPlots(TString HistName, char* Region,  bool DoLog=1,int NMergeBins=1)
 
     // 
     if(HistName=="mj") HistName="JetMass";
-    if(corr1) c->Print( Form("Figures/corr_%s_sys_CompareDataMC_%s_%s%s.pdf", c_region[0].Data(),HistName.Data(), Region, DoLog?"_log":"") );
-    else if(corr2)c->Print( Form("Figures/corr_%s_sys_CompareDataMC_%s_%s%s.pdf", c_region[1].Data(),HistName.Data(), Region, DoLog?"_log":"") );
-    else c->Print( Form("Figures/sys_CompareDataMC_%s_%s%s.pdf", HistName.Data(), Region, DoLog?"_log":"") ); 
+    //if(corr) c->Print( Form("Figures/v%i/corr_%s_sys_CompareDataMC_%s_%s%s_v%i.pdf",version,corr_region.Data(),HistName.Data(), Region, DoLog?"_log":"",version) );
+    if(corr) c->Print( Form("Out/v%i/Figures/%s_in_%s_corrected_by_%s%s_v%i.pdf",version,HistName.Data(),Region, corr_region.Data(), DoLog?"_log":"",version) );
+    //else if(corr2)c->Print( Form("Figures/v%i/corr_%s_sys_CompareDataMC_%s_%s%s_v%i.pdf",version, c_region[1].Data(),HistName.Data(), Region, DoLog?"_log":"",version) );
+    else c->Print( Form("Out/v%i/Figures/%s_in_%s%s_v%i.pdf",version, HistName.Data(), Region, DoLog?"_log":"",version) ); 
     
     // 
     HistFile->Close();

@@ -20,10 +20,10 @@
 
 using namespace std;
 
-void MakeSF( char* Region, TString HistName)
+void MakeSF( int version, char* Region, TString HistName)
 {
   int NMergeBins=1;
-  TFile* HistFile = TFile::Open(Form("HistFiles/Hist_%s.root", Region));
+  TFile* HistFile = TFile::Open(Form("Out/v%i/HistFiles/Hist_%s_v%i.root",version, Region, version));
    
  
 
@@ -144,21 +144,21 @@ void MakeSF( char* Region, TString HistName)
         TexCMS->Draw("SAME");
 	if(i!=6)TexExt->Draw("SAME");
   }
-  c->Print( Form("Figures/toy_SF_%s_%s.pdf", HistName.Data(), Region) ); 
+  c->Print( Form("Out/v%i/Figures/toy_SF_%s_%s_v%i.pdf",version, HistName.Data(), Region, version) ); 
     
     // 
   HistFile->Close();
   delete c; 
   //TString HistFileName = Form("%s_SF",HistName.Data());
-  TString HistFileName = Form("HistFiles/%s_SF_%s.root", HistName.Data(), Region);
+  TString HistFileName = Form("Out/v%i/HistFiles/%s_SF_%s_v%i.root",version, HistName.Data(), Region, version);
   TFile *HistFile2 = new TFile(HistFileName, "RECREATE");
   gROOT->cd();
   HistFile2->cd();
-  cout<<"got here"<<endl;
+  //cout<<"got here"<<endl;
   // write histograms
   for(int j =2;j<7;j++){
     //g1_SF[j]->SetDirectory(0);
-    cout<<j<<endl;
+    //cout<<j<<endl;
     g1_SF[j]->Write();
   }
   HistFile2->Close();
