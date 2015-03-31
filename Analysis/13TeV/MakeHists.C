@@ -201,8 +201,11 @@ void MakeHists(int version, TChain *ch, char* Region)
     TH2F *h2_HTMJ[7], *h2_METmT[7];
     TH1F *h1_toppT1[7], *h1_toppT2[7];
     TH1F *h1_toppT[7];
+    TH2F *h2_toppT[7];
     TH1F *h1_toppT1_incl, *h1_toppT2_incl;
     TH1F *h1_toppT_incl;
+    TH2F *h2_toppT_incl;
+
     TH1F *h1_MJ_coarse[7];
     
     h1_toppT1_incl = InitTH1F( Form("h1_%s_toppT1_incl", ch->GetTitle()), 

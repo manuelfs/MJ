@@ -151,12 +151,14 @@ void Make1DPlots(int version, TString HistName, char* Region,  bool DoLog=1,int 
     }
     
     TGraphErrors *MJ_SF[7];
+    TGraphErrors *MJ_SF_non_pois[7];
     if(corr){
       TFile* SFFile;
       SFFile = TFile::Open(Form("Out/v%i/HistFiles/%s_SF_%s_v%i.root",version,HistName.Data() ,corr_region.Data(),version));
       // else SFFile = TFile::Open(Form("HistFiles/v%i/%s_SF_%s_v%i.root",version,HistName.Data() ,c_region[1].Data(),version));  
       for(int j=2;j<7;j++){
 	MJ_SF[j] = (TGraphErrors*)SFFile->Get(Form("SF_%i",j));
+	MJ_SF_non_pois[j] = (TGraphErrors*)SFFile->Get(Form("SF_non_pois_%i",j));
       }
       SFFile->Close();
     }
@@ -217,13 +219,16 @@ void Make1DPlots(int version, TString HistName, char* Region,  bool DoLog=1,int 
 	if(corr){
 	  Int_t nSF = MJ_SF[i]->GetN();
 	  for(int p=0;p<nSF;p++){
-	    Double_t xx=-1; Double_t yy = -1;
+	    Double_t xx=-1; Double_t yy = -1; //Double_t ey=0;
 	    MJ_SF[i]->GetPoint(p,xx,yy);
 	    // cout<<"p  x  y:   "<<p<<" "<<xx<<" "<<yy<<" "<<endl;
 	    if(yy>0.4 && xx>0.4){
 	      // cout<<"Found bin  ,  content     new content  "<<h1_TT_sl[i]->FindBin(xx)<<"  "<<h1_TT_sl[i]->GetBinContent(xx)<<"  "<<yy*1_TT_sl[i]->GetBinContent(xx)<<endl;
-	      h1_TT_sl[i]->SetBinContent( h1_TT_sl[i]->FindBin(xx),yy*(float)h1_TT_sl[i]->GetBinContent(h1_TT_sl[i]->FindBin(xx)));
-	      h1_TT_ll[i]->SetBinContent( h1_TT_ll[i]->FindBin(xx),yy*(float)h1_TT_ll[i]->GetBinContent(h1_TT_ll[i]->FindBin(xx)));
+	      int binx = h1_TT_sl[i]->FindBin(xx);
+	      h1_TT_sl[i]->SetBinContent( binx,yy*(float)h1_TT_sl[i]->GetBinContent(binx));
+	      //   h1_TT_sl[i]->SetBinError( binx, pow(pow(ey/yy,2)+pow(h1_TT_sl[i]->GetBinError(binx)/h1_TT_sl[i]->GetBinContent(binx),2),0.5));
+	      h1_TT_ll[i]->SetBinContent( binx,yy*(float)h1_TT_ll[i]->GetBinContent(binx));
+	      //h1_TT_ll[i]->SetBinError( binx, pow(pow(ey/yy,2)+pow(h1_TT_ll[i]->GetBinError(binx)/h1_TT_ll[i]->GetBinContent(binx),2),0.5));
 	    }
 	  }
 

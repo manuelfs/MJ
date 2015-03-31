@@ -32,7 +32,7 @@ void MakeSF( int version, char* Region, TString HistName)
   TH1F *h1_f1500_100[7], *h1_f1200_800[7];
   
   
-  TGraphErrors *g1_SF[7];
+  TGraphErrors *g1_SF[7],*g2_SF[7];
   TCanvas *c = new TCanvas("c","c",1200,800); 
   c->Divide(3,2);
   for(int i=2; i<7; i++) {
@@ -60,11 +60,13 @@ void MakeSF( int version, char* Region, TString HistName)
 	h1_TT[i] = (TH1F*)h1_TT_ll[i]->Clone();
         h1_TT[i]->Add(h1_TT_sl[i]);
 	
+
 	//put sys-varied into data path
 	h1_DATA[i]=(TH1F*)h1_TT_sys[i]->Clone(Form("h1_sys_data_%s_%ifatjet", HistName.Data(), i));
 	h1_DATA[i]->Add(h1_WJets[i]);
         h1_DATA[i]->Add(h1_T[i]);
         h1_DATA[i]->Add(h1_DY[i]);
+
 	
 	//restore poisson errors on data
 	for(int b=0;b<((int)h1_DATA[i]->GetXaxis()->GetNbins()+1);b++){
@@ -95,6 +97,29 @@ void MakeSF( int version, char* Region, TString HistName)
 	  }
 	  
 	}
+
+	Int_t nbins1 = h1_TT_sys[i]->GetXaxis()->GetNbins()+1;
+	cout<<"nbins = "<<nbins<<endl;
+	Double_t x1[nbins1];
+	Double_t y1[nbins1];
+	Double_t ex1[nbins1];
+	Double_t ey1[nbins1];
+	for(int b=0;b<(nbins1+1);b++){
+	  x1[b] = h1_TT_sys[i]->GetBinCenter(b);
+	  ex1[b] = 0.5* h1_TT_sys[i]->GetBinWidth(b);
+	  y1[b] = -1; ey1[b]=0;
+	  
+	  if(h1_TT[i]->GetBinContent(b)>1 && h1_TT_sys[i]->GetBinContent(b)>1){ y1[b] = h1_TT_sys[i]->GetBinContent(b)/h1_TT[i]->GetBinContent(b);
+	    //  ey1[b] = y1[b]*pow(pow(h1_TT[i]->GetBinError(b)/h1_TT[i]->GetBinContent(b),2)+pow(h1_TT_sys[i]->GetBinError(b)/h1_TT_sys[i]->GetBinContent(b),2),0.5);
+	     ey1[b] = y1[b]*h1_TT_sys[i]->GetBinError(b)/h1_TT_sys[i]->GetBinContent(b);
+
+	     /*if(b==(nbins-1) || b ==7) */ cout<<"SF NFJ from sys = "<<i<<" x ex y ey  "<<x1[b]<<" "<<ex1[b]<<" "<<y1[b]<<" "<<ey1[b]<<endl; 
+	     ey1[b] = y1[b]*h1_TT[i]->GetBinError(b)/h1_TT[i]->GetBinContent(b);
+	     cout<<"SF NFJ plain= "<<i<<" x ex y ey  "<<x1[b]<<" "<<ex1[b]<<" "<<y1[b]<<" "<<ey1[b]<<endl; 
+	  }
+	  
+	}
+
 	
 	g1_SF[i] = new TGraphErrors(nbins,x,y,ex,ey);
 	g1_SF[i]->SetMarkerStyle(20);
@@ -111,7 +136,21 @@ void MakeSF( int version, char* Region, TString HistName)
 	g1_SF[i]->GetXaxis()->SetTitle("MJ [GeV]");
 	g1_SF[i]->GetYaxis()->SetTitle("Top pT SF");
 	g1_SF[i]->Draw("APZ");
+	
+	g2_SF[i] = new TGraphErrors(nbins,x1,y1,ex1,ey1);
 
+	g2_SF[i]->SetLineColor(kBlue);
+	g2_SF[i]->SetMinimum(0);
+	g2_SF[i]->SetMaximum(1.5);
+	//	g2_SF[i]->SetLineWidth(1504);
+	g2_SF[i]->SetFillStyle(3002);
+	g2_SF[i]->SetFillColor(kBlack);
+       	g2_SF[i]->GetXaxis()->SetRangeUser(0,2000);
+	g2_SF[i]->SetTitle(StackTitle);
+	g2_SF[i]->SetName(Form("SF_non_pois_%i",i));
+	g2_SF[i]->GetXaxis()->SetTitle("MJ [GeV]");
+	g2_SF[i]->GetYaxis()->SetTitle("Top pT SF");
+	g2_SF[i]->Draw("2Z same");
 
 
 	
@@ -160,6 +199,7 @@ void MakeSF( int version, char* Region, TString HistName)
     //g1_SF[j]->SetDirectory(0);
     //cout<<j<<endl;
     g1_SF[j]->Write();
+    g2_SF[j]->Write();
   }
   HistFile2->Close();
   cout<<"finished"<<endl;

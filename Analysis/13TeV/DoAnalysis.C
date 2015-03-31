@@ -13,10 +13,12 @@ void DoAnalysis(bool OnlyDraw=false)
   gROOT->LoadMacro("MakeSF.C+");
   gROOT->LoadMacro("Make2DPlots.C+");
   gROOT->LoadMacro("MakeTables.C+");
-  gSystem->Exec(Form("mkdir -p Out/v%i/Figures/",version));
-  gSystem->Exec(Form("mkdir -p Out/v%i/HistFiles/",version));
-  gSystem->Exec(Form("mkdir -p Out/v%i/Tables/",version));
-
+  TString sysnames[3] = {"toppT","ISRpT","ISRpartons"};
+  for(int i=0;i<3;i++){
+  gSystem->Exec(Form("mkdir -p Out/v%i/toppT/Figures/",version));
+  gSystem->Exec(Form("mkdir -p Out/v%i/toppT/HistFiles/",version));
+  gSystem->Exec(Form("mkdir -p Out/v%i/toppT/Tables/",version));
+  }
   // ----------------------------------------
   //  Define chains  
   // ----------------------------------------
@@ -30,9 +32,9 @@ void DoAnalysis(bool OnlyDraw=false)
   TChain *ch_f1500_100    = new TChain("tree", "T1tttt_f1500_100");
   TChain *ch_f1200_800    = new TChain("tree", "T1tttt_f1200_800");
   
-  TString BabyDir = //"/Users/heller/Jae/ntuples/HT750MET250/";
+  TString BabyDir = "/Users/heller/Jae/ntuples/HT750MET250/";
     //"/net/cms26/cms26r0/jaehyeok/baby/Fatjet/13TeV/Phys14NoSkim/";
-     "/net/cms26/cms26r0/jaehyeok/baby/Fatjet/13TeV/Phys14/HT750MET250/";
+    //"/net/cms26/cms26r0/jaehyeok/baby/Fatjet/13TeV/Phys14/HT750MET250/";
   //"/Users/jaehyeok/Research/Tools/fastjet-3.0.6/example/babies/13TeV/HT750MET250/";
     
   // Data
@@ -101,8 +103,8 @@ void DoAnalysis(bool OnlyDraw=false)
 	  //  Make the final histogram file
 	  // ----------------------------------------
 	  cout << "[MJ Analysis] Merging result files" << endl;
-	  gSystem->Exec(Form("rm Out/v%i/HistFiles/Hist_%s_v%i.root",version, Region[iregion],version));
-	  gSystem->Exec(Form("hadd -f Out/v%i/HistFiles/Hist_%s_v%i.root Out/v%i/HistFiles/*_%s_v%i.root",version, Region[iregion],version, version, Region[iregion],version));
+	  gSystem->Exec(Form("rm Out/v%i/toppT/HistFiles/Hist_%s_v%i.root",version, Region[iregion],version));
+	  gSystem->Exec(Form("hadd -f Out/v%i/toppT/HistFiles/Hist_%s_v%i.root Out/v%i/toppT/HistFiles/*_%s_v%i.root",version, Region[iregion],version, version, Region[iregion],version));
         }
 
       // ----------------------------------------
@@ -167,11 +169,11 @@ void DoAnalysis(bool OnlyDraw=false)
       MakeTables(version, 13,  Region[iregion], false);
         
     } //for(int iregion=0; iregion<2; iregion++)
- gSystem->Exec(Form("cp DoAnalysis.C Out/v%i/",version));
- gSystem->Exec(Form("cp MakeHists.C Out/v%i/",version));
- gSystem->Exec(Form("cp Make1DPlots.C Out/v%i/",version));
- gSystem->Exec(Form("cp Make2DPlots.C Out/v%i/",version));
- gSystem->Exec(Form("cp MakeSF.C Out/v%i/",version));
- gSystem->Exec(Form("cp MakeTables.C Out/v%i/",version));
- gSystem->Exec(Form("cp PassSelection.h Out/v%i/",version));
+ gSystem->Exec(Form("cp DoAnalysis.C Out/v%i/toppT/",version));
+ gSystem->Exec(Form("cp MakeHists.C Out/v%i/toppT/",version));
+ gSystem->Exec(Form("cp Make1DPlots.C Out/v%i/toppT/",version));
+ gSystem->Exec(Form("cp Make2DPlots.C Out/v%i/toppT/",version));
+ gSystem->Exec(Form("cp MakeSF.C Out/v%i/toppT/",version));
+ gSystem->Exec(Form("cp MakeTables.C Out/v%i/toppT/",version));
+ gSystem->Exec(Form("cp PassSelection.h Out/v%i/toppT/",version));
 }
