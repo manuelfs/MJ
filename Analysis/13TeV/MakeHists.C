@@ -219,6 +219,10 @@ void MakeHists(int version, TChain *ch, char* Region)
 			       Form("h1_%s_toppT_incl", ch->GetTitle()), 
 			       //20, 350, 1350);
 			       30, 0, 1500);
+    h2_toppT_incl = InitTH2F( Form("h2_%s_toppT_incl", ch->GetTitle()), 
+			       Form("h2_%s_toppT_incl", ch->GetTitle()), 
+			       //20, 350, 1350);
+			      30, 0, 1500,30, 0, 1500);
 
     for(int i=0; i<7; i++) 
     {   
@@ -275,7 +279,8 @@ void MakeHists(int version, TChain *ch, char* Region)
                              20, 0, 200);
         h1_elspTminusMET[i] = InitTH1F( Form("h1_%s_elspTminusMET_%ifatjet", ch->GetTitle(), i), 
                              Form("h1_%s_elspTminusMET_%ifatjet", ch->GetTitle(), i), 
-                             //20, 100, 400);
+
+					//20, 100, 400);
                              20, -2, 8);
         h1_elsEta[i] = InitTH1F( Form("h1_%s_elsEta_%ifatjet", ch->GetTitle(), i), 
                                 Form("h1_%s_elsEta_%ifatjet", ch->GetTitle(), i), 
@@ -302,6 +307,10 @@ void MakeHists(int version, TChain *ch, char* Region)
                              Form("h1_%s_toppT_%ifatjet", ch->GetTitle(), i), 
                              //20, 350, 1350);
                              30, 0, 1500);
+	h2_toppT[i] = InitTH2F( Form("h1_%s_toppT_%ifatjet", ch->GetTitle(), i), 
+				Form("h1_%s_toppT_%ifatjet", ch->GetTitle(), i), 
+				//20, 350, 1350);
+				30, 0, 1500,30, 0, 1500);
       
       
         h1_MET[i] = InitTH1F( Form("h1_%s_MET_%ifatjet", ch->GetTitle(), i), 
@@ -495,10 +504,10 @@ void MakeHists(int version, TChain *ch, char* Region)
         // 
         // Temp fixes for wrong event weights 
         // TTJets cross section  
-        if(ChainName.Contains("TT"))  
+	/*  if(ChainName.Contains("TT"))  
         { 
             EventWeight_ = EventWeight_*806.1/832.; // I used 832 pb while M used 806.1 pb.
-        }
+	    }*/
 
 	N_pre_toppT+=EventWeight_;
 
@@ -522,6 +531,7 @@ void MakeHists(int version, TChain *ch, char* Region)
 	if(ChainName.Contains("TT")) {
 	FillTH1F(h1_toppT_incl, top1pT_, EventWeight_);
 	FillTH1F(h1_toppT_incl, top2pT_, EventWeight_);
+	FillTH2F(h2_toppT_incl, top1pT_, top2pT_, EventWeight_);
 	FillTH1F(h1_toppT1_incl, top1pT_, EventWeight_);
 	FillTH1F(h1_toppT2_incl, top2pT_, EventWeight_);
 	}
@@ -658,7 +668,7 @@ void MakeHists(int version, TChain *ch, char* Region)
 	
 	FillTH1FAll(h1_toppT, NFJbin, top1pT_, EventWeight_);
 	FillTH1FAll(h1_toppT, NFJbin, top2pT_, EventWeight_);
-
+	FillTH2FAll(h2_toppT, NFJbin, top1pT_, top2pT_, EventWeight_);
 	}
         //
         // Fill histogams 
