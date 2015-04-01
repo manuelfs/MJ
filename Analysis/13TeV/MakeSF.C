@@ -95,7 +95,7 @@ void MakeSF( int version, char* Region, TString HistName, char* sys)
 	  
 	  if(h1_TT[i]->GetBinContent(b)>1 && h1_DATA[i]->GetBinContent(b)>1){ y[b] = h1_DATA[i]->GetBinContent(b)/h1_TT[i]->GetBinContent(b);
 	    ey[b] = y[b]*pow(pow(h1_TT[i]->GetBinError(b)/h1_TT[i]->GetBinContent(b),2)+pow(h1_DATA[i]->GetBinError(b)/h1_DATA[i]->GetBinContent(b),2),0.5);
-	    if(b==(nbins-1) || b ==7) cout<<"SF NFJ = "<<i<<" x ex y ey  "<<x[b]<<" "<<ex[b]<<" "<<y[b]<<" "<<ey[b]<<endl; 
+	    //if(b==(nbins-1) || b ==7) //cout<<"SF NFJ = "<<i<<" x ex y ey  "<<x[b]<<" "<<ex[b]<<" "<<y[b]<<" "<<ey[b]<<endl; 
 	  }
 	  
 	}
@@ -204,6 +204,6 @@ void MakeSF( int version, char* Region, TString HistName, char* sys)
     g2_SF[j]->Write();
   }
   HistFile2->Close();
-  cout<<"finished"<<endl;
+  //cout<<"finished"<<endl;
 
 }

@@ -7,7 +7,7 @@ void DoAnalysis(bool OnlyDraw=false)
   // Style
   //gROOT->ProcessLine(".L /Users/jaehyeok/macros/rootlogon.C");
   // Load macros
-  int version = 3;
+  int version = 4;
   bool OnlyEssential=true;
   gROOT->LoadMacro("MakeHists.C+");
   gROOT->LoadMacro("Make1DPlots.C+");
@@ -78,6 +78,7 @@ void DoAnalysis(bool OnlyDraw=false)
     
   char* Region[] = {"1BCRincl","1B4SJCRincl","1B45SJ","1B67SJ","1B8SJ","SRincl"};
   int nregion =6;
+  int SRthres=4;
   //COPY TO MAKE1DPlots
 
   
@@ -132,46 +133,52 @@ void DoAnalysis(bool OnlyDraw=false)
 	    Make1DPlots(version, "elsPhi",       Region[iregion],bo,sysname[isys]);
 	    Make1DPlots(version, "elsEta",       Region[iregion],bo,sysname[isys]);
 	    Make1DPlots(version, "mT",           Region[iregion],bo,sysname[isys]);
-	    Make1DPlots(version, "mj",           Region[iregion],bo,sysname[isys]);}
+	    Make1DPlots(version, "mj",           Region[iregion],bo,sysname[isys]);
+	    Make1DPlots(version, "HT",           Region[iregion],bo,sysname[isys]);
+	  }
 	  Make1DPlots(version, "MJ",           Region[iregion],bo,sysname[isys]);
 	  Make1DPlots(version, "MJ_coarse",           Region[iregion],bo,sysname[isys]);
-	  for(int icorr=0;icorr<nregion-1;icorr++){
-	    Make1DPlots(version, Form("MJ_coarse_corr%i",icorr), Region[iregion],bo,sysname[isys]);
-	    Make1DPlots(version, Form("MJ_corr%i",icorr),  Region[iregion],bo,sysname[isys]);
+	  if(iregion> SRthres){
+	    for(int icorr=0;icorr<nregion-1;icorr++){
+	      Make1DPlots(version, Form("MJ_coarse_corr%i",icorr), Region[iregion],bo,sysname[isys]);
+	      Make1DPlots(version, Form("MJ_corr%i",icorr),  Region[iregion],bo,sysname[isys]);
+	    }
 	  }
-	  Make1DPlots(version, "HT",           Region[iregion],bo,sysname[isys]);
-	  Make1DPlots(version, "toppT",       Region[iregion],bo,sysname[isys]);
-	  Make1DPlots(version, "toppT_incl",       Region[iregion],bo,sysname[isys]);
-	  Make1DPlots(version, "ttbarpT",       Region[iregion],bo,sysname[isys]);
-	  Make1DPlots(version, "ttbarpT_incl",       Region[iregion],bo,sysname[isys]);
+	  TString temp = Form("%s",sysname[isys]);
+	  if(temp.Contains("toppT")){
+	    Make1DPlots(version, "toppT",       Region[iregion],bo,sysname[isys]);
+	    if(bo) Make1DPlots(version, "toppT_incl",       Region[iregion],bo,sysname[isys]);}
+	  if(temp.Contains("ISRpT")){
+	    Make1DPlots(version, "ttbarpT",       Region[iregion],bo,sysname[isys]);
+	    if(bo)Make1DPlots(version, "ttbarpT_incl",       Region[iregion],bo,sysname[isys]);}
 	  //Make1DPlots(version, "toppT1",       Region[iregion],bo,sysname[isys]);
 	  //Make1DPlots(version, "toppT2",       Region[iregion],bo,sysname[isys]);
 	  if(!OnlyDraw && !OnlyEssential){
 	    Make1DPlots(version, "Nfatjet",      Region[iregion],bo,sysname[isys]);
 	    Make1DPlots(version, "Nskinnyjet",   Region[iregion],bo,sysname[isys]);
 	    Make1DPlots(version, "Ncsvm",        Region[iregion],bo,sysname[isys]);
-	    Make1DPlots(version, "MET",          Region[iregion],bo,sysname[isys]);
-	    Make1DPlots(version, "METPhi",       Region[iregion],bo,sysname[isys]);
-	    Make1DPlots(version, "WpT",          Region[iregion],bo,sysname[isys]);
-	    Make1DPlots(version, "FatjetPt1"     ,Region[iregion],bo,sysname[isys]);
-	    Make1DPlots(version, "FatjetPt2"     ,Region[iregion],bo,sysname[isys]);
-	    Make1DPlots(version, "FatjetPt3"     ,Region[iregion],bo,sysname[isys]);
-	    Make1DPlots(version, "FatjetPt4"     ,Region[iregion],bo,sysname[isys]);
-	    Make1DPlots(version, "FatjetPhi1"    ,Region[iregion],bo,sysname[isys]);
-	    Make1DPlots(version, "FatjetPhi2"    ,Region[iregion],bo,sysname[isys]);
-	    Make1DPlots(version, "FatjetPhi3"    ,Region[iregion],bo,sysname[isys]);
-	    Make1DPlots(version, "FatjetPhi4"    ,Region[iregion],bo,sysname[isys]);
-	    Make1DPlots(version, "FatjetEta1"    ,Region[iregion],bo,sysname[isys]);
-	    Make1DPlots(version, "FatjetEta2"    ,Region[iregion],bo,sysname[isys]);
-	    Make1DPlots(version, "FatjetEta3"    ,Region[iregion],bo,sysname[isys]);
-	    Make1DPlots(version, "FatjetEta4"    ,Region[iregion],bo,sysname[isys]);
-	    Make1DPlots(version, "mj1",          Region[iregion],bo,sysname[isys]);
-	    Make1DPlots(version, "mj2",          Region[iregion],bo,sysname[isys]);
-	    Make1DPlots(version, "mj3",          Region[iregion],bo,sysname[isys]);
-	    Make1DPlots(version, "mj4",          Region[iregion],bo,sysname[isys]);
-	    Make1DPlots(version, "mj3overmj2",   Region[iregion],bo,sysname[isys]);
-	    Make1DPlots(version, "mj2overmj1",   Region[iregion],bo,sysname[isys]);}
-	}
+	      Make1DPlots(version, "MET",          Region[iregion],bo,sysname[isys]);
+	      Make1DPlots(version, "METPhi",       Region[iregion],bo,sysname[isys]);
+	      Make1DPlots(version, "WpT",          Region[iregion],bo,sysname[isys]);
+	      Make1DPlots(version, "FatjetPt1"     ,Region[iregion],bo,sysname[isys]);
+	      Make1DPlots(version, "FatjetPt2"     ,Region[iregion],bo,sysname[isys]);
+	      Make1DPlots(version, "FatjetPt3"     ,Region[iregion],bo,sysname[isys]);
+	      Make1DPlots(version, "FatjetPt4"     ,Region[iregion],bo,sysname[isys]);
+	      Make1DPlots(version, "FatjetPhi1"    ,Region[iregion],bo,sysname[isys]);
+	      Make1DPlots(version, "FatjetPhi2"    ,Region[iregion],bo,sysname[isys]);
+	      Make1DPlots(version, "FatjetPhi3"    ,Region[iregion],bo,sysname[isys]);
+	      Make1DPlots(version, "FatjetPhi4"    ,Region[iregion],bo,sysname[isys]);
+	      Make1DPlots(version, "FatjetEta1"    ,Region[iregion],bo,sysname[isys]);
+	      Make1DPlots(version, "FatjetEta2"    ,Region[iregion],bo,sysname[isys]);
+	      Make1DPlots(version, "FatjetEta3"    ,Region[iregion],bo,sysname[isys]);
+	      Make1DPlots(version, "FatjetEta4"    ,Region[iregion],bo,sysname[isys]);
+	      Make1DPlots(version, "mj1",          Region[iregion],bo,sysname[isys]);
+	      Make1DPlots(version, "mj2",          Region[iregion],bo,sysname[isys]);
+	      Make1DPlots(version, "mj3",          Region[iregion],bo,sysname[isys]);
+	      Make1DPlots(version, "mj4",          Region[iregion],bo,sysname[isys]);
+	      Make1DPlots(version, "mj3overmj2",   Region[iregion],bo,sysname[isys]);
+	      Make1DPlots(version, "mj2overmj1",   Region[iregion],bo,sysname[isys]);}
+	  }
 	// ----------------------------------------
 	//  Make table of yields 
 	// ---------------------------------------- 

@@ -351,8 +351,8 @@ void MakeHists(int version, TChain *ch, char* Region, char* sys=(char*)"")
 				Form("h1_%s_ttbarpT_%ifatjet", ChainName.Data(), i), 
 				//20, 350, 1350);
 				40, 0, 2000);
-	h2_toppT[i] = InitTH2F( Form("h1_%s_toppT_%ifatjet", ChainName.Data(), i), 
-				Form("h1_%s_toppT_%ifatjet", ChainName.Data(), i), 
+	h2_toppT[i] = InitTH2F( Form("h2_%s_toppT_%ifatjet", ChainName.Data(), i), 
+				Form("h2_%s_toppT_%ifatjet", ChainName.Data(), i), 
 				//20, 350, 1350);
 				30, 0, 1500,30, 0, 1500);
       
@@ -543,6 +543,19 @@ void MakeHists(int version, TChain *ch, char* Region, char* sys=(char*)"")
         if(ChainName.Contains("TT_sl") && Ngenlep!=1) continue;  
         if(ChainName.Contains("TT_ll") && Ngenlep!=2) continue;  
 	if(ChainName.Contains("TT_sys") && !(Ngenlep==2 || Ngenlep==1)) continue;  
+	//calc HT
+	float HT40 =0.0;
+	int RA4NSJ=0;
+	int RA4NB=0;
+	for(unsigned int a=0;a<JetPt_->size();a++){
+	  if(JetPt_->at(a)>40. && TMath::Abs(JetEta_->at(a))<2.5){ 
+	    HT40+=JetPt_->at(a);
+	    RA4NSJ++;
+	    if(JetCSV_->at(a)>0.814) RA4NB++;
+	  }
+	}
+	if(HT40<750 || RA4NB==0) continue;
+		
         // 
         // weights 
         // 
@@ -561,9 +574,7 @@ void MakeHists(int version, TChain *ch, char* Region, char* sys=(char*)"")
         ISRpT = TMath::Sqrt(ISRpx*ISRpx+ISRpy*ISRpy);
 	}
 	if(ChainName.Contains("TT_sys"))
-	  {
-	  
-
+	  {	  
 	    //v1
 	    if(ChainName.Contains("toppT1")){
 	      float t1pT,t2pT;
@@ -696,7 +707,7 @@ void MakeHists(int version, TChain *ch, char* Region, char* sys=(char*)"")
         //
         // baseline selection
 	// if( !PassBaselineSelection() ) continue; // now part of PassSelection
-        if( Region!="Baseline" && !PassSelection(Region, HT_, MET_, NBtagCSVM_, Nskinnyjet_, mT, MJ_thres)) continue;
+        if( /*Region!="Baseline" &&*/ !PassSelection(Region, HT40, MET_, RA4NB, RA4NSJ, mT, MJ_thres)) continue;
  
         int NFJbin = -1;
         if(Nfatjet_thres>4) NFJbin=5;
@@ -774,15 +785,15 @@ void MakeHists(int version, TChain *ch, char* Region, char* sys=(char*)"")
         if(NFJbin>1) FillTH2FAll(h2_mj1vsmj2, NFJbin, mj_thres_sorted.at(0), mj_thres_sorted.at(1), EventWeight_);           
         if(NFJbin>2) FillTH2FAll(h2_mj2vsmj3, NFJbin, mj_thres_sorted.at(1), mj_thres_sorted.at(2), EventWeight_);           
         if(NFJbin>3) FillTH2FAll(h2_mj3vsmj4, NFJbin, mj_thres_sorted.at(2), mj_thres_sorted.at(3), EventWeight_);           
-        FillTH2FAll(h2_HTMET, NFJbin, HT_, MET_, EventWeight_);         
+        FillTH2FAll(h2_HTMET, NFJbin, HT40, MET_, EventWeight_);         
         FillTH2FAll(h2_MJmT, NFJbin, MJ_thres, mT, EventWeight_);       
-        FillTH2FAll(h2_HTmT, NFJbin, HT_, mT, EventWeight_);            
+        FillTH2FAll(h2_HTmT, NFJbin, HT40, mT, EventWeight_);            
         FillTH2FAll(h2_MJMET, NFJbin, MJ_thres, MET_, EventWeight_);    
-        FillTH2FAll(h2_HTMJ, NFJbin, HT_, MJ_thres,EventWeight_);       
+        FillTH2FAll(h2_HTMJ, NFJbin, HT40, MJ_thres,EventWeight_);       
         FillTH2FAll(h2_METmT, NFJbin, MET_, mT, EventWeight_);           
         FillTH1FAll(h1_mT,  NFJbin, mT, EventWeight_);                 
         FillTH1FAll(h1_WpT, NFJbin, WpT, EventWeight_);               
-        FillTH1FAll(h1_HT, NFJbin, HT_, EventWeight_);   
+        FillTH1FAll(h1_HT, NFJbin, HT40, EventWeight_);   
         FillTH1FAll(h1_MJ, NFJbin, MJ_thres, EventWeight_);
 	FillTH1FAll(h1_MJ_coarse, NFJbin, MJ_thres, EventWeight_); 
         FillTH1FAll(h1_MET, NFJbin, MET_, EventWeight_);              
@@ -850,8 +861,8 @@ void MakeHists(int version, TChain *ch, char* Region, char* sys=(char*)"")
         }
 
         FillTH1FAll(h1_Nfatjet,     NFJbin, Nfatjet_thres,  EventWeight_);       
-        FillTH1FAll(h1_Nskinnyjet,  NFJbin, Nskinnyjet_,    EventWeight_);      
-        FillTH1FAll(h1_Ncsvm,       NFJbin, NBtagCSVM_,     EventWeight_);            
+        FillTH1FAll(h1_Nskinnyjet,  NFJbin, RA4NSJ,    EventWeight_);      
+        FillTH1FAll(h1_Ncsvm,       NFJbin, RA4NB,     EventWeight_);            
             
     } // for(int i = 0; i<nentries; i++)
     
