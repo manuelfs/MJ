@@ -20,12 +20,14 @@
 
 using namespace std;
 
-void MakeSF( int version, char* Region, TString HistName)
+void MakeSF( int version, char* Region, TString HistName, char* sys)
 {
   int NMergeBins=1;
   TFile* HistFile = TFile::Open(Form("Out/v%i/HistFiles/Hist_%s_v%i.root",version, Region, version));
-   
- 
+  TString axistitle="blank";
+  TString syst = Form("%s",sys);
+  if(syst.Contains("toppT")) axistitle = "Top pT SF";
+  if(syst.Contains("ISRpT")) axistitle = "ISR pT SF";
 
   //TString HistName = "MJ";
   TH1F *h1_DATA[7], *h1_T[7], *h1_TT_sl[7], *h1_TT_ll[7], *h1_TT_sys[7], *h1_TT[7], *h1_WJets[7], *h1_DY[7]; 
@@ -40,7 +42,7 @@ void MakeSF( int version, char* Region, TString HistName)
       h1_T[i]         = (TH1F*)HistFile->Get(Form("h1_T_%s_%ifatjet", HistName.Data(), i));
       h1_TT_sl[i]     = (TH1F*)HistFile->Get(Form("h1_TT_sl_%s_%ifatjet", HistName.Data(), i));
       h1_TT_ll[i]     = (TH1F*)HistFile->Get(Form("h1_TT_ll_%s_%ifatjet", HistName.Data(), i));
-      h1_TT_sys[i]     = (TH1F*)HistFile->Get(Form("h1_TT_sys_%s_%ifatjet", HistName.Data(), i));
+      h1_TT_sys[i]     = (TH1F*)HistFile->Get(Form("h1_TT_sys%s_%s_%ifatjet", sys,HistName.Data(), i));
       h1_WJets[i]     = (TH1F*)HistFile->Get(Form("h1_WJets_%s_%ifatjet", HistName.Data(), i));
       h1_DY[i]        = (TH1F*)HistFile->Get(Form("h1_DY_%s_%ifatjet", HistName.Data(), i)); 
       h1_f1500_100[i] = (TH1F*)HistFile->Get(Form("h1_T1tttt_f1500_100_%s_%ifatjet", HistName.Data(), i)); 
@@ -80,7 +82,7 @@ void MakeSF( int version, char* Region, TString HistName)
         h1_DATA[i]->Add(h1_DY[i],-1);
 	
 	Int_t nbins = h1_DATA[i]->GetXaxis()->GetNbins()+1;
-	cout<<"nbins = "<<nbins<<endl;
+	//	cout<<"nbins = "<<nbins<<endl;
 	Double_t x[nbins];
 	Double_t y[nbins];
 	Double_t ex[nbins];
@@ -99,7 +101,7 @@ void MakeSF( int version, char* Region, TString HistName)
 	}
 
 	Int_t nbins1 = h1_TT_sys[i]->GetXaxis()->GetNbins()+1;
-	cout<<"nbins = "<<nbins<<endl;
+	//cout<<"nbins = "<<nbins<<endl;
 	Double_t x1[nbins1];
 	Double_t y1[nbins1];
 	Double_t ex1[nbins1];
@@ -113,9 +115,9 @@ void MakeSF( int version, char* Region, TString HistName)
 	    //  ey1[b] = y1[b]*pow(pow(h1_TT[i]->GetBinError(b)/h1_TT[i]->GetBinContent(b),2)+pow(h1_TT_sys[i]->GetBinError(b)/h1_TT_sys[i]->GetBinContent(b),2),0.5);
 	     ey1[b] = y1[b]*h1_TT_sys[i]->GetBinError(b)/h1_TT_sys[i]->GetBinContent(b);
 
-	     /*if(b==(nbins-1) || b ==7) */ cout<<"SF NFJ from sys = "<<i<<" x ex y ey  "<<x1[b]<<" "<<ex1[b]<<" "<<y1[b]<<" "<<ey1[b]<<endl; 
+	     /*if(b==(nbins-1) || b ==7) */ //cout<<"SF NFJ from sys = "<<i<<" x ex y ey  "<<x1[b]<<" "<<ex1[b]<<" "<<y1[b]<<" "<<ey1[b]<<endl; 
 	     ey1[b] = y1[b]*h1_TT[i]->GetBinError(b)/h1_TT[i]->GetBinContent(b);
-	     cout<<"SF NFJ plain= "<<i<<" x ex y ey  "<<x1[b]<<" "<<ex1[b]<<" "<<y1[b]<<" "<<ey1[b]<<endl; 
+	     // cout<<"SF NFJ plain= "<<i<<" x ex y ey  "<<x1[b]<<" "<<ex1[b]<<" "<<y1[b]<<" "<<ey1[b]<<endl; 
 	  }
 	  
 	}
@@ -134,7 +136,7 @@ void MakeSF( int version, char* Region, TString HistName)
 	g1_SF[i]->SetTitle(StackTitle);
 	g1_SF[i]->SetName(Form("SF_%i",i));
 	g1_SF[i]->GetXaxis()->SetTitle("MJ [GeV]");
-	g1_SF[i]->GetYaxis()->SetTitle("Top pT SF");
+	g1_SF[i]->GetYaxis()->SetTitle(axistitle);
 	g1_SF[i]->Draw("APZ");
 	
 	g2_SF[i] = new TGraphErrors(nbins,x1,y1,ex1,ey1);
@@ -149,7 +151,7 @@ void MakeSF( int version, char* Region, TString HistName)
 	g2_SF[i]->SetTitle(StackTitle);
 	g2_SF[i]->SetName(Form("SF_non_pois_%i",i));
 	g2_SF[i]->GetXaxis()->SetTitle("MJ [GeV]");
-	g2_SF[i]->GetYaxis()->SetTitle("Top pT SF");
+	g2_SF[i]->GetYaxis()->SetTitle(axistitle);
 	g2_SF[i]->Draw("2Z same");
 
 
@@ -183,13 +185,13 @@ void MakeSF( int version, char* Region, TString HistName)
         TexCMS->Draw("SAME");
 	if(i!=6)TexExt->Draw("SAME");
   }
-  c->Print( Form("Out/v%i/Figures/toy_SF_%s_%s_v%i.pdf",version, HistName.Data(), Region, version) ); 
+  c->Print( Form("Out/v%i/Figures/toy_SF_%s%s_%s_v%i.pdf",version, HistName.Data(),sys, Region, version) ); 
     
     // 
   HistFile->Close();
   delete c; 
   //TString HistFileName = Form("%s_SF",HistName.Data());
-  TString HistFileName = Form("Out/v%i/HistFiles/%s_SF_%s_v%i.root",version, HistName.Data(), Region, version);
+  TString HistFileName = Form("Out/v%i/HistFiles/%s%s_SF_%s_v%i.root",version, HistName.Data(),sys, Region, version);
   TFile *HistFile2 = new TFile(HistFileName, "RECREATE");
   gROOT->cd();
   HistFile2->cd();

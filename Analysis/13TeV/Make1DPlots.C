@@ -53,13 +53,9 @@ void h2cosmetic(TH2F* &h2, char* title, TString Xvar="", TString Yvar="", TStrin
 //
 // Stacks
 //
-void Make1DPlots(int version, TString HistName, char* Region,  bool DoLog=1,int NMergeBins=1) 
+void Make1DPlots(int version, TString HistName, char* Region,  bool DoLog=1,char* sys=(char*)"",int NMergeBins=1) 
 { 
-  //gInterpreter->ExecuteMacro("~/macros/JaeStyle.C");
-
-  
-
-    
+  //gInterpreter->ExecuteMacro("~/macros/JaeStyle.C"); 
    
     char *var; 
     if(HistName=="MET")                 	var=(char*)"MET [GeV]";
@@ -94,7 +90,9 @@ void Make1DPlots(int version, TString HistName, char* Region,  bool DoLog=1,int 
     if(HistName=="toppT1")                  	var=(char*)"top 1 p_{T} [GeV]"; 
     if(HistName=="toppT2")                  	var=(char*)"top 2 p_{T} [GeV]"; 
     if(HistName=="toppT")                  	var=(char*)"top p_{T} [GeV]"; 
-    if(HistName=="toppT_incl")                	var=(char*)"top p_{T} [GeV]"; 
+    if(HistName=="toppT_incl")                	var=(char*)"top p_{T} [GeV]";
+    if(HistName=="ttbarpT")                  	var=(char*)"ttbar system p_{T} [GeV]"; 
+    if(HistName=="ttbarpT_incl")              	var=(char*)"ttbar system p_{T} [GeV]"; 
     if(HistName=="MJ")                  	var=(char*)"M_{J} [GeV]";
     if(HistName=="MJ_coarse")                  	var=(char*)"M_{J} [GeV]";
     if(HistName=="MJ_corr1")                  	var=(char*)"M_{J} [GeV]";  
@@ -111,6 +109,7 @@ void Make1DPlots(int version, TString HistName, char* Region,  bool DoLog=1,int 
     if(HistName=="elspTminusMET")          	var=(char*)"(MET-p_{T}(muon))/p_{T}(muon)";                  
     if(HistName=="elsEta")              	var=(char*)"#eta(muon)";                         
     if(HistName=="elsPhi")              	var=(char*)"#phi(muon)";                         
+
     if(HistName=="Nfatjet")             	var=(char*)"N_{fatjet}";
     if(HistName=="Nskinnyjet")          	var=(char*)"N_{skinny}";
     if(HistName=="Ncsvm")          	        var=(char*)"N_{CSVM}";
@@ -124,8 +123,10 @@ void Make1DPlots(int version, TString HistName, char* Region,  bool DoLog=1,int 
     bool corr=false;
     bool coarse = false;
     TString c_region[2] = {"1BCRincl","1B4SJCRincl"};
-    char* Regions[] = {"1BCRincl","1B4SJCRincl","SRincl"};
-    int nregion = 3;
+    /*char* Regions[] = {"1BCRincl","1B4SJCRincl","SRincl"};
+      int nregion = 3;*/
+    char* Regions[] = {"1BCRincl","1B4SJCRincl","1B45SJ","1B67SJ","1B8SJ","SRincl"};
+    int nregion =6;
     TString corr_region = "";
     if(HistName.Contains("coarse")){
       coarse=true;
@@ -154,7 +155,7 @@ void Make1DPlots(int version, TString HistName, char* Region,  bool DoLog=1,int 
     TGraphErrors *MJ_SF_non_pois[7];
     if(corr){
       TFile* SFFile;
-      SFFile = TFile::Open(Form("Out/v%i/HistFiles/%s_SF_%s_v%i.root",version,HistName.Data() ,corr_region.Data(),version));
+      SFFile = TFile::Open(Form("Out/v%i/HistFiles/%s%s_SF_%s_v%i.root",version,HistName.Data(),sys ,corr_region.Data(),version));
       // else SFFile = TFile::Open(Form("HistFiles/v%i/%s_SF_%s_v%i.root",version,HistName.Data() ,c_region[1].Data(),version));  
       for(int j=2;j<7;j++){
 	MJ_SF[j] = (TGraphErrors*)SFFile->Get(Form("SF_%i",j));
@@ -171,12 +172,12 @@ void Make1DPlots(int version, TString HistName, char* Region,  bool DoLog=1,int 
     for(int i=2; i<7; i++) 
     {
 
-      if(HistName=="toppT_incl"){
+      if(HistName.Contains("incl")){
 	if(i>3) break;
 	h1_T[i]         = (TH1F*)HistFile->Get(Form("h1_T_%s", HistName.Data()));
         h1_TT_sl[i]     = (TH1F*)HistFile->Get(Form("h1_TT_sl_%s", HistName.Data()));
         h1_TT_ll[i]     = (TH1F*)HistFile->Get(Form("h1_TT_ll_%s", HistName.Data()));
-	h1_TT_sys[i]     = (TH1F*)HistFile->Get(Form("h1_TT_sys_%s", HistName.Data()));
+	h1_TT_sys[i]     = (TH1F*)HistFile->Get(Form("h1_TT_sys%s_%s",sys, HistName.Data()));
         h1_WJets[i]     = (TH1F*)HistFile->Get(Form("h1_WJets_%s", HistName.Data()));
         h1_DY[i]        = (TH1F*)HistFile->Get(Form("h1_DY_%s", HistName.Data())); 
         h1_f1500_100[i] = (TH1F*)HistFile->Get(Form("h1_T1tttt_f1500_100_%s", HistName.Data())); 
@@ -188,7 +189,7 @@ void Make1DPlots(int version, TString HistName, char* Region,  bool DoLog=1,int 
         h1_T[i]         = (TH1F*)HistFile->Get(Form("h1_T_%s_%ifatjet", HistName.Data(), i));
         h1_TT_sl[i]     = (TH1F*)HistFile->Get(Form("h1_TT_sl_%s_%ifatjet", HistName.Data(), i));
         h1_TT_ll[i]     = (TH1F*)HistFile->Get(Form("h1_TT_ll_%s_%ifatjet", HistName.Data(), i));
-	h1_TT_sys[i]     = (TH1F*)HistFile->Get(Form("h1_TT_sys_%s_%ifatjet", HistName.Data(), i));
+	h1_TT_sys[i]     = (TH1F*)HistFile->Get(Form("h1_TT_sys%s_%s_%ifatjet", sys,HistName.Data(), i));
         h1_WJets[i]     = (TH1F*)HistFile->Get(Form("h1_WJets_%s_%ifatjet", HistName.Data(), i));
         h1_DY[i]        = (TH1F*)HistFile->Get(Form("h1_DY_%s_%ifatjet", HistName.Data(), i)); 
         h1_f1500_100[i] = (TH1F*)HistFile->Get(Form("h1_T1tttt_f1500_100_%s_%ifatjet", HistName.Data(), i)); 
@@ -256,7 +257,7 @@ void Make1DPlots(int version, TString HistName, char* Region,  bool DoLog=1,int 
         h1cosmetic(h1_f1200_800[i],     Form("T1tttt(1200,800) %ifatjet", i),   kBlue,  1, 0,           var);
 
         bool DoLogOne = (DoLog && h1_MC[i]->Integral()>0);
-	if(HistName=="toppT_incl" && i==3) DoLogOne=false; 
+	if(HistName.Contains("incl") && i==3) DoLogOne=false; 
         c->cd(i-1);
         if(DoLogOne) c->cd(i-1)->SetLogy(1);
         //c->cd(i-1)->SetLeftMargin(0.15);
@@ -264,7 +265,7 @@ void Make1DPlots(int version, TString HistName, char* Region,  bool DoLog=1,int 
         //c->cd(i-1)->SetBottomMargin(0.15);
         //c->cd(i-1)->SetTopMargin(0.1);
         TString StackTitle;
-	if( HistName != "toppT_incl"){ StackTitle = Form("%i fatjets", i);
+	if( !HistName.Contains("incl")){ StackTitle = Form("%i fatjets", i);
         if(i==6) StackTitle = "All fatjets";
         if(i==5) StackTitle = "5+ fatjets";}
 	else StackTitle = "";
@@ -277,7 +278,7 @@ void Make1DPlots(int version, TString HistName, char* Region,  bool DoLog=1,int 
          st[i]->Add(h1_TT_sl[i]);
         st[i]->SetMaximum(h1_MC[i]->GetMaximum()*(DoLogOne?200:1.6));
         //st[i]->SetMinimum(h1_MC[i]->GetMinimum()*(DoLogOne?1:0));
-        if(HistName!="toppT_incl") st[i]->SetMinimum((DoLogOne?0.05:0));
+        if(!HistName.Contains("incl")) st[i]->SetMinimum((DoLogOne?0.05:0));
 	else st[i]->SetMinimum((DoLogOne?1:0));
         st[i]->Draw("HIST"); 
 
@@ -355,15 +356,15 @@ void Make1DPlots(int version, TString HistName, char* Region,  bool DoLog=1,int 
         
         TexEnergyLumi->Draw("SAME");
         TexCMS->Draw("SAME");
-        if(i!=6 && HistName != "toppT_incl") TexExt->Draw("SAME");
+        if(i!=6 && !HistName.Contains("incl")) TexExt->Draw("SAME");
     }
 
     // 
     if(HistName=="mj") HistName="JetMass";
     //if(corr) c->Print( Form("Figures/v%i/corr_%s_sys_CompareDataMC_%s_%s%s_v%i.pdf",version,corr_region.Data(),HistName.Data(), Region, DoLog?"_log":"",version) );
-    if(corr) c->Print( Form("Out/v%i/Figures/%s_in_%s_corrected_by_%s%s_v%i.pdf",version,HistName.Data(),Region, corr_region.Data(), DoLog?"_log":"",version) );
+    if(corr) c->Print( Form("Out/v%i/Figures/%s_%s_in_%s_corrected_by_%s%s_v%i.pdf",version,sys,HistName.Data(),Region, corr_region.Data(), DoLog?"_log":"",version) );
     //else if(corr2)c->Print( Form("Figures/v%i/corr_%s_sys_CompareDataMC_%s_%s%s_v%i.pdf",version, c_region[1].Data(),HistName.Data(), Region, DoLog?"_log":"",version) );
-    else c->Print( Form("Out/v%i/Figures/%s_in_%s%s_v%i.pdf",version, HistName.Data(), Region, DoLog?"_log":"",version) ); 
+    else c->Print( Form("Out/v%i/Figures/%s_%s_in_%s%s_v%i.pdf",version,sys,HistName.Data(), Region, DoLog?"_log":"",version) ); 
     
     // 
     HistFile->Close();

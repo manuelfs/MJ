@@ -93,6 +93,16 @@ double nPUScaleFactor2012(TH1F* h1PU, float npu){
 }
 
 
+/*void MCDump(){
+    vector<float>   *GenId_;
+    vector<float>   *GenMId_;
+    vector<float>   *GenGMId_;
+    for(unsigned int igen=0; igen<GenId_->size(); igen++)
+        { 
+	  cout<<"ID"
+        }
+	}*/
+
 float GetMuonEff(float pt, float eta)
 { 
    float eff = 1; 
@@ -147,6 +157,26 @@ float GetMuonEff(float pt, float eta)
     return eff;
 }
 
+float getISRSF(float ISRpT)
+{ 
+    // ref : https://twiki.cern.ch/twiki/bin/viewauth/CMS/SMST2ccMadgraph8TeV
+    if( ISRpT>250) return 0.8;
+    else if( ISRpT>150 ) return 0.9;
+    else if( ISRpT>120 ) return 0.95;
+    else return 1;
+}
+
+float getISR2SF(float ISRpT)
+{ 
+  // ref : https://twiki.cern.ch/twiki/bin/viewauth/CMS/SMST2ccMadgraph8TeV
+  if( ISRpT>400) return 1.3;
+  else if( ISRpT>350 ) return 1.15;
+  else if( ISRpT>300 ) return 1;
+  else if( ISRpT>200 ) return 0.85;
+  else if( ISRpT>100 ) return 0.9;			   
+  else return 1;
+}
+
 float getDPhi(float phi1, float phi2) 
 { 
     float absdphi = abs(phi1-phi2);
@@ -172,11 +202,12 @@ float getDR(float eta1, float eta2, float phi1, float phi2)
 //
 // per process
 //
-void MakeHists(int version, TChain *ch, char* Region) 
+void MakeHists(int version, TChain *ch, char* Region, char* sys=(char*)"") 
 { 
 
     InitBaby(ch); 
-    TString ChainName = ch->GetTitle();
+    TString ChainName = Form("%s%s",ch->GetTitle(),sys);
+    
     cout << "[MJ Analysis] " << ChainName << endl;  
 
     //
@@ -201,29 +232,35 @@ void MakeHists(int version, TChain *ch, char* Region)
     TH2F *h2_HTMJ[7], *h2_METmT[7];
     TH1F *h1_toppT1[7], *h1_toppT2[7];
     TH1F *h1_toppT[7];
+    TH1F *h1_ttbarpT[7];
     TH2F *h2_toppT[7];
     TH1F *h1_toppT1_incl, *h1_toppT2_incl;
     TH1F *h1_toppT_incl;
+    TH1F *h1_ttbarpT_incl;
     TH2F *h2_toppT_incl;
 
     TH1F *h1_MJ_coarse[7];
     
-    h1_toppT1_incl = InitTH1F( Form("h1_%s_toppT1_incl", ch->GetTitle()), 
-			       Form("h1_%s_toppT1_incl", ch->GetTitle()), 
+    h1_toppT1_incl = InitTH1F( Form("h1_%s_toppT1_incl", ChainName.Data()), 
+			       Form("h1_%s_toppT1_incl", ChainName.Data()), 
 			       //20, 350, 1350);
 			       30, 0, 1500);
 
-    h1_toppT2_incl = InitTH1F( Form("h1_%s_toppT2_incl", ch->GetTitle()), 
-			       Form("h1_%s_toppT2_incl", ch->GetTitle()), 
+    h1_toppT2_incl = InitTH1F( Form("h1_%s_toppT2_incl", ChainName.Data()), 
+			       Form("h1_%s_toppT2_incl", ChainName.Data()), 
 			       //20, 350, 1350);
 			       30, 0, 1500);
     
-    h1_toppT_incl = InitTH1F( Form("h1_%s_toppT_incl", ch->GetTitle()), 
-			       Form("h1_%s_toppT_incl", ch->GetTitle()), 
+    h1_toppT_incl = InitTH1F( Form("h1_%s_toppT_incl", ChainName.Data()), 
+			       Form("h1_%s_toppT_incl", ChainName.Data()), 
 			       //20, 350, 1350);
 			       30, 0, 1500);
-    h2_toppT_incl = InitTH2F( Form("h2_%s_toppT_incl", ch->GetTitle()), 
-			       Form("h2_%s_toppT_incl", ch->GetTitle()), 
+     h1_ttbarpT_incl = InitTH1F( Form("h1_%s_ttbarpT_incl", ChainName.Data()), 
+			       Form("h1_%s_ttbarpT_incl", ChainName.Data()), 
+			       //20, 350, 1350);
+			       40, 0, 2000);
+    h2_toppT_incl = InitTH2F( Form("h2_%s_toppT_incl", ChainName.Data()), 
+			       Form("h2_%s_toppT_incl", ChainName.Data()), 
 			       //20, 350, 1350);
 			      30, 0, 1500,30, 0, 1500);
 
@@ -232,208 +269,212 @@ void MakeHists(int version, TChain *ch, char* Region)
         //
         // yields : for table                   
         //
-        h1_yields[i] = InitTH1F( Form("h1_%s_yields_%ifatjet", ch->GetTitle(), i), 
-                                 Form("h1_%s_yields_%ifatjet", ch->GetTitle(), i), 
+        h1_yields[i] = InitTH1F( Form("h1_%s_yields_%ifatjet", ChainName.Data(), i), 
+                                 Form("h1_%s_yields_%ifatjet", ChainName.Data(), i), 
                                  2, 0, 2); // bin1 for e, bin2 for mu
         //
         // h1                    
         //
-        h1_MJ[i] = InitTH1F( Form("h1_%s_MJ_%ifatjet", ch->GetTitle(), i), 
-                             Form("h1_%s_MJ_%ifatjet", ch->GetTitle(), i), 
+        h1_MJ[i] = InitTH1F( Form("h1_%s_MJ_%ifatjet", ChainName.Data(), i), 
+                             Form("h1_%s_MJ_%ifatjet", ChainName.Data(), i), 
                              20, 0, 2000);
 
 	Float_t xbins[] = {0,100,200,300,400,500,600,2000};
 	int nbin = 7;
-	h1_MJ_coarse[i] = InitTH1FVarBin( Form("h1_%s_MJ_coarse_%ifatjet", ch->GetTitle(), i), 
-                             Form("h1_%s_MJ_%ifatjet", ch->GetTitle(), i), 
+	h1_MJ_coarse[i] = InitTH1FVarBin( Form("h1_%s_MJ_coarse_%ifatjet", ChainName.Data(), i), 
+                             Form("h1_%s_MJ_%ifatjet", ChainName.Data(), i), 
                              nbin,xbins);
-        h1_mj[i] = InitTH1F( Form("h1_%s_mj_%ifatjet", ch->GetTitle(), i), 
-                             Form("h1_%s_mj_%ifatjet", ch->GetTitle(), i), 
+        h1_mj[i] = InitTH1F( Form("h1_%s_mj_%ifatjet", ChainName.Data(), i), 
+                             Form("h1_%s_mj_%ifatjet", ChainName.Data(), i), 
                              40, 0, 800);
-        h1_Nfatjet[i] = InitTH1F( Form("h1_%s_Nfatjet_%ifatjet", ch->GetTitle(), i), 
-                                  Form("h1_%s_Nfatjet_%ifatjet", ch->GetTitle(), i), 
+        h1_Nfatjet[i] = InitTH1F( Form("h1_%s_Nfatjet_%ifatjet", ChainName.Data(), i), 
+                                  Form("h1_%s_Nfatjet_%ifatjet", ChainName.Data(), i), 
                                   11, -0.5, 10.5);
-        h1_Nskinnyjet[i] = InitTH1F( Form("h1_%s_Nskinnyjet_%ifatjet", ch->GetTitle(), i), 
-                                     Form("h1_%s_Nskinnyjet_%ifatjet", ch->GetTitle(), i), 
+        h1_Nskinnyjet[i] = InitTH1F( Form("h1_%s_Nskinnyjet_%ifatjet", ChainName.Data(), i), 
+                                     Form("h1_%s_Nskinnyjet_%ifatjet", ChainName.Data(), i), 
                                      16, -0.5, 15.5);
-        h1_Ncsvm[i] = InitTH1F( Form("h1_%s_Ncsvm_%ifatjet", ch->GetTitle(), i), 
-                                     Form("h1_%s_Ncsvm_%ifatjet", ch->GetTitle(), i), 
+        h1_Ncsvm[i] = InitTH1F( Form("h1_%s_Ncsvm_%ifatjet", ChainName.Data(), i), 
+                                     Form("h1_%s_Ncsvm_%ifatjet", ChainName.Data(), i), 
                                      7, -0.5, 6.5);
-        h1_mT[i] = InitTH1F( Form("h1_%s_mT_%ifatjet", ch->GetTitle(), i), 
-                             Form("h1_%s_mT_%ifatjet", ch->GetTitle(), i), 
+        h1_mT[i] = InitTH1F( Form("h1_%s_mT_%ifatjet", ChainName.Data(), i), 
+                             Form("h1_%s_mT_%ifatjet", ChainName.Data(), i), 
                              //20, 0, 200);
                              16, 0, 800);
-        h1_muspT[i] = InitTH1F( Form("h1_%s_muspT_%ifatjet", ch->GetTitle(), i), 
-                             Form("h1_%s_muspT_%ifatjet", ch->GetTitle(), i), 
+        h1_muspT[i] = InitTH1F( Form("h1_%s_muspT_%ifatjet", ChainName.Data(), i), 
+                             Form("h1_%s_muspT_%ifatjet", ChainName.Data(), i), 
                              20, 0, 200);
-        h1_muspTminusMET[i] = InitTH1F( Form("h1_%s_muspTminusMET_%ifatjet", ch->GetTitle(), i), 
-                             Form("h1_%s_muspTminusMET_%ifatjet", ch->GetTitle(), i), 
+        h1_muspTminusMET[i] = InitTH1F( Form("h1_%s_muspTminusMET_%ifatjet", ChainName.Data(), i), 
+                             Form("h1_%s_muspTminusMET_%ifatjet", ChainName.Data(), i), 
                              //20, 100, 400);
                              20, -2, 8);
-        h1_musEta[i] = InitTH1F( Form("h1_%s_musEta_%ifatjet", ch->GetTitle(), i), 
-                                Form("h1_%s_musEta_%ifatjet", ch->GetTitle(), i), 
+        h1_musEta[i] = InitTH1F( Form("h1_%s_musEta_%ifatjet", ChainName.Data(), i), 
+                                Form("h1_%s_musEta_%ifatjet", ChainName.Data(), i), 
                                 20, -2.5, 2.5);
                                 //100, -2.1, 2.1);
-        h1_musPhi[i] = InitTH1F( Form("h1_%s_musPhi_%ifatjet", ch->GetTitle(), i), 
-                                Form("h1_%s_musPhi_%ifatjet", ch->GetTitle(), i), 
+        h1_musPhi[i] = InitTH1F( Form("h1_%s_musPhi_%ifatjet", ChainName.Data(), i), 
+                                Form("h1_%s_musPhi_%ifatjet", ChainName.Data(), i), 
                                 20, -TMath::Pi(), TMath::Pi());
-        h1_elspT[i] = InitTH1F( Form("h1_%s_elspT_%ifatjet", ch->GetTitle(), i), 
-                             Form("h1_%s_elspT_%ifatjet", ch->GetTitle(), i), 
+        h1_elspT[i] = InitTH1F( Form("h1_%s_elspT_%ifatjet", ChainName.Data(), i), 
+                             Form("h1_%s_elspT_%ifatjet", ChainName.Data(), i), 
                              20, 0, 200);
-        h1_elspTminusMET[i] = InitTH1F( Form("h1_%s_elspTminusMET_%ifatjet", ch->GetTitle(), i), 
-                             Form("h1_%s_elspTminusMET_%ifatjet", ch->GetTitle(), i), 
+        h1_elspTminusMET[i] = InitTH1F( Form("h1_%s_elspTminusMET_%ifatjet", ChainName.Data(), i), 
+                             Form("h1_%s_elspTminusMET_%ifatjet", ChainName.Data(), i), 
 
 					//20, 100, 400);
                              20, -2, 8);
-        h1_elsEta[i] = InitTH1F( Form("h1_%s_elsEta_%ifatjet", ch->GetTitle(), i), 
-                                Form("h1_%s_elsEta_%ifatjet", ch->GetTitle(), i), 
+        h1_elsEta[i] = InitTH1F( Form("h1_%s_elsEta_%ifatjet", ChainName.Data(), i), 
+                                Form("h1_%s_elsEta_%ifatjet", ChainName.Data(), i), 
                                 20, -2.5, 2.5);
                                 //100, -2.1, 2.1);
-        h1_elsPhi[i] = InitTH1F( Form("h1_%s_elsPhi_%ifatjet", ch->GetTitle(), i), 
-                                Form("h1_%s_elsPhi_%ifatjet", ch->GetTitle(), i), 
+        h1_elsPhi[i] = InitTH1F( Form("h1_%s_elsPhi_%ifatjet", ChainName.Data(), i), 
+                                Form("h1_%s_elsPhi_%ifatjet", ChainName.Data(), i), 
                                 20, -TMath::Pi(), TMath::Pi());
-        h1_HT[i] = InitTH1F( Form("h1_%s_HT_%ifatjet", ch->GetTitle(), i), 
-                             Form("h1_%s_HT_%ifatjet", ch->GetTitle(), i), 
+        h1_HT[i] = InitTH1F( Form("h1_%s_HT_%ifatjet", ChainName.Data(), i), 
+                             Form("h1_%s_HT_%ifatjet", ChainName.Data(), i), 
                              //20, 350, 1350);
                              28, 500, 4000);
 
-	h1_toppT1[i] = InitTH1F( Form("h1_%s_toppT1_%ifatjet", ch->GetTitle(), i), 
-                             Form("h1_%s_toppT1_%ifatjet", ch->GetTitle(), i), 
+	h1_toppT1[i] = InitTH1F( Form("h1_%s_toppT1_%ifatjet", ChainName.Data(), i), 
+                             Form("h1_%s_toppT1_%ifatjet", ChainName.Data(), i), 
                              //20, 350, 1350);
 			     30, 0, 1500);
 
-	h1_toppT2[i] = InitTH1F( Form("h1_%s_toppT2_%ifatjet", ch->GetTitle(), i), 
-                             Form("h1_%s_toppT2_%ifatjet", ch->GetTitle(), i), 
+	h1_toppT2[i] = InitTH1F( Form("h1_%s_toppT2_%ifatjet", ChainName.Data(), i), 
+                             Form("h1_%s_toppT2_%ifatjet", ChainName.Data(), i), 
                              //20, 350, 1350);
                              30, 0, 1500);
-	h1_toppT[i] = InitTH1F( Form("h1_%s_toppT_%ifatjet", ch->GetTitle(), i), 
-                             Form("h1_%s_toppT_%ifatjet", ch->GetTitle(), i), 
+	h1_toppT[i] = InitTH1F( Form("h1_%s_toppT_%ifatjet", ChainName.Data(), i), 
+                             Form("h1_%s_toppT_%ifatjet", ChainName.Data(), i), 
                              //20, 350, 1350);
                              30, 0, 1500);
-	h2_toppT[i] = InitTH2F( Form("h1_%s_toppT_%ifatjet", ch->GetTitle(), i), 
-				Form("h1_%s_toppT_%ifatjet", ch->GetTitle(), i), 
+	h1_ttbarpT[i] = InitTH1F( Form("h1_%s_ttbarpT_%ifatjet", ChainName.Data(), i), 
+				Form("h1_%s_ttbarpT_%ifatjet", ChainName.Data(), i), 
+				//20, 350, 1350);
+				40, 0, 2000);
+	h2_toppT[i] = InitTH2F( Form("h1_%s_toppT_%ifatjet", ChainName.Data(), i), 
+				Form("h1_%s_toppT_%ifatjet", ChainName.Data(), i), 
 				//20, 350, 1350);
 				30, 0, 1500,30, 0, 1500);
       
       
-        h1_MET[i] = InitTH1F( Form("h1_%s_MET_%ifatjet", ch->GetTitle(), i), 
-                             Form("h1_%s_MET_%ifatjet", ch->GetTitle(), i), 
+        h1_MET[i] = InitTH1F( Form("h1_%s_MET_%ifatjet", ChainName.Data(), i), 
+                             Form("h1_%s_MET_%ifatjet", ChainName.Data(), i), 
                              //20, 0, 500);
                              18, 100, 1000);
-        h1_METPhi[i] = InitTH1F( Form("h1_%s_METPhi_%ifatjet", ch->GetTitle(), i), 
-                                 Form("h1_%s_METPhi_%ifatjet", ch->GetTitle(), i), 
+        h1_METPhi[i] = InitTH1F( Form("h1_%s_METPhi_%ifatjet", ChainName.Data(), i), 
+                                 Form("h1_%s_METPhi_%ifatjet", ChainName.Data(), i), 
                                  20, -TMath::Pi(), TMath::Pi());
-        h1_METx[i] = InitTH1F( Form("h1_%s_METx_%ifatjet", ch->GetTitle(), i), 
-                               Form("h1_%s_METx_%ifatjet", ch->GetTitle(), i), 
+        h1_METx[i] = InitTH1F( Form("h1_%s_METx_%ifatjet", ChainName.Data(), i), 
+                               Form("h1_%s_METx_%ifatjet", ChainName.Data(), i), 
                                100, -300, 300);
-        h1_METy[i] = InitTH1F( Form("h1_%s_METy_%ifatjet", ch->GetTitle(), i), 
-                               Form("h1_%s_METy_%ifatjet", ch->GetTitle(), i), 
+        h1_METy[i] = InitTH1F( Form("h1_%s_METy_%ifatjet", ChainName.Data(), i), 
+                               Form("h1_%s_METy_%ifatjet", ChainName.Data(), i), 
                                100, -300, 300);
-        h1_DPhi[i] = InitTH1F( Form("h1_%s_DPhi_%ifatjet", ch->GetTitle(), i), 
-                               Form("h1_%s_DPhi_%ifatjet", ch->GetTitle(), i), 
+        h1_DPhi[i] = InitTH1F( Form("h1_%s_DPhi_%ifatjet", ChainName.Data(), i), 
+                               Form("h1_%s_DPhi_%ifatjet", ChainName.Data(), i), 
                                32, 0, TMath::Pi());
-        h1_dRFJ[i] = InitTH1F( Form("h1_%s_dRFJ_%ifatjet", ch->GetTitle(), i), 
-                               Form("h1_%s_dRFJ_%ifatjet", ch->GetTitle(), i), 
+        h1_dRFJ[i] = InitTH1F( Form("h1_%s_dRFJ_%ifatjet", ChainName.Data(), i), 
+                               Form("h1_%s_dRFJ_%ifatjet", ChainName.Data(), i), 
                                20, 1, 5);
-        h1_dPhiFJ[i] = InitTH1F( Form("h1_%s_dPhiFJ_%ifatjet", ch->GetTitle(), i), 
-                               Form("h1_%s_dPhiFJ_%ifatjet", ch->GetTitle(), i), 
+        h1_dPhiFJ[i] = InitTH1F( Form("h1_%s_dPhiFJ_%ifatjet", ChainName.Data(), i), 
+                               Form("h1_%s_dPhiFJ_%ifatjet", ChainName.Data(), i), 
                                32, 0, TMath::Pi());
-        h1_dEtaFJ[i] = InitTH1F( Form("h1_%s_dEtaFJ_%ifatjet", ch->GetTitle(), i), 
-                               Form("h1_%s_dEtaFJ_%ifatjet", ch->GetTitle(), i), 
+        h1_dEtaFJ[i] = InitTH1F( Form("h1_%s_dEtaFJ_%ifatjet", ChainName.Data(), i), 
+                               Form("h1_%s_dEtaFJ_%ifatjet", ChainName.Data(), i), 
                                20, 0, 4);
-        h1_FatjetPt[i] = InitTH1F( Form("h1_%s_FatjetPt_%ifatjet", ch->GetTitle(), i), 
-                                   Form("h1_%s_FatjetPt_%ifatjet", ch->GetTitle(), i), 
+        h1_FatjetPt[i] = InitTH1F( Form("h1_%s_FatjetPt_%ifatjet", ChainName.Data(), i), 
+                                   Form("h1_%s_FatjetPt_%ifatjet", ChainName.Data(), i), 
                                    20, 0, 800);
-        h1_FatjetPt1[i] = InitTH1F( Form("h1_%s_FatjetPt1_%ifatjet", ch->GetTitle(), i), 
-                                    Form("h1_%s_FatjetPt1_%ifatjet", ch->GetTitle(), i), 
+        h1_FatjetPt1[i] = InitTH1F( Form("h1_%s_FatjetPt1_%ifatjet", ChainName.Data(), i), 
+                                    Form("h1_%s_FatjetPt1_%ifatjet", ChainName.Data(), i), 
                                     20, 0, 2000);
-        h1_FatjetPt2[i] = InitTH1F( Form("h1_%s_FatjetPt2_%ifatjet", ch->GetTitle(), i), 
-                                    Form("h1_%s_FatjetPt2_%ifatjet", ch->GetTitle(), i), 
+        h1_FatjetPt2[i] = InitTH1F( Form("h1_%s_FatjetPt2_%ifatjet", ChainName.Data(), i), 
+                                    Form("h1_%s_FatjetPt2_%ifatjet", ChainName.Data(), i), 
                                     20, 0, 1200);
-        h1_FatjetPt3[i] = InitTH1F( Form("h1_%s_FatjetPt3_%ifatjet", ch->GetTitle(), i), 
-                                    Form("h1_%s_FatjetPt3_%ifatjet", ch->GetTitle(), i), 
+        h1_FatjetPt3[i] = InitTH1F( Form("h1_%s_FatjetPt3_%ifatjet", ChainName.Data(), i), 
+                                    Form("h1_%s_FatjetPt3_%ifatjet", ChainName.Data(), i), 
                                     20, 0, 800);
-        h1_FatjetPt4[i] = InitTH1F( Form("h1_%s_FatjetPt4_%ifatjet", ch->GetTitle(), i), 
-                                    Form("h1_%s_FatjetPt4_%ifatjet", ch->GetTitle(), i), 
+        h1_FatjetPt4[i] = InitTH1F( Form("h1_%s_FatjetPt4_%ifatjet", ChainName.Data(), i), 
+                                    Form("h1_%s_FatjetPt4_%ifatjet", ChainName.Data(), i), 
                                     20, 0, 500);
-        h1_mj1[i] = InitTH1F( Form("h1_%s_mj1_%ifatjet", ch->GetTitle(), i), 
-                                    Form("h1_%s_mj1_%ifatjet", ch->GetTitle(), i), 
+        h1_mj1[i] = InitTH1F( Form("h1_%s_mj1_%ifatjet", ChainName.Data(), i), 
+                                    Form("h1_%s_mj1_%ifatjet", ChainName.Data(), i), 
                                     20, 0, 500);
-        h1_mj2[i] = InitTH1F( Form("h1_%s_mj2_%ifatjet", ch->GetTitle(), i), 
-                                    Form("h1_%s_mj2_%ifatjet", ch->GetTitle(), i), 
+        h1_mj2[i] = InitTH1F( Form("h1_%s_mj2_%ifatjet", ChainName.Data(), i), 
+                                    Form("h1_%s_mj2_%ifatjet", ChainName.Data(), i), 
                                     20, 0, 500);
-        h1_mj3[i] = InitTH1F( Form("h1_%s_mj3_%ifatjet", ch->GetTitle(), i), 
-                                    Form("h1_%s_mj3_%ifatjet", ch->GetTitle(), i), 
+        h1_mj3[i] = InitTH1F( Form("h1_%s_mj3_%ifatjet", ChainName.Data(), i), 
+                                    Form("h1_%s_mj3_%ifatjet", ChainName.Data(), i), 
                                     20, 0, 500);
-        h1_mj4[i] = InitTH1F( Form("h1_%s_mj4_%ifatjet", ch->GetTitle(), i), 
-                                    Form("h1_%s_mj4_%ifatjet", ch->GetTitle(), i), 
+        h1_mj4[i] = InitTH1F( Form("h1_%s_mj4_%ifatjet", ChainName.Data(), i), 
+                                    Form("h1_%s_mj4_%ifatjet", ChainName.Data(), i), 
                                     20, 0, 500);
-        h1_mj3overmj2[i] = InitTH1F( Form("h1_%s_mj3overmj2_%ifatjet", ch->GetTitle(), i), 
-                                    Form("h1_%s_mj3overmj2_%ifatjet", ch->GetTitle(), i), 
+        h1_mj3overmj2[i] = InitTH1F( Form("h1_%s_mj3overmj2_%ifatjet", ChainName.Data(), i), 
+                                    Form("h1_%s_mj3overmj2_%ifatjet", ChainName.Data(), i), 
                                     20, 0, 1);
-        h1_mj2overmj1[i] = InitTH1F( Form("h1_%s_mj2overmj1_%ifatjet", ch->GetTitle(), i), 
-                                    Form("h1_%s_mj2overmj1_%ifatjet", ch->GetTitle(), i), 
+        h1_mj2overmj1[i] = InitTH1F( Form("h1_%s_mj2overmj1_%ifatjet", ChainName.Data(), i), 
+                                    Form("h1_%s_mj2overmj1_%ifatjet", ChainName.Data(), i), 
                                     20, 0, 1);
-        h1_FatjetPhi1[i] = InitTH1F( Form("h1_%s_FatjetPhi1_%ifatjet", ch->GetTitle(), i), 
-                                    Form("h1_%s_FatjetPhi1_%ifatjet", ch->GetTitle(), i), 
+        h1_FatjetPhi1[i] = InitTH1F( Form("h1_%s_FatjetPhi1_%ifatjet", ChainName.Data(), i), 
+                                    Form("h1_%s_FatjetPhi1_%ifatjet", ChainName.Data(), i), 
                                     32, -TMath::Pi(), TMath::Pi());
-        h1_FatjetPhi2[i] = InitTH1F( Form("h1_%s_FatjetPhi2_%ifatjet", ch->GetTitle(), i), 
-                                    Form("h1_%s_FatjetPhi2_%ifatjet", ch->GetTitle(), i), 
+        h1_FatjetPhi2[i] = InitTH1F( Form("h1_%s_FatjetPhi2_%ifatjet", ChainName.Data(), i), 
+                                    Form("h1_%s_FatjetPhi2_%ifatjet", ChainName.Data(), i), 
                                     32, -TMath::Pi(), TMath::Pi());
-        h1_FatjetPhi3[i] = InitTH1F( Form("h1_%s_FatjetPhi3_%ifatjet", ch->GetTitle(), i), 
-                                    Form("h1_%s_FatjetPhi3_%ifatjet", ch->GetTitle(), i), 
+        h1_FatjetPhi3[i] = InitTH1F( Form("h1_%s_FatjetPhi3_%ifatjet", ChainName.Data(), i), 
+                                    Form("h1_%s_FatjetPhi3_%ifatjet", ChainName.Data(), i), 
                                     32, -TMath::Pi(), TMath::Pi());
-        h1_FatjetPhi4[i] = InitTH1F( Form("h1_%s_FatjetPhi4_%ifatjet", ch->GetTitle(), i), 
-                                    Form("h1_%s_FatjetPhi4_%ifatjet", ch->GetTitle(), i), 
+        h1_FatjetPhi4[i] = InitTH1F( Form("h1_%s_FatjetPhi4_%ifatjet", ChainName.Data(), i), 
+                                    Form("h1_%s_FatjetPhi4_%ifatjet", ChainName.Data(), i), 
                                     32, -TMath::Pi(), TMath::Pi());
-        h1_FatjetEta1[i] = InitTH1F( Form("h1_%s_FatjetEta1_%ifatjet", ch->GetTitle(), i), 
-                                    Form("h1_%s_FatjetEta1_%ifatjet", ch->GetTitle(), i), 
+        h1_FatjetEta1[i] = InitTH1F( Form("h1_%s_FatjetEta1_%ifatjet", ChainName.Data(), i), 
+                                    Form("h1_%s_FatjetEta1_%ifatjet", ChainName.Data(), i), 
                                     30, -3, 3);
-        h1_FatjetEta2[i] = InitTH1F( Form("h1_%s_FatjetEta2_%ifatjet", ch->GetTitle(), i), 
-                                    Form("h1_%s_FatjetEta2_%ifatjet", ch->GetTitle(), i), 
+        h1_FatjetEta2[i] = InitTH1F( Form("h1_%s_FatjetEta2_%ifatjet", ChainName.Data(), i), 
+                                    Form("h1_%s_FatjetEta2_%ifatjet", ChainName.Data(), i), 
                                     30, -3, 3);
-        h1_FatjetEta3[i] = InitTH1F( Form("h1_%s_FatjetEta3_%ifatjet", ch->GetTitle(), i), 
-                                    Form("h1_%s_FatjetEta3_%ifatjet", ch->GetTitle(), i), 
+        h1_FatjetEta3[i] = InitTH1F( Form("h1_%s_FatjetEta3_%ifatjet", ChainName.Data(), i), 
+                                    Form("h1_%s_FatjetEta3_%ifatjet", ChainName.Data(), i), 
                                     30, -3, 3);
-        h1_FatjetEta4[i] = InitTH1F( Form("h1_%s_FatjetEta4_%ifatjet", ch->GetTitle(), i), 
-                                    Form("h1_%s_FatjetEta4_%ifatjet", ch->GetTitle(), i), 
+        h1_FatjetEta4[i] = InitTH1F( Form("h1_%s_FatjetEta4_%ifatjet", ChainName.Data(), i), 
+                                    Form("h1_%s_FatjetEta4_%ifatjet", ChainName.Data(), i), 
                                     30, -3, 3);
-        h1_FatjetEta[i] = InitTH1F( Form("h1_%s_FatjetEta_%ifatjet", ch->GetTitle(), i), 
-                                    Form("h1_%s_FatjetEta_%ifatjet", ch->GetTitle(), i), 
+        h1_FatjetEta[i] = InitTH1F( Form("h1_%s_FatjetEta_%ifatjet", ChainName.Data(), i), 
+                                    Form("h1_%s_FatjetEta_%ifatjet", ChainName.Data(), i), 
                                     20, -2.5, 2.5);
-        h1_WpT[i] = InitTH1F( Form("h1_%s_WpT_%ifatjet", ch->GetTitle(), i), 
-                             Form("h1_%s_WpT_%ifatjet", ch->GetTitle(), i), 
+        h1_WpT[i] = InitTH1F( Form("h1_%s_WpT_%ifatjet", ChainName.Data(), i), 
+                             Form("h1_%s_WpT_%ifatjet", ChainName.Data(), i), 
                              //20, 0, 500);
                              20, 0, 1000);
         //
         // h2                    
         //
-        h2_HTMET[i]    =   InitTH2F(Form("h2_%s_HTMET_%ifatjet", ch->GetTitle(), i),
-                                    Form("h2_%s_HTMET_%ifatjet", ch->GetTitle(), i), 
+        h2_HTMET[i]    =   InitTH2F(Form("h2_%s_HTMET_%ifatjet", ChainName.Data(), i),
+                                    Form("h2_%s_HTMET_%ifatjet", ChainName.Data(), i), 
                                     25, 500, 1750, 10, 250, 750);
-        h2_MJmT[i]    =   InitTH2F(Form("h2_%s_MJmT_%ifatjet", ch->GetTitle(), i),
-                                   Form("h2_%s_MJmT_%ifatjet", ch->GetTitle(), i), 
+        h2_MJmT[i]    =   InitTH2F(Form("h2_%s_MJmT_%ifatjet", ChainName.Data(), i),
+                                   Form("h2_%s_MJmT_%ifatjet", ChainName.Data(), i), 
                                    15, 0, 750, 10, 0, 500);
-        h2_HTmT[i]    =   InitTH2F(Form("h2_%s_HTmT_%ifatjet", ch->GetTitle(), i),
-                                   Form("h2_%s_HTmT_%ifatjet", ch->GetTitle(), i), 
+        h2_HTmT[i]    =   InitTH2F(Form("h2_%s_HTmT_%ifatjet", ChainName.Data(), i),
+                                   Form("h2_%s_HTmT_%ifatjet", ChainName.Data(), i), 
                                    25, 500, 1750, 10, 0, 500);
-        h2_MJMET[i]    =   InitTH2F(Form("h2_%s_MJMET_%ifatjet", ch->GetTitle(), i),
-                                   Form("h2_%s_MJMET_%ifatjet", ch->GetTitle(), i), 
+        h2_MJMET[i]    =   InitTH2F(Form("h2_%s_MJMET_%ifatjet", ChainName.Data(), i),
+                                   Form("h2_%s_MJMET_%ifatjet", ChainName.Data(), i), 
                                    15, 0, 750, 10, 250, 750);
-        h2_HTMJ[i]    =   InitTH2F(Form("h2_%s_HTMJ_%ifatjet", ch->GetTitle(), i),
-                                   Form("h2_%s_HTMJ_%ifatjet", ch->GetTitle(), i), 
+        h2_HTMJ[i]    =   InitTH2F(Form("h2_%s_HTMJ_%ifatjet", ChainName.Data(), i),
+                                   Form("h2_%s_HTMJ_%ifatjet", ChainName.Data(), i), 
                                    25, 500, 1750, 15, 0, 750);
-        h2_METmT[i]    =   InitTH2F(Form("h2_%s_METmT_%ifatjet", ch->GetTitle(), i),
-                                   Form("h2_%s_METmT_%ifatjet", ch->GetTitle(), i), 
+        h2_METmT[i]    =   InitTH2F(Form("h2_%s_METmT_%ifatjet", ChainName.Data(), i),
+                                   Form("h2_%s_METmT_%ifatjet", ChainName.Data(), i), 
                                    10, 250, 750, 10, 0, 500);
-        h2_mj1vsmj2[i]    =   InitTH2F(Form("h2_%s_mj1vsmj2_%ifatjet", ch->GetTitle(), i),
-                                       Form("h2_%s_mj1vsmj2_%ifatjet", ch->GetTitle(), i), 
+        h2_mj1vsmj2[i]    =   InitTH2F(Form("h2_%s_mj1vsmj2_%ifatjet", ChainName.Data(), i),
+                                       Form("h2_%s_mj1vsmj2_%ifatjet", ChainName.Data(), i), 
                                        10, 0, 500, 10, 0, 500);
-        h2_mj2vsmj3[i]    =   InitTH2F(Form("h2_%s_mj2vsmj3_%ifatjet", ch->GetTitle(), i),
-                                       Form("h2_%s_mj2vsmj3_%ifatjet", ch->GetTitle(), i), 
+        h2_mj2vsmj3[i]    =   InitTH2F(Form("h2_%s_mj2vsmj3_%ifatjet", ChainName.Data(), i),
+                                       Form("h2_%s_mj2vsmj3_%ifatjet", ChainName.Data(), i), 
                                        10, 0, 500, 10, 0, 500);
-        h2_mj3vsmj4[i]    =   InitTH2F(Form("h2_%s_mj3vsmj4_%ifatjet", ch->GetTitle(), i),
-                                       Form("h2_%s_mj4vsmj4_%ifatjet", ch->GetTitle(), i), 
+        h2_mj3vsmj4[i]    =   InitTH2F(Form("h2_%s_mj3vsmj4_%ifatjet", ChainName.Data(), i),
+                                       Form("h2_%s_mj4vsmj4_%ifatjet", ChainName.Data(), i), 
                                        10, 0, 500, 10, 0, 500);
     }
     
@@ -511,32 +552,61 @@ void MakeHists(int version, TChain *ch, char* Region)
         { 
             EventWeight_ = EventWeight_*806.1/832.; // I used 832 pb while M used 806.1 pb.
 	    }*/
-
+	float ISRpT;
 	N_pre_toppT+=EventWeight_;
-
-	
-	if(ChainName.Contains("TT_sys"))
+	if(ChainName.Contains("TT"))
 	{
-	  float t1pT,t2pT;
-	   if(top1pT_>400) t1pT=400;
-	   else t1pT=top1pT_;
-
-           if(top2pT_>400) t2pT=400;
-	   else t2pT=top2pT_;
-           float weight_top1pT = TMath::Exp(0.159-0.00141*t1pT);
-           float weight_top2pT = TMath::Exp(0.159-0.00141*t2pT);
-	    EventWeight_ = EventWeight_ * TMath::Sqrt(weight_top1pT*weight_top2pT);
-	    EventWeight_ = EventWeight_ * 0.959;
+	float ISRpx = top1pT_*TMath::Cos(top1Phi_) + top2pT_*TMath::Cos(top2Phi_);
+	float ISRpy = top1pT_*TMath::Sin(top1Phi_) + top2pT_*TMath::Sin(top2Phi_);
+        ISRpT = TMath::Sqrt(ISRpx*ISRpx+ISRpy*ISRpy);
+	}
+	if(ChainName.Contains("TT_sys"))
+	  {
 	  
-        }
+
+	    //v1
+	    if(ChainName.Contains("toppT1")){
+	      float t1pT,t2pT;
+	      if(top1pT_>400) t1pT=400;
+	      else t1pT=top1pT_;
+
+	      if(top2pT_>400) t2pT=400;
+	      else t2pT=top2pT_;
+	      float weight_top1pT = TMath::Exp(0.159-0.00141*t1pT);
+	      float weight_top2pT = TMath::Exp(0.159-0.00141*t2pT);
+	      EventWeight_ = EventWeight_ * TMath::Sqrt(weight_top1pT*weight_top2pT);
+	      EventWeight_ = EventWeight_ * 0.959;}
+
+	     if(ChainName.Contains("toppT2")){
+	      float t1pT,t2pT;
+	      if(top1pT_>600) t1pT=600;
+	      if(top1pT_<200) t1pT=200;
+	      else t1pT=top1pT_;
+
+	      if(top2pT_>600) t2pT=600;
+	      if(top2pT_<200) t2pT=200;
+	      else t2pT=top2pT_;
+	      float weight_top1pT = TMath::Exp(-0.6662+0.00155*t1pT);
+	      float weight_top2pT = TMath::Exp(-0.6662+0.00155*t2pT);
+	      EventWeight_ = EventWeight_ * TMath::Sqrt(weight_top1pT*weight_top2pT);
+	      // EventWeight_ = EventWeight_ * 0.959;
+	     }
+	    
+	    if(ChainName.Contains("ISRpT1")){
+	      EventWeight_ = EventWeight_ * getISRSF(ISRpT);}
+	    // EventWeight = EventWeight * 1.013;
+	    if(ChainName.Contains("ISRpT2")){
+	      EventWeight_ = EventWeight_ * getISR2SF(ISRpT);}
+	  }
 	
 	N_post_toppT+=EventWeight_;
 	if(ChainName.Contains("TT")) {
-	FillTH1F(h1_toppT_incl, top1pT_, EventWeight_);
-	FillTH1F(h1_toppT_incl, top2pT_, EventWeight_);
-	FillTH2F(h2_toppT_incl, top1pT_, top2pT_, EventWeight_);
-	FillTH1F(h1_toppT1_incl, top1pT_, EventWeight_);
-	FillTH1F(h1_toppT2_incl, top2pT_, EventWeight_);
+	  FillTH1F(h1_ttbarpT_incl, ISRpT, EventWeight_);
+	  FillTH1F(h1_toppT_incl, top1pT_, EventWeight_);
+	  FillTH1F(h1_toppT_incl, top2pT_, EventWeight_);
+	  FillTH2F(h2_toppT_incl, top1pT_, top2pT_, EventWeight_);
+	  FillTH1F(h1_toppT1_incl, top1pT_, EventWeight_);
+	  FillTH1F(h1_toppT2_incl, top2pT_, EventWeight_);
 	}
         // Pileup 
 
@@ -668,7 +738,7 @@ void MakeHists(int version, TChain *ch, char* Region)
 	if(ChainName.Contains("TT")) {
 	FillTH1FAll(h1_toppT1, NFJbin, top1pT_, EventWeight_);
 	FillTH1FAll(h1_toppT2, NFJbin, top2pT_, EventWeight_);
-	
+	FillTH1FAll(h1_ttbarpT, NFJbin, ISRpT, EventWeight_);
 	FillTH1FAll(h1_toppT, NFJbin, top1pT_, EventWeight_);
 	FillTH1FAll(h1_toppT, NFJbin, top2pT_, EventWeight_);
 	FillTH2FAll(h2_toppT, NFJbin, top1pT_, top2pT_, EventWeight_);
@@ -801,7 +871,7 @@ void MakeHists(int version, TChain *ch, char* Region)
     else ptscale=0;
     cout<<"TOP PT REWEIGHT pre: "<<N_pre_toppT<<"   post: "<<N_post_toppT<<"    Ratio: "<<ptscale<<endl;
 
-    TString HistFileName = ch->GetTitle();
+    TString HistFileName = ChainName;
     HistFileName = Form("Out/v%i/HistFiles/%s_%s_v%i.root", version,HistFileName.Data(), Region,version);
     cout << "[MJ Analysis] Writing " << HistFileName << endl;
     TFile *HistFile = new TFile(HistFileName, "RECREATE");
@@ -811,6 +881,7 @@ void MakeHists(int version, TChain *ch, char* Region)
     h1_toppT1_incl->SetDirectory(0);                      h1_toppT1_incl->Write();
     h1_toppT2_incl->SetDirectory(0);                      h1_toppT2_incl->Write();
     h1_toppT_incl->SetDirectory(0);                      h1_toppT_incl->Write();
+    h1_ttbarpT_incl->SetDirectory(0);                      h1_ttbarpT_incl->Write();
     for(int i=0; i<7; i++)  
     {
         h1_yields[i]->SetDirectory(0);                      h1_yields[i]->Write();
@@ -818,6 +889,7 @@ void MakeHists(int version, TChain *ch, char* Region)
 	h1_MJ_coarse[i]->SetDirectory(0);                   h1_MJ_coarse[i]->Write();
         h1_HT[i]->SetDirectory(0);                          h1_HT[i]->Write();
 	h1_toppT[i]->SetDirectory(0);                       h1_toppT[i]->Write();
+	h1_ttbarpT[i]->SetDirectory(0);                     h1_ttbarpT[i]->Write();
 	h1_toppT1[i]->SetDirectory(0);                      h1_toppT1[i]->Write();
 	h1_toppT2[i]->SetDirectory(0);                      h1_toppT2[i]->Write();
         h1_MET[i]->SetDirectory(0);                         h1_MET[i]->Write();

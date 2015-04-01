@@ -114,6 +114,31 @@ bool PassSelection(TString Region,
         && MJ > -1 
     )  passed = true;
 
+       if(Region=="1B45SJ" && PassLowSJ1BBaselineSelection() &&  PassNLep(1)
+	  && HT > 750
+	  && MET > -1 
+	  && Nb > -1 
+	  && Njet > 3 && Njet<6 
+	  && mT > -1
+	  && MJ > -1 
+	  )  passed = true;
+       if(Region=="1B67SJ" && PassLowSJ1BBaselineSelection() &&  PassNLep(1)
+	  && HT > 750
+	  && MET > -1 
+	  && Nb > -1 
+	  && Njet > 5 && Njet<8 
+	  && mT > -1
+	  && MJ > -1 
+	  )  passed = true;
+       if(Region=="1B8SJ" && PassLowSJ1BBaselineSelection() &&  PassNLep(1)
+	  && HT > 750
+	  && MET > -1 
+	  && Nb > -1 
+	  && Njet > 7
+	  && mT > -1
+	  && MJ > -1 
+	  )  passed = true;
+
      if(Region=="AllBCRincl" && PassAllBBaselineSelection() &&  PassNLep(1)
        && HT > 750
         && MET > -1 
