@@ -7,15 +7,17 @@ void DoAnalysis(bool OnlyDraw=false)
   // Style
   //gROOT->ProcessLine(".L /Users/jaehyeok/macros/rootlogon.C");
   // Load macros
-  int version = 4;
+  int version = 5;
+  bool status =true;
   bool OnlyEssential=true;
   gROOT->LoadMacro("MakeHists.C+");
   gROOT->LoadMacro("Make1DPlots.C+");
   gROOT->LoadMacro("MakeSF.C+");
   gROOT->LoadMacro("Make2DPlots.C+");
   gROOT->LoadMacro("MakeTables.C+");
-  char* sysname[] = {"_toppT1","_toppT2","_ISRpT1","_ISRpT2","_ISRpartons"};
-  int nsys=4;
+  char* sysname[] = {"_toppT1","_toppT2","_ISRpT1","_ISRpT2","_ISRpT3","_ISRpartons"};
+  int nsys=6;
+  if(!status) nsys=5;
   gSystem->Exec(Form("mkdir -p Out/v%i/Figures/",version));
   gSystem->Exec(Form("mkdir -p Out/v%i/HistFiles/",version));
   gSystem->Exec(Form("mkdir -p Out/v%i/Tables/",version));
@@ -33,8 +35,9 @@ void DoAnalysis(bool OnlyDraw=false)
   TChain *ch_f1500_100    = new TChain("tree", "T1tttt_f1500_100");
   TChain *ch_f1200_800    = new TChain("tree", "T1tttt_f1200_800");
   
-  TString BabyDir = "/Users/heller/Jae/ntuples/HT750MET250/";
-    //"/net/cms26/cms26r0/jaehyeok/baby/Fatjet/13TeV/Phys14NoSkim/";
+  TString BabyDir = //"/Users/heller/Jae/ntuples/HT750MET250/";
+    //  "/net/cms26/cms26r0/jaehyeok/baby/Fatjet/13TeV/Phys14NoSkim/";
+  "/net/cms26/cms26r0/jaehyeok/baby/Fatjet/13TeV/";
     //"/net/cms26/cms26r0/jaehyeok/baby/Fatjet/13TeV/Phys14/HT750MET250/";
   //"/Users/jaehyeok/Research/Tools/fastjet-3.0.6/example/babies/13TeV/HT750MET250/";
     
@@ -151,6 +154,9 @@ void DoAnalysis(bool OnlyDraw=false)
 	  if(temp.Contains("ISRpT")){
 	    Make1DPlots(version, "ttbarpT",       Region[iregion],bo,sysname[isys]);
 	    if(bo)Make1DPlots(version, "ttbarpT_incl",       Region[iregion],bo,sysname[isys]);}
+	  if(temp.Contains("nISR")){
+	    Make1DPlots(version, "nISR",       Region[iregion],bo,sysname[isys]);
+	    if(bo)Make1DPlots(version, "nISR_incl",       Region[iregion],bo,sysname[isys]);}
 	  //Make1DPlots(version, "toppT1",       Region[iregion],bo,sysname[isys]);
 	  //Make1DPlots(version, "toppT2",       Region[iregion],bo,sysname[isys]);
 	  if(!OnlyDraw && !OnlyEssential){

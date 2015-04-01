@@ -28,6 +28,7 @@ void MakeSF( int version, char* Region, TString HistName, char* sys)
   TString syst = Form("%s",sys);
   if(syst.Contains("toppT")) axistitle = "Top pT SF";
   if(syst.Contains("ISRpT")) axistitle = "ISR pT SF";
+  if(syst.Contains("nISR")) axistitle = "nISR SF";
 
   //TString HistName = "MJ";
   TH1F *h1_DATA[7], *h1_T[7], *h1_TT_sl[7], *h1_TT_ll[7], *h1_TT_sys[7], *h1_TT[7], *h1_WJets[7], *h1_DY[7]; 

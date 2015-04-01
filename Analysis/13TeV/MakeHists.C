@@ -18,6 +18,7 @@ using namespace std;
 bool    DoLog           = 1;
 int     FatjetpTthres   = 50;
 int     mjthres         = 0;
+//bool status = true;
 
 //
 //TH1F initialization
@@ -103,6 +104,18 @@ double nPUScaleFactor2012(TH1F* h1PU, float npu){
         }
 	}*/
 
+int GetnISR(){
+  int nISR=0;
+   for(unsigned int igen=0; igen<GenId_->size(); igen++)
+        { 
+	  if(GenId_->at(igen)==23 && fabs(GenId_->at(0))!=6 && fabs(GenMId_->at(0))!=6 && fabs(GenGMId_->at(0))!=6){
+	    nISR++;
+	  }
+        }
+   return nISR;
+}
+
+
 float GetMuonEff(float pt, float eta)
 { 
    float eff = 1; 
@@ -170,11 +183,31 @@ float getISR2SF(float ISRpT)
 { 
   // ref : https://twiki.cern.ch/twiki/bin/viewauth/CMS/SMST2ccMadgraph8TeV
   if( ISRpT>400) return 1.3;
-  else if( ISRpT>350 ) return 1.15;
-  else if( ISRpT>300 ) return 1;
-  else if( ISRpT>200 ) return 0.85;
-  else if( ISRpT>100 ) return 0.9;			   
-  else return 1;
+  //else if( ISRpT>350 ) return 1.15;
+  else if( ISRpT>300 ) return 1.15;
+  else if( ISRpT>200 ) return 1.0;
+  else if( ISRpT>100 ) return 0.85;			   
+  else return 0.7;
+}
+
+float getISR3SF(float ISRpT)
+{ 
+  // ref : https://twiki.cern.ch/twiki/bin/viewauth/CMS/SMST2ccMadgraph8TeV
+  if( ISRpT>500) return 0.6;
+  //else if( ISRpT>350 ) return 1.15;
+  else if( ISRpT>300 ) return 0.8;
+  else if( ISRpT>240 ) return 0.9;
+  else if( ISRpT>120) return 0.95;
+  else return 1.0;
+}
+
+float GetNISRSF(int nISR){
+  if(nISR>3) cout<<"ERROR: n ISR = "<<nISR<<endl;
+  else if(nISR==3) return 1.30;
+  else if(nISR==2) return 1.15;
+  else if(nISR==1) return 1.0;
+  else return 0.85;
+  
 }
 
 float getDPhi(float phi1, float phi2) 
@@ -232,10 +265,12 @@ void MakeHists(int version, TChain *ch, char* Region, char* sys=(char*)"")
     TH2F *h2_HTMJ[7], *h2_METmT[7];
     TH1F *h1_toppT1[7], *h1_toppT2[7];
     TH1F *h1_toppT[7];
+    TH1F *h1_nISR[7];
     TH1F *h1_ttbarpT[7];
     TH2F *h2_toppT[7];
     TH1F *h1_toppT1_incl, *h1_toppT2_incl;
     TH1F *h1_toppT_incl;
+    TH1F *h1_nISR_incl;
     TH1F *h1_ttbarpT_incl;
     TH2F *h2_toppT_incl;
 
@@ -255,6 +290,10 @@ void MakeHists(int version, TChain *ch, char* Region, char* sys=(char*)"")
 			       Form("h1_%s_toppT_incl", ChainName.Data()), 
 			       //20, 350, 1350);
 			       30, 0, 1500);
+       h1_nISR_incl = InitTH1F( Form("h1_%s_nISR_incl", ChainName.Data()), 
+			       Form("h1_%s_nISR_incl", ChainName.Data()), 
+			       //20, 350, 1350);
+			       6, -0.5, 5.5);
      h1_ttbarpT_incl = InitTH1F( Form("h1_%s_ttbarpT_incl", ChainName.Data()), 
 			       Form("h1_%s_ttbarpT_incl", ChainName.Data()), 
 			       //20, 350, 1350);
@@ -347,6 +386,10 @@ void MakeHists(int version, TChain *ch, char* Region, char* sys=(char*)"")
                              Form("h1_%s_toppT_%ifatjet", ChainName.Data(), i), 
                              //20, 350, 1350);
                              30, 0, 1500);
+	h1_nISR[i] = InitTH1F( Form("h1_%s_nISR_%ifatjet", ChainName.Data(), i), 
+			       Form("h1_%s_nISR_%ifatjet", ChainName.Data(), i), 
+			       //20, 350, 1350);
+			       6,-0.5, 5.5);
 	h1_ttbarpT[i] = InitTH1F( Form("h1_%s_ttbarpT_%ifatjet", ChainName.Data(), i), 
 				Form("h1_%s_ttbarpT_%ifatjet", ChainName.Data(), i), 
 				//20, 350, 1350);
@@ -555,7 +598,9 @@ void MakeHists(int version, TChain *ch, char* Region, char* sys=(char*)"")
 	  }
 	}
 	if(HT40<750 || RA4NB==0) continue;
-		
+
+	int nISR=0;
+	
         // 
         // weights 
         // 
@@ -569,9 +614,10 @@ void MakeHists(int version, TChain *ch, char* Region, char* sys=(char*)"")
 	N_pre_toppT+=EventWeight_;
 	if(ChainName.Contains("TT"))
 	{
-	float ISRpx = top1pT_*TMath::Cos(top1Phi_) + top2pT_*TMath::Cos(top2Phi_);
-	float ISRpy = top1pT_*TMath::Sin(top1Phi_) + top2pT_*TMath::Sin(top2Phi_);
-        ISRpT = TMath::Sqrt(ISRpx*ISRpx+ISRpy*ISRpy);
+	  if(status) nISR = GetnISR();
+	  float ISRpx = top1pT_*TMath::Cos(top1Phi_) + top2pT_*TMath::Cos(top2Phi_);
+	  float ISRpy = top1pT_*TMath::Sin(top1Phi_) + top2pT_*TMath::Sin(top2Phi_);
+	  ISRpT = TMath::Sqrt(ISRpx*ISRpx+ISRpy*ISRpy);
 	}
 	if(ChainName.Contains("TT_sys"))
 	  {	  
@@ -608,12 +654,18 @@ void MakeHists(int version, TChain *ch, char* Region, char* sys=(char*)"")
 	    // EventWeight = EventWeight * 1.013;
 	    if(ChainName.Contains("ISRpT2")){
 	      EventWeight_ = EventWeight_ * getISR2SF(ISRpT);}
+	    if(ChainName.Contains("ISRpT3")){
+	      EventWeight_ = EventWeight_ * getISR2SF(ISRpT);}
+	    if(ChainName.Contains("nISR")){
+	      EventWeight_= EventWeight_ * GetNISRSF(nISR);
+	    }
 	  }
 	
 	N_post_toppT+=EventWeight_;
 	if(ChainName.Contains("TT")) {
 	  FillTH1F(h1_ttbarpT_incl, ISRpT, EventWeight_);
 	  FillTH1F(h1_toppT_incl, top1pT_, EventWeight_);
+	  FillTH1F(h1_nISR_incl, nISR, EventWeight_);
 	  FillTH1F(h1_toppT_incl, top2pT_, EventWeight_);
 	  FillTH2F(h2_toppT_incl, top1pT_, top2pT_, EventWeight_);
 	  FillTH1F(h1_toppT1_incl, top1pT_, EventWeight_);
@@ -747,12 +799,13 @@ void MakeHists(int version, TChain *ch, char* Region, char* sys=(char*)"")
         if( (Ne==1 || Nm==1) && Nt==1 && (Ntn==1 && (Nen==0 && Nmn==0)) )           Nlth = Nlth + EventWeight_; 
 	
 	if(ChainName.Contains("TT")) {
-	FillTH1FAll(h1_toppT1, NFJbin, top1pT_, EventWeight_);
-	FillTH1FAll(h1_toppT2, NFJbin, top2pT_, EventWeight_);
-	FillTH1FAll(h1_ttbarpT, NFJbin, ISRpT, EventWeight_);
-	FillTH1FAll(h1_toppT, NFJbin, top1pT_, EventWeight_);
-	FillTH1FAll(h1_toppT, NFJbin, top2pT_, EventWeight_);
-	FillTH2FAll(h2_toppT, NFJbin, top1pT_, top2pT_, EventWeight_);
+	  FillTH1FAll(h1_toppT1, NFJbin, top1pT_, EventWeight_);
+	  FillTH1FAll(h1_toppT2, NFJbin, top2pT_, EventWeight_);
+	  FillTH1FAll(h1_nISR, NFJbin, nISR, EventWeight_);
+	  FillTH1FAll(h1_ttbarpT, NFJbin, ISRpT, EventWeight_);
+	  FillTH1FAll(h1_toppT, NFJbin, top1pT_, EventWeight_);
+	  FillTH1FAll(h1_toppT, NFJbin, top2pT_, EventWeight_);
+	  FillTH2FAll(h2_toppT, NFJbin, top1pT_, top2pT_, EventWeight_);
 	}
         //
         // Fill histogams 

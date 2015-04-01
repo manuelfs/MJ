@@ -89,7 +89,9 @@ void Make1DPlots(int version, TString HistName, char* Region,  bool DoLog=1,char
     if(HistName=="HT")                  	var=(char*)"H_{T} [GeV]";    
     if(HistName=="toppT1")                  	var=(char*)"top 1 p_{T} [GeV]"; 
     if(HistName=="toppT2")                  	var=(char*)"top 2 p_{T} [GeV]"; 
-    if(HistName=="toppT")                  	var=(char*)"top p_{T} [GeV]"; 
+    if(HistName=="toppT")                  	var=(char*)"top p_{T} [GeV]";
+    if(HistName=="nISR")                  	var=(char*)"N ISR partons";
+    if(HistName=="nISR_incl")                  	var=(char*)"N ISR partons"; 
     if(HistName=="toppT_incl")                	var=(char*)"top p_{T} [GeV]";
     if(HistName=="ttbarpT")                  	var=(char*)"ttbar system p_{T} [GeV]"; 
     if(HistName=="ttbarpT_incl")              	var=(char*)"ttbar system p_{T} [GeV]"; 

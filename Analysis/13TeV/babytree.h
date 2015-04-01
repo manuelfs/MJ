@@ -2,6 +2,7 @@
 #include <string>
 #include "TChain.h"
 
+bool status = true;
     int             event_;
     float           EventWeight_;
     float           Npu_;
@@ -30,6 +31,7 @@
     vector<float>   *RA4MusVetoPt_;
     vector<float>   *RA4ElsVetoPt_;
     vector<float>   *GenId_;
+    vector<float>   *GenStatus_;
     vector<float>   *GenMId_;
     vector<float>   *GenGMId_;
     bool        TrigMuon_;
@@ -67,6 +69,7 @@
     TBranch         *b_RA4MusVetoPt;   //!
     TBranch         *b_RA4ElsVetoPt;   //!
     TBranch         *b_GenId;   //!
+    TBranch         *b_GenStatus;   //!
     TBranch         *b_GenMId;   //!
     TBranch         *b_GenGMId;   //!
     TBranch     *b_TrigMuon; 
@@ -95,6 +98,7 @@ void InitBaby(TChain *ch)
     RA4MusVetoPt_  = 0;
     RA4ElsVetoPt_  = 0;
     GenId_  = 0;
+    GenStatus_  = 0;
     GenMId_  = 0;
     GenGMId_  = 0;
 
@@ -127,6 +131,7 @@ void InitBaby(TChain *ch)
     ch->SetBranchAddress("RA4ElsVetoPt",    &RA4ElsVetoPt_, &b_RA4ElsVetoPt);
     ch->SetBranchAddress("GenId",           &GenId_,         &b_GenId);
     ch->SetBranchAddress("GenMId",          &GenMId_,        &b_GenMId);
+    if(status)ch->SetBranchAddress("GenStatus",          &GenMId_,        &b_GenMId);
     ch->SetBranchAddress("GenGMId",         &GenGMId_,       &b_GenGMId);
     ch->SetBranchAddress("top1pT",        &top1pT_, &b_top1pT);
     ch->SetBranchAddress("top1Phi",       &top1Phi_, &b_top1Phi);
