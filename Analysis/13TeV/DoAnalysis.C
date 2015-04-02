@@ -15,7 +15,7 @@ void DoAnalysis(bool OnlyDraw=false)
   gROOT->LoadMacro("MakeSF.C+");
   gROOT->LoadMacro("Make2DPlots.C+");
   gROOT->LoadMacro("MakeTables.C+");
-  char* sysname[] = {"_toppT1","_toppT2","_ISRpT1","_ISRpT2","_ISRpT3","_ISRpartons"};
+  char* sysname[] = {"_toppT1","_toppT2","_ISRpT1","_ISRpT2","_ISRpT3","_nISR"};
   int nsys=6;
   if(!status) nsys=5;
   gSystem->Exec(Form("mkdir -p Out/v%i/Figures/",version));
@@ -137,8 +137,9 @@ void DoAnalysis(bool OnlyDraw=false)
 	    Make1DPlots(version, "elsEta",       Region[iregion],bo,sysname[isys]);
 	    Make1DPlots(version, "mT",           Region[iregion],bo,sysname[isys]);
 	    Make1DPlots(version, "mj",           Region[iregion],bo,sysname[isys]);
-	    Make1DPlots(version, "HT",           Region[iregion],bo,sysname[isys]);
+	   
 	  }
+	  Make1DPlots(version, "HT",           Region[iregion],bo,sysname[isys]);
 	  Make1DPlots(version, "MJ",           Region[iregion],bo,sysname[isys]);
 	  Make1DPlots(version, "MJ_coarse",           Region[iregion],bo,sysname[isys]);
 	  if(iregion> SRthres){

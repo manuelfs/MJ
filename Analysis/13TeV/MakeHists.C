@@ -94,21 +94,19 @@ double nPUScaleFactor2012(TH1F* h1PU, float npu){
 }
 
 
-/*void MCDump(){
-    vector<float>   *GenId_;
-    vector<float>   *GenMId_;
-    vector<float>   *GenGMId_;
+void MCDump(){
     for(unsigned int igen=0; igen<GenId_->size(); igen++)
         { 
-	  cout<<"ID"
+	  cout<<"STATUS   ID   MID   GMID   "<<GenStatus_->at(igen)<<"  "<<fabs(GenId_->at(igen))<<"  "<<fabs(GenMId_->at(igen))<<"  "<<fabs(GenGMId_->at(igen))<<endl;
         }
-	}*/
+}
 
 int GetnISR(){
   int nISR=0;
    for(unsigned int igen=0; igen<GenId_->size(); igen++)
         { 
-	  if(GenId_->at(igen)==23 && fabs(GenId_->at(0))!=6 && fabs(GenMId_->at(0))!=6 && fabs(GenGMId_->at(0))!=6){
+	  if(GenStatus_->at(igen)==23 && fabs(GenId_->at(igen))!=6 && fabs(GenMId_->at(igen))!=6 && fabs(GenGMId_->at(igen))!=6
+	      && fabs(GenId_->at(igen))!=24 && fabs(GenMId_->at(igen))!=24 && fabs(GenGMId_->at(igen))!=24 ){
 	    nISR++;
 	  }
         }
@@ -202,7 +200,7 @@ float getISR3SF(float ISRpT)
 }
 
 float GetNISRSF(int nISR){
-  if(nISR>3) cout<<"ERROR: n ISR = "<<nISR<<endl;
+  if(nISR>3) {cout<<"ERROR: n ISR = "<<nISR<<endl; MCDump(); return 1.0;}
   else if(nISR==3) return 1.30;
   else if(nISR==2) return 1.15;
   else if(nISR==1) return 1.0;
@@ -600,7 +598,7 @@ void MakeHists(int version, TChain *ch, char* Region, char* sys=(char*)"")
 	if(HT40<750 || RA4NB==0) continue;
 
 	int nISR=0;
-	
+	EventWeight_ = EventWeight_*5000.;
         // 
         // weights 
         // 
@@ -655,7 +653,7 @@ void MakeHists(int version, TChain *ch, char* Region, char* sys=(char*)"")
 	    if(ChainName.Contains("ISRpT2")){
 	      EventWeight_ = EventWeight_ * getISR2SF(ISRpT);}
 	    if(ChainName.Contains("ISRpT3")){
-	      EventWeight_ = EventWeight_ * getISR2SF(ISRpT);}
+	      EventWeight_ = EventWeight_ * getISR3SF(ISRpT);}
 	    if(ChainName.Contains("nISR")){
 	      EventWeight_= EventWeight_ * GetNISRSF(nISR);
 	    }
@@ -945,6 +943,7 @@ void MakeHists(int version, TChain *ch, char* Region, char* sys=(char*)"")
     h1_toppT1_incl->SetDirectory(0);                      h1_toppT1_incl->Write();
     h1_toppT2_incl->SetDirectory(0);                      h1_toppT2_incl->Write();
     h1_toppT_incl->SetDirectory(0);                      h1_toppT_incl->Write();
+    h1_nISR_incl->SetDirectory(0);                      h1_nISR_incl->Write();
     h1_ttbarpT_incl->SetDirectory(0);                      h1_ttbarpT_incl->Write();
     for(int i=0; i<7; i++)  
     {
@@ -953,6 +952,7 @@ void MakeHists(int version, TChain *ch, char* Region, char* sys=(char*)"")
 	h1_MJ_coarse[i]->SetDirectory(0);                   h1_MJ_coarse[i]->Write();
         h1_HT[i]->SetDirectory(0);                          h1_HT[i]->Write();
 	h1_toppT[i]->SetDirectory(0);                       h1_toppT[i]->Write();
+	h1_nISR[i]->SetDirectory(0);                        h1_nISR[i]->Write();
 	h1_ttbarpT[i]->SetDirectory(0);                     h1_ttbarpT[i]->Write();
 	h1_toppT1[i]->SetDirectory(0);                      h1_toppT1[i]->Write();
 	h1_toppT2[i]->SetDirectory(0);                      h1_toppT2[i]->Write();

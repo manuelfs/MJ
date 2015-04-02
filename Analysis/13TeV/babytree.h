@@ -2,7 +2,7 @@
 #include <string>
 #include "TChain.h"
 
-bool status = true;
+    bool status = true;
     int             event_;
     float           EventWeight_;
     float           Npu_;
@@ -131,7 +131,7 @@ void InitBaby(TChain *ch)
     ch->SetBranchAddress("RA4ElsVetoPt",    &RA4ElsVetoPt_, &b_RA4ElsVetoPt);
     ch->SetBranchAddress("GenId",           &GenId_,         &b_GenId);
     ch->SetBranchAddress("GenMId",          &GenMId_,        &b_GenMId);
-    if(status)ch->SetBranchAddress("GenStatus",          &GenMId_,        &b_GenMId);
+    if(status)ch->SetBranchAddress("GenStatus",          &GenStatus_,        &b_GenStatus);
     ch->SetBranchAddress("GenGMId",         &GenGMId_,       &b_GenGMId);
     ch->SetBranchAddress("top1pT",        &top1pT_, &b_top1pT);
     ch->SetBranchAddress("top1Phi",       &top1Phi_, &b_top1Phi);
