@@ -10,6 +10,7 @@
 #include "TDatime.h"
 #include "TLegend.h"
 #include "TMath.h"
+#include "TGraphErrors.h"
 
 #include "babytree.h"
 #include "PassSelection.h"
@@ -201,10 +202,10 @@ float getISR3SF(float ISRpT)
 
 float GetNISRSF(int nISR){
   if(nISR>3) {cout<<"ERROR: n ISR = "<<nISR<<endl; MCDump(); return 1.0;}
-  else if(nISR==3) return 1.30;
-  else if(nISR==2) return 1.15;
+  else if(nISR==3) return 1.5;
+  else if(nISR==2) return 1.25;
   else if(nISR==1) return 1.0;
-  else return 0.85;
+  else return 0.75;
   
 }
 
@@ -298,7 +299,7 @@ void MakeHists(int version, TChain *ch, char* Region, char* sys=(char*)"")
      h1_ttbarpT_incl = InitTH1F( Form("h1_%s_ttbarpT_incl", ChainName.Data()), 
 			       Form("h1_%s_ttbarpT_incl", ChainName.Data()), 
 			       //20, 350, 1350);
-			       40, 0, 2000);
+			       20, 0, 1600);
     h2_toppT_incl = InitTH2F( Form("h2_%s_toppT_incl", ChainName.Data()), 
 			       Form("h2_%s_toppT_incl", ChainName.Data()), 
 			       //20, 350, 1350);
@@ -326,6 +327,9 @@ void MakeHists(int version, TChain *ch, char* Region, char* sys=(char*)"")
 						 6,-3,3);
 	}
 	}
+	
+	
+	
 	h1_MJ_coarse[i] = InitTH1FVarBin( Form("h1_%s_MJ_coarse_%ifatjet", ChainName.Data(), i), 
                              Form("h1_%s_MJ_%ifatjet", ChainName.Data(), i), 
                              nbin,xbins);
@@ -402,7 +406,7 @@ void MakeHists(int version, TChain *ch, char* Region, char* sys=(char*)"")
 	h1_ttbarpT[i] = InitTH1F( Form("h1_%s_ttbarpT_%ifatjet", ChainName.Data(), i), 
 				Form("h1_%s_ttbarpT_%ifatjet", ChainName.Data(), i), 
 				//20, 350, 1350);
-				40, 0, 2000);
+				20, 0, 1600);
 	h2_toppT[i] = InitTH2F( Form("h2_%s_toppT_%ifatjet", ChainName.Data(), i), 
 				Form("h2_%s_toppT_%ifatjet", ChainName.Data(), i), 
 				//20, 350, 1350);
@@ -863,11 +867,14 @@ void MakeHists(int version, TChain *ch, char* Region, char* sys=(char*)"")
 
 	if(ChainName.Contains("TT_sys")){
 	  if(MJ_thres<0) cout<<"MJ IS LESS THAN ZERO"<<endl;
-	  int jbin = h1_MJ_coarse->FindBin(MJ_thres)-1 ;
+	  int jbin = h1_MJ_coarse[NFJbin]->FindBin(MJ_thres)-1 ;
 	  if(jbin<0 || jbin >= nbin) cout<<"jbin out of range."<<endl;
 	  h1_MJ_weights_by_bin[NFJbin][jbin]->Fill(EventWeight_/orig_weight, orig_weight);
 	  h1_MJ_weights_by_bin[6][jbin]->Fill(EventWeight_/orig_weight, orig_weight);
 	}
+
+
+
         FillTH1FAll(h1_MET, NFJbin, MET_, EventWeight_);              
         FillTH1FAll(h1_METPhi, NFJbin, METPhi_, EventWeight_);        
         FillTH1FAll(h1_METx, NFJbin, MET_*TMath::Cos(METPhi_), EventWeight_);           
@@ -955,7 +962,20 @@ void MakeHists(int version, TChain *ch, char* Region, char* sys=(char*)"")
     cout<<"TOP PT REWEIGHT pre: "<<N_pre_toppT<<"   post: "<<N_post_toppT<<"    Ratio: "<<ptscale<<endl;
 
     //make tgraph to output SF/unc
-
+    TGraphErrors* g1_SF_mc[7];
+    if(ChainName.Contains("TT_sys")){
+      for(int ifj=0; ifj<7; ifj++){ 
+	Double_t x[nbin],ex[nbin],y[nbin],ey[nbin];
+	for(int i=0;i<nbin;i++){
+	  x[i] = h1_MJ_coarse[ifj]->GetBinCenter(i+1);
+	  ex[i] = 0.5*h1_MJ_coarse[ifj]->GetBinWidth(i+1);	
+	  y[i] = h1_MJ_weights_by_bin[ifj][i]->GetMean();
+	  ey[i] = h1_MJ_weights_by_bin[ifj][i]->GetMeanError();
+	}
+	g1_SF_mc[ifj] = new TGraphErrors(nbin,x,y,ex,ey);
+	g1_SF_mc[ifj]->SetName(Form("%s_mcSF_%i",ChainName.Data(),ifj));
+      }
+    }
     
     TString HistFileName = ChainName;
     HistFileName = Form("Out/v%i/HistFiles/%s_%s_v%i.root", version,HistFileName.Data(), Region,version);
@@ -971,6 +991,7 @@ void MakeHists(int version, TChain *ch, char* Region, char* sys=(char*)"")
     h1_ttbarpT_incl->SetDirectory(0);                      h1_ttbarpT_incl->Write();
     for(int i=0; i<7; i++)  
     {
+      if(ChainName.Contains("TT_sys")){ g1_SF_mc[i]->Write();}
         h1_yields[i]->SetDirectory(0);                      h1_yields[i]->Write();
         h1_MJ[i]->SetDirectory(0);                          h1_MJ[i]->Write();
 	h1_MJ_coarse[i]->SetDirectory(0);                   h1_MJ_coarse[i]->Write();

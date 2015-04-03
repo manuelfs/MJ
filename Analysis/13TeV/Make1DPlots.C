@@ -161,7 +161,7 @@ void Make1DPlots(int version, TString HistName, char* Region,  bool DoLog=1,char
       // else SFFile = TFile::Open(Form("HistFiles/v%i/%s_SF_%s_v%i.root",version,HistName.Data() ,c_region[1].Data(),version));  
       for(int j=2;j<7;j++){
 	MJ_SF[j] = (TGraphErrors*)SFFile->Get(Form("SF_%i",j));
-	MJ_SF_non_pois[j] = (TGraphErrors*)SFFile->Get(Form("SF_non_pois_%i",j));
+	//MJ_SF_non_pois[j] = (TGraphErrors*)SFFile->Get(Form("SF_non_pois_%i",j));
       }
       SFFile->Close();
     }

@@ -35,7 +35,7 @@ void MakeSF( int version, char* Region, TString HistName, char* sys)
   TH1F *h1_f1500_100[7], *h1_f1200_800[7];
   
   
-  TGraphErrors *g1_SF[7],*g2_SF[7];
+  TGraphErrors *g1_SF[7],*g2_SF[7], *g1_SF_mc[7];
   TCanvas *c = new TCanvas("c","c",1200,800); 
   c->Divide(3,2);
   for(int i=2; i<7; i++) {
@@ -48,7 +48,8 @@ void MakeSF( int version, char* Region, TString HistName, char* sys)
       h1_DY[i]        = (TH1F*)HistFile->Get(Form("h1_DY_%s_%ifatjet", HistName.Data(), i)); 
       h1_f1500_100[i] = (TH1F*)HistFile->Get(Form("h1_T1tttt_f1500_100_%s_%ifatjet", HistName.Data(), i)); 
       h1_f1200_800[i] = (TH1F*)HistFile->Get(Form("h1_T1tttt_f1200_800_%s_%ifatjet", HistName.Data(), i)); 
-    
+      g1_SF_mc[i] = (TGraphErrors*)HistFile->Get(Form("%s%s_mcSF_%i","TT_sys",sys,i));
+      	g1_SF_mc[i]->SetLineColor(kBlue);
 
    //h1_DATA[i]->Rebin(NMergeBins);
         h1_T[i]->Rebin(NMergeBins);
@@ -112,7 +113,7 @@ void MakeSF( int version, char* Region, TString HistName, char* sys)
 	  ex1[b] = 0.5* h1_TT_sys[i]->GetBinWidth(b);
 	  y1[b] = -1; ey1[b]=0;
 	  
-	  if(h1_TT[i]->GetBinContent(b)>1 && h1_TT_sys[i]->GetBinContent(b)>1){ y1[b] = h1_TT_sys[i]->GetBinContent(b)/h1_TT[i]->GetBinContent(b);
+	  if(h1_TT[i]->GetBinContent(b)>0.5 && h1_TT_sys[i]->GetBinContent(b)>0.5){ y1[b] = h1_TT_sys[i]->GetBinContent(b)/h1_TT[i]->GetBinContent(b);
 	    //  ey1[b] = y1[b]*pow(pow(h1_TT[i]->GetBinError(b)/h1_TT[i]->GetBinContent(b),2)+pow(h1_TT_sys[i]->GetBinError(b)/h1_TT_sys[i]->GetBinContent(b),2),0.5);
 	     ey1[b] = y1[b]*h1_TT_sys[i]->GetBinError(b)/h1_TT_sys[i]->GetBinContent(b);
 
@@ -129,7 +130,7 @@ void MakeSF( int version, char* Region, TString HistName, char* sys)
 	g1_SF[i]->SetMarkerColor(kBlue);
 	g1_SF[i]->SetLineColor(kBlue);
 	g1_SF[i]->SetMinimum(0);
-	g1_SF[i]->SetMaximum(1.5);
+	g1_SF[i]->SetMaximum(2.0);
        	g1_SF[i]->GetXaxis()->SetRangeUser(0,2000);
 	TString StackTitle = Form("%i fatjets", i);
         if(i==6) StackTitle = "All fatjets";
@@ -140,8 +141,8 @@ void MakeSF( int version, char* Region, TString HistName, char* sys)
 	g1_SF[i]->GetYaxis()->SetTitle(axistitle);
 	g1_SF[i]->Draw("APZ");
 	
-	g2_SF[i] = new TGraphErrors(nbins,x1,y1,ex1,ey1);
-
+	//	g2_SF[i] = new TGraphErrors(nbins,x1,y1,ex1,ey1);
+	/*
 	g2_SF[i]->SetLineColor(kBlue);
 	g2_SF[i]->SetMinimum(0);
 	g2_SF[i]->SetMaximum(1.5);
@@ -153,9 +154,22 @@ void MakeSF( int version, char* Region, TString HistName, char* sys)
 	g2_SF[i]->SetName(Form("SF_non_pois_%i",i));
 	g2_SF[i]->GetXaxis()->SetTitle("MJ [GeV]");
 	g2_SF[i]->GetYaxis()->SetTitle(axistitle);
-	g2_SF[i]->Draw("2Z same");
+	g2_SF[i]->Draw("2Z same");*/
+	
+		
+	g1_SF_mc[i]->SetMinimum(0);
+	g1_SF_mc[i]->SetMaximum(2.0);
+	//	g1_SF_mc[i]->SetLineWidth(1504);
+	g1_SF_mc[i]->SetFillStyle(3002);
+	g1_SF_mc[i]->SetFillColor(kBlack);
+       	g1_SF_mc[i]->GetXaxis()->SetRangeUser(0,2000);
+		g1_SF_mc[i]->SetTitle(StackTitle);
+	//g1_SF_mc[i]->SetName(Form("SF_non_pois_%i",i));
+	g1_SF_mc[i]->GetXaxis()->SetTitle("MJ [GeV]");
+	g1_SF_mc[i]->GetYaxis()->SetTitle(axistitle);
+	g1_SF_mc[i]->Draw("2Z same");
 
-
+	
 	
 	 // CMS Labels 
         float textSize = 0.04;
@@ -202,7 +216,7 @@ void MakeSF( int version, char* Region, TString HistName, char* sys)
     //g1_SF[j]->SetDirectory(0);
     //cout<<j<<endl;
     g1_SF[j]->Write();
-    g2_SF[j]->Write();
+    //g2_SF[j]->Write();
   }
   HistFile2->Close();
   //cout<<"finished"<<endl;

@@ -7,7 +7,7 @@ void DoAnalysis(bool OnlyDraw=false)
   // Style
   //gROOT->ProcessLine(".L /Users/jaehyeok/macros/rootlogon.C");
   // Load macros
-  int version = 5;
+  int version = 6;
   bool status =true;
   bool OnlyEssential=true;
   gROOT->LoadMacro("MakeHists.C+");
@@ -15,8 +15,8 @@ void DoAnalysis(bool OnlyDraw=false)
   gROOT->LoadMacro("MakeSF.C+");
   gROOT->LoadMacro("Make2DPlots.C+");
   gROOT->LoadMacro("MakeTables.C+");
-  char* sysname[] = {"_toppT1","_toppT2","_ISRpT1","_ISRpT2","_ISRpT3","_nISR"};
-  int nsys=6;
+  char* sysname[] = {/*"_toppT1",*/"_toppT2",/*"_ISRpT1",*/"_ISRpT2","_ISRpT3","_nISR"};
+  int nsys=4;
   if(!status) nsys=5;
   gSystem->Exec(Form("mkdir -p Out/v%i/Figures/",version));
   gSystem->Exec(Form("mkdir -p Out/v%i/HistFiles/",version));
@@ -35,9 +35,9 @@ void DoAnalysis(bool OnlyDraw=false)
   TChain *ch_f1500_100    = new TChain("tree", "T1tttt_f1500_100");
   TChain *ch_f1200_800    = new TChain("tree", "T1tttt_f1200_800");
   
-  TString BabyDir = //"/Users/heller/Jae/ntuples/HT750MET250/";
+  TString BabyDir = "/Users/heller/Jae/ntuples/HT750MET250_JetPt20/";
     //  "/net/cms26/cms26r0/jaehyeok/baby/Fatjet/13TeV/Phys14NoSkim/";
-  "/net/cms26/cms26r0/jaehyeok/baby/Fatjet/13TeV/";
+    // "/net/cms26/cms26r0/jaehyeok/baby/Fatjet/13TeV/";
     //"/net/cms26/cms26r0/jaehyeok/baby/Fatjet/13TeV/Phys14/HT750MET250/";
   //"/Users/jaehyeok/Research/Tools/fastjet-3.0.6/example/babies/13TeV/HT750MET250/";
     
@@ -79,9 +79,9 @@ void DoAnalysis(bool OnlyDraw=false)
   // Loop over SR and CR : make sure that these regions exist in "PassSelection.h"
   //
     
-  char* Region[] = {"1BCRincl","1B4SJCRincl","1B45SJ","1B67SJ","1B8SJ","SRincl"};
-  int nregion =6;
-  int SRthres=4;
+  char* Region[] = {"1BCRincl","1B4SJCRincl",/*"1B45SJ","1B67SJ","1B8SJ",*/"SRincl"};
+  int nregion =3;
+  int SRthres=1;
   //COPY TO MAKE1DPlots
 
   
@@ -119,7 +119,7 @@ void DoAnalysis(bool OnlyDraw=false)
       //  Draw histograms 
       // ----------------------------------------
       for(int isys=0;isys<nsys;isys++){
-	MakeSF(version, Region[iregion],"MJ",sysname[isys]);
+	//	MakeSF(version, Region[iregion],"MJ",sysname[isys]);
 	MakeSF(version, Region[iregion],"MJ_coarse",sysname[isys]);
       }
     }
@@ -140,12 +140,12 @@ void DoAnalysis(bool OnlyDraw=false)
 	   
 	  }
 	  Make1DPlots(version, "HT",           Region[iregion],bo,sysname[isys]);
-	  Make1DPlots(version, "MJ",           Region[iregion],bo,sysname[isys]);
+	  //Make1DPlots(version, "MJ",           Region[iregion],bo,sysname[isys]);
 	  Make1DPlots(version, "MJ_coarse",           Region[iregion],bo,sysname[isys]);
 	  if(iregion> SRthres){
 	    for(int icorr=0;icorr<nregion-1;icorr++){
 	      Make1DPlots(version, Form("MJ_coarse_corr%i",icorr), Region[iregion],bo,sysname[isys]);
-	      Make1DPlots(version, Form("MJ_corr%i",icorr),  Region[iregion],bo,sysname[isys]);
+	      // Make1DPlots(version, Form("MJ_corr%i",icorr),  Region[iregion],bo,sysname[isys]);
 	    }
 	  }
 	  TString temp = Form("%s",sysname[isys]);
