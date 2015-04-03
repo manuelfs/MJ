@@ -273,6 +273,9 @@ void MakeHists(int version, TChain *ch, char* Region, char* sys=(char*)"")
     TH2F *h2_toppT_incl;
 
     TH1F *h1_MJ_coarse[7];
+    Float_t xbins[] = {0,100,200,300,400,500,600,2000};
+    const int nbin = 7;
+    TH1F* h1_MJ_weights_by_bin[7][nbin];
     
     h1_toppT1_incl = InitTH1F( Form("h1_%s_toppT1_incl", ChainName.Data()), 
 			       Form("h1_%s_toppT1_incl", ChainName.Data()), 
@@ -316,11 +319,19 @@ void MakeHists(int version, TChain *ch, char* Region, char* sys=(char*)"")
                              Form("h1_%s_MJ_%ifatjet", ChainName.Data(), i), 
                              20, 0, 2000);
 
-	Float_t xbins[] = {0,100,200,300,400,500,600,2000};
-	int nbin = 7;
+	if(ChainName.Contains("TT_sys")){
+	for(int j=0;j<nbin; j++){
+	  h1_MJ_weights_by_bin[i][j] = InitTH1F( Form("h1_%s_MJ_weights_by_bin_%ifatjet_bin%i", ChainName.Data(), i, j), 
+						 Form("h1_%s_MJ_weights_by_bin_%ifatjet_bin%i", ChainName.Data(), i, j), 
+						 6,-3,3);
+	}
+	}
 	h1_MJ_coarse[i] = InitTH1FVarBin( Form("h1_%s_MJ_coarse_%ifatjet", ChainName.Data(), i), 
                              Form("h1_%s_MJ_%ifatjet", ChainName.Data(), i), 
                              nbin,xbins);
+
+
+	
         h1_mj[i] = InitTH1F( Form("h1_%s_mj_%ifatjet", ChainName.Data(), i), 
                              Form("h1_%s_mj_%ifatjet", ChainName.Data(), i), 
                              40, 0, 800);
@@ -609,6 +620,7 @@ void MakeHists(int version, TChain *ch, char* Region, char* sys=(char*)"")
             EventWeight_ = EventWeight_*806.1/832.; // I used 832 pb while M used 806.1 pb.
 	    }*/
 	float ISRpT;
+	float orig_weight=EventWeight_;
 	N_pre_toppT+=EventWeight_;
 	if(ChainName.Contains("TT"))
 	{
@@ -620,6 +632,7 @@ void MakeHists(int version, TChain *ch, char* Region, char* sys=(char*)"")
 	if(ChainName.Contains("TT_sys"))
 	  {	  
 	    //v1
+	    
 	    if(ChainName.Contains("toppT1")){
 	      float t1pT,t2pT;
 	      if(top1pT_>400) t1pT=400;
@@ -846,7 +859,15 @@ void MakeHists(int version, TChain *ch, char* Region, char* sys=(char*)"")
         FillTH1FAll(h1_WpT, NFJbin, WpT, EventWeight_);               
         FillTH1FAll(h1_HT, NFJbin, HT40, EventWeight_);   
         FillTH1FAll(h1_MJ, NFJbin, MJ_thres, EventWeight_);
-	FillTH1FAll(h1_MJ_coarse, NFJbin, MJ_thres, EventWeight_); 
+	FillTH1FAll(h1_MJ_coarse, NFJbin, MJ_thres, EventWeight_);
+
+	if(ChainName.Contains("TT_sys")){
+	  if(MJ_thres<0) cout<<"MJ IS LESS THAN ZERO"<<endl;
+	  int jbin = h1_MJ_coarse->FindBin(MJ_thres)-1 ;
+	  if(jbin<0 || jbin >= nbin) cout<<"jbin out of range."<<endl;
+	  h1_MJ_weights_by_bin[NFJbin][jbin]->Fill(EventWeight_/orig_weight, orig_weight);
+	  h1_MJ_weights_by_bin[6][jbin]->Fill(EventWeight_/orig_weight, orig_weight);
+	}
         FillTH1FAll(h1_MET, NFJbin, MET_, EventWeight_);              
         FillTH1FAll(h1_METPhi, NFJbin, METPhi_, EventWeight_);        
         FillTH1FAll(h1_METx, NFJbin, MET_*TMath::Cos(METPhi_), EventWeight_);           
@@ -933,6 +954,9 @@ void MakeHists(int version, TChain *ch, char* Region, char* sys=(char*)"")
     else ptscale=0;
     cout<<"TOP PT REWEIGHT pre: "<<N_pre_toppT<<"   post: "<<N_post_toppT<<"    Ratio: "<<ptscale<<endl;
 
+    //make tgraph to output SF/unc
+
+    
     TString HistFileName = ChainName;
     HistFileName = Form("Out/v%i/HistFiles/%s_%s_v%i.root", version,HistFileName.Data(), Region,version);
     cout << "[MJ Analysis] Writing " << HistFileName << endl;
