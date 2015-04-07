@@ -7,7 +7,7 @@ void DoAnalysis(bool OnlyDraw=false)
   // Style
   //gROOT->ProcessLine(".L /Users/jaehyeok/macros/rootlogon.C");
   // Load macros
-  int version = 11;
+  int version = 13;
   bool status =false;
   bool OnlyEssential=true;
   gROOT->LoadMacro("MakeHists.C+");
@@ -36,7 +36,8 @@ void DoAnalysis(bool OnlyDraw=false)
   TChain *ch_f1200_800    = new TChain("tree", "T1tttt_f1200_800");
   
   TString BabyDir = //"/Users/heller/Jae/ntuples/HT750MET250_JetPt20/";
-    "/Users/heller/Jae/ntuples/HT750MET250/";
+    //"/Users/heller/Jae/ntuples/HT750MET250/";
+    "/net/top/homes/rohan/MJ/Analysis/13TeV/Phys14/";
     //  "/net/cms26/cms26r0/jaehyeok/baby/Fatjet/13TeV/Phys14NoSkim/";
     // "/net/cms26/cms26r0/jaehyeok/baby/Fatjet/13TeV/";
     //"/net/cms26/cms26r0/jaehyeok/baby/Fatjet/13TeV/Phys14/HT750MET250/";
@@ -80,7 +81,7 @@ void DoAnalysis(bool OnlyDraw=false)
   // Loop over SR and CR : make sure that these regions exist in "PassSelection.h"
   //
     
-  char* Region[] = {"SR0","baseline","1BCRincl","1B4SJCRincl",/*"1B45SJ","1B67SJ","1B8SJ",*/"SRincl"};
+  char* Region[] = {"baseline","1BCRincl","1B4SJCRincl",/*"1B45SJ","1B67SJ","1B8SJ",*/"SRincl"};
   int nregion =1;
   int SRthres=2;
   //COPY TO MAKE1DPlots
