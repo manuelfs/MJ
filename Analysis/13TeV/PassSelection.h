@@ -40,9 +40,19 @@ bool PassSelection(TString Region,
                    float HT, float MET, int Nb, int Njet, float mT, float MJ)
 {
     bool passed=false;
-    
+
+
+     if(Region=="baseline" && PassNLep(1)
+        && HT > 750 
+        && MET > 250
+        && Nb > 1 
+        && Njet > 5
+        && mT > -1
+        && MJ > -1 
+    )  passed = true;
+     
     if(Region=="SR0" && PassBaselineSelection() &&  PassNLep(1)
-        && HT > -1 
+        && HT > 750 
         && MET > 400
         && Nb > 1 
         && Njet > 5

@@ -7,8 +7,8 @@ void DoAnalysis(bool OnlyDraw=false)
   // Style
   //gROOT->ProcessLine(".L /Users/jaehyeok/macros/rootlogon.C");
   // Load macros
-  int version = 6;
-  bool status =true;
+  int version = 11;
+  bool status =false;
   bool OnlyEssential=true;
   gROOT->LoadMacro("MakeHists.C+");
   gROOT->LoadMacro("Make1DPlots.C+");
@@ -16,8 +16,8 @@ void DoAnalysis(bool OnlyDraw=false)
   gROOT->LoadMacro("Make2DPlots.C+");
   gROOT->LoadMacro("MakeTables.C+");
   char* sysname[] = {/*"_toppT1",*/"_toppT2",/*"_ISRpT1",*/"_ISRpT2","_ISRpT3","_nISR"};
-  int nsys=4;
-  if(!status) nsys=5;
+  int nsys=1;
+  // if(!status) nsys=1;
   gSystem->Exec(Form("mkdir -p Out/v%i/Figures/",version));
   gSystem->Exec(Form("mkdir -p Out/v%i/HistFiles/",version));
   gSystem->Exec(Form("mkdir -p Out/v%i/Tables/",version));
@@ -35,7 +35,8 @@ void DoAnalysis(bool OnlyDraw=false)
   TChain *ch_f1500_100    = new TChain("tree", "T1tttt_f1500_100");
   TChain *ch_f1200_800    = new TChain("tree", "T1tttt_f1200_800");
   
-  TString BabyDir = "/Users/heller/Jae/ntuples/HT750MET250_JetPt20/";
+  TString BabyDir = //"/Users/heller/Jae/ntuples/HT750MET250_JetPt20/";
+    "/Users/heller/Jae/ntuples/HT750MET250/";
     //  "/net/cms26/cms26r0/jaehyeok/baby/Fatjet/13TeV/Phys14NoSkim/";
     // "/net/cms26/cms26r0/jaehyeok/baby/Fatjet/13TeV/";
     //"/net/cms26/cms26r0/jaehyeok/baby/Fatjet/13TeV/Phys14/HT750MET250/";
@@ -79,9 +80,9 @@ void DoAnalysis(bool OnlyDraw=false)
   // Loop over SR and CR : make sure that these regions exist in "PassSelection.h"
   //
     
-  char* Region[] = {"1BCRincl","1B4SJCRincl",/*"1B45SJ","1B67SJ","1B8SJ",*/"SRincl"};
-  int nregion =3;
-  int SRthres=1;
+  char* Region[] = {"SR0","baseline","1BCRincl","1B4SJCRincl",/*"1B45SJ","1B67SJ","1B8SJ",*/"SRincl"};
+  int nregion =1;
+  int SRthres=2;
   //COPY TO MAKE1DPlots
 
   

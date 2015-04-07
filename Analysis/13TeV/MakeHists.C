@@ -211,7 +211,7 @@ float GetNISRSF(int nISR){
 
 float getDPhi(float phi1, float phi2) 
 { 
-    float absdphi = abs(phi1-phi2);
+    float absdphi = fabs(phi1-phi2);
     if(absdphi < TMath::Pi()) return absdphi;
     else return (2*TMath::Pi() - absdphi);
     // Ryan's : http://www.aidansean.com/cheatsheets/?p=105
@@ -220,7 +220,7 @@ float getDPhi(float phi1, float phi2)
 }
 float getDEta(float eta1, float eta2)
 {
-    return abs(eta1-eta2);
+    return fabs(eta1-eta2);
 }
 float getDR(float dphi, float deta)
 {
@@ -239,7 +239,7 @@ void MakeHists(int version, TChain *ch, char* Region, char* sys=(char*)"")
 
     InitBaby(ch); 
     TString ChainName = Form("%s%s",ch->GetTitle(),sys);
-    
+    vector<int> eventlist;
     cout << "[MJ Analysis] " << ChainName << endl;  
 
     //
@@ -563,7 +563,9 @@ void MakeHists(int version, TChain *ch, char* Region, char* sys=(char*)"")
     Int_t nentries = (Int_t)ch->GetEntries();
     for(int i = 0; i<nentries; i++)
     {
-        ch->GetEntry(i); 
+      bool flagged =false;
+        ch->GetEntry(i);
+	if(event_==21962862 || event_==121299115 || event_==64381257) flagged = true;
 
         // Progress indicator begin --------------------------------
         int i_permille = (int)floor(1000 * i / float(nentries));
@@ -604,16 +606,16 @@ void MakeHists(int version, TChain *ch, char* Region, char* sys=(char*)"")
 	int RA4NSJ=0;
 	int RA4NB=0;
 	for(unsigned int a=0;a<JetPt_->size();a++){
-	  if(JetPt_->at(a)>40. && TMath::Abs(JetEta_->at(a))<2.5){ 
+	  if(JetPt_->at(a)>=40. && TMath::Abs(JetEta_->at(a))<=2.5){ 
 	    HT40+=JetPt_->at(a);
 	    RA4NSJ++;
-	    if(JetCSV_->at(a)>0.814) RA4NB++;
+	    if(JetCSV_->at(a)>=0.814) RA4NB++;
 	  }
 	}
-	if(HT40<750 || RA4NB==0) continue;
-
+	if(HT40<=750 || RA4NB==0) continue;
+	
 	int nISR=0;
-	EventWeight_ = EventWeight_*5000.;
+	if(status)EventWeight_ = EventWeight_*5000.;
         // 
         // weights 
         // 
@@ -690,7 +692,8 @@ void MakeHists(int version, TChain *ch, char* Region, char* sys=(char*)"")
 
         // 
         // single-lepton events selection
-        // 
+        //
+	if(flagged) cout<<"flagged event HT40 NSJ NB RA4mus RA4els RA4musveto RA4elsveto "<<event_<<"   "<<HT40<<"   "<<RA4NSJ<<"   "<<RA4NB<<"   "<<RA4MusPt_->size()<<"   "<<RA4ElsPt_->size()<<"   "<<RA4MusVetoPt_->size()<<"   "<<RA4ElsVetoPt_->size()<<endl;
         if(!(PassNLep(1) || PassNLep(2)))  continue; // need this upfront because of mT calculation
 
         // Nfatjet, MJ, mj sorting 
@@ -828,7 +831,8 @@ void MakeHists(int version, TChain *ch, char* Region, char* sys=(char*)"")
 
         // yields
         if(RA4ElsPt_->size()==1) FillTH1FAll(h1_yields, NFJbin, 0.5, EventWeight_);   
-        if(RA4MusPt_->size()==1) FillTH1FAll(h1_yields, NFJbin, 1.5, EventWeight_);  
+        if(RA4MusPt_->size()==1) FillTH1FAll(h1_yields, NFJbin, 1.5, EventWeight_);
+	if(NFJbin==5 && ChainName.Contains("TT_ll") ) eventlist.push_back(event_);
         
         // plots
         if(RA4MusPt_->size()==1) {
@@ -1054,4 +1058,8 @@ void MakeHists(int version, TChain *ch, char* Region, char* sys=(char*)"")
         h2_mj3vsmj4[i]->SetDirectory(0);                    h2_mj3vsmj4[i]->Write();
     }
     HistFile->Close();
+    for(unsigned int b =0;b<eventlist.size(); b++)
+      {
+	cout<<"5 FJ TT_ll event: "<<eventlist.at(b)<<endl;
+      }
 }
