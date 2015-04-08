@@ -40,17 +40,28 @@ void MakeSF( int version, char* Region, TString HistName, char* sys)
   c->Divide(3,2);
   for(int i=2; i<7; i++) {
     c->cd(i-1);
-      h1_T[i]         = (TH1F*)HistFile->Get(Form("h1_T_%s_%ifatjet", HistName.Data(), i));
-      h1_TT_sl[i]     = (TH1F*)HistFile->Get(Form("h1_TT_sl_%s_%ifatjet", HistName.Data(), i));
-      h1_TT_ll[i]     = (TH1F*)HistFile->Get(Form("h1_TT_ll_%s_%ifatjet", HistName.Data(), i));
-      h1_TT_sys[i]     = (TH1F*)HistFile->Get(Form("h1_TT_sys%s_%s_%ifatjet", sys,HistName.Data(), i));
-      h1_WJets[i]     = (TH1F*)HistFile->Get(Form("h1_WJets_%s_%ifatjet", HistName.Data(), i));
-      h1_DY[i]        = (TH1F*)HistFile->Get(Form("h1_DY_%s_%ifatjet", HistName.Data(), i)); 
-      h1_f1500_100[i] = (TH1F*)HistFile->Get(Form("h1_T1tttt_f1500_100_%s_%ifatjet", HistName.Data(), i)); 
-      h1_f1200_800[i] = (TH1F*)HistFile->Get(Form("h1_T1tttt_f1200_800_%s_%ifatjet", HistName.Data(), i)); 
-      g1_SF_mc[i] = (TGraphErrors*)HistFile->Get(Form("%s%s_mcSF_%i","TT_sys",sys,i));
-      	g1_SF_mc[i]->SetLineColor(kBlue);
+    h1_T[i]         = (TH1F*)HistFile->Get(Form("h1_T_%s_%s_%ifatjet", Region,HistName.Data(), i));
+    h1_TT_sl[i]     = (TH1F*)HistFile->Get(Form("h1_TT_sl_%s_%s_%ifatjet",Region, HistName.Data(), i));
+    h1_TT_ll[i]     = (TH1F*)HistFile->Get(Form("h1_TT_ll_%s_%s_%ifatjet", Region,HistName.Data(), i));
+    h1_TT_sys[i]     = (TH1F*)HistFile->Get(Form("h1_TT_sys_%s%s_%s_%ifatjet", Region,sys,HistName.Data(), i));
+    h1_WJets[i]     = (TH1F*)HistFile->Get(Form("h1_WJets_%s_%s_%ifatjet", Region,HistName.Data(), i));
+    h1_DY[i]        = (TH1F*)HistFile->Get(Form("h1_DY_%s_%s_%ifatjet", Region,HistName.Data(), i)); 
+    h1_f1500_100[i] = (TH1F*)HistFile->Get(Form("h1_T1tttt_f1500_100_%s_%s_%ifatjet", Region,HistName.Data(), i)); 
+    h1_f1200_800[i] = (TH1F*)HistFile->Get(Form("h1_T1tttt_f1200_800_%s_%s_%ifatjet",Region, HistName.Data(), i)); 
+    g1_SF_mc[i] = (TGraphErrors*)HistFile->Get(Form("%s_%s%s_mcSF_%i","TT_sys",Region,sys,i));
+    g1_SF_mc[i]->SetLineColor(kBlue);
 
+
+    if(!g1_SF_mc[i])  cout<<"ERROR MakeSF Histfile Get g1"<<endl;    
+    if(!h1_T[i]) cout<<"ERROR MakeSF Histfile Get T"<<endl;    
+    if(!h1_TT_sl[i]) cout<<"ERROR MakeSF Histfile Get TT sl"<<endl;  
+    if(!h1_TT_ll[i]) cout<<"ERROR MakeSF Histfile Get TT ll"<<endl;
+    if(!h1_TT_sys[i]) cout<<"ERROR MakeSF Histfile Get TT sys "<<endl;
+    if(!h1_WJets[i]) cout<<"ERROR MakeSF Histfile Get Wjets"<<endl;     
+    if(!h1_DY[i]) cout<<"ERROR MakeSF Histfile Get DY"<<endl;
+    if(!h1_f1500_100[i]) cout<<"ERROR MakeSF Histfile Get noncomp"<<endl;
+    if(!h1_f1200_800[i]) cout<<"ERROR MakeSF Histfile Get compr"<<endl;
+	
    //h1_DATA[i]->Rebin(NMergeBins);
         h1_T[i]->Rebin(NMergeBins);
         h1_TT_sl[i]->Rebin(NMergeBins);
@@ -164,7 +175,7 @@ void MakeSF( int version, char* Region, TString HistName, char* sys)
 	g1_SF_mc[i]->SetFillColor(kBlack);
        	g1_SF_mc[i]->GetXaxis()->SetRangeUser(0,2000);
 		g1_SF_mc[i]->SetTitle(StackTitle);
-	//g1_SF_mc[i]->SetName(Form("SF_non_pois_%i",i));
+	g1_SF_mc[i]->SetName(Form("SF_mc_err_%i",i));
 	g1_SF_mc[i]->GetXaxis()->SetTitle("MJ [GeV]");
 	g1_SF_mc[i]->GetYaxis()->SetTitle(axistitle);
 	g1_SF_mc[i]->Draw("2Z same");
@@ -216,6 +227,7 @@ void MakeSF( int version, char* Region, TString HistName, char* sys)
     //g1_SF[j]->SetDirectory(0);
     //cout<<j<<endl;
     g1_SF[j]->Write();
+    //g1_SF_mc[j]->Write();
     //g2_SF[j]->Write();
   }
   HistFile2->Close();

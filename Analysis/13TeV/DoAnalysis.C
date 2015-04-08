@@ -7,15 +7,17 @@ void DoAnalysis(bool OnlyDraw=false)
   // Style
   //gROOT->ProcessLine(".L /Users/jaehyeok/macros/rootlogon.C");
   // Load macros
-  int version = 13;
-  bool status =false;
+  int version = 14;
+  bool status =true;
   bool OnlyEssential=true;
   gROOT->LoadMacro("MakeHists.C+");
   gROOT->LoadMacro("Make1DPlots.C+");
   gROOT->LoadMacro("MakeSF.C+");
   gROOT->LoadMacro("Make2DPlots.C+");
   gROOT->LoadMacro("MakeTables.C+");
-  char* sysname[] = {/*"_toppT1",*/"_toppT2",/*"_ISRpT1",*/"_ISRpT2","_ISRpT3","_nISR"};
+  gROOT->LoadMacro("MakeTables_all.C+");
+  gROOT->LoadMacro("OverlaySF.C+");
+  char* sysname[] = {"_nISR",/*"_toppT1",*/"_toppT2",/*"_ISRpT1",*/"_ISRpT2","_ISRpT3","_nISR"};
   int nsys=1;
   // if(!status) nsys=1;
   gSystem->Exec(Form("mkdir -p Out/v%i/Figures/",version));
@@ -35,9 +37,9 @@ void DoAnalysis(bool OnlyDraw=false)
   TChain *ch_f1500_100    = new TChain("tree", "T1tttt_f1500_100");
   TChain *ch_f1200_800    = new TChain("tree", "T1tttt_f1200_800");
   
-  TString BabyDir = //"/Users/heller/Jae/ntuples/HT750MET250_JetPt20/";
+  TString BabyDir = "/Users/heller/Jae/ntuples/HT750MET250_JetPt20/";
     //"/Users/heller/Jae/ntuples/HT750MET250/";
-    "/net/top/homes/rohan/MJ/Analysis/13TeV/Phys14/";
+    //"/net/top/homes/rohan/MJ/Analysis/13TeV/Phys14/";
     //  "/net/cms26/cms26r0/jaehyeok/baby/Fatjet/13TeV/Phys14NoSkim/";
     // "/net/cms26/cms26r0/jaehyeok/baby/Fatjet/13TeV/";
     //"/net/cms26/cms26r0/jaehyeok/baby/Fatjet/13TeV/Phys14/HT750MET250/";
@@ -81,9 +83,9 @@ void DoAnalysis(bool OnlyDraw=false)
   // Loop over SR and CR : make sure that these regions exist in "PassSelection.h"
   //
     
-  char* Region[] = {"baseline","1BCRincl","1B4SJCRincl",/*"1B45SJ","1B67SJ","1B8SJ",*/"SRincl"};
-  int nregion =1;
-  int SRthres=2;
+  char* Region[] = {"baseline","1BCRincl","1B4SJCRincl","1B45SJ","1B67SJ","1B8SJ","SRincl"};
+  int nregion =7;
+  int SRthres=5;
   //COPY TO MAKE1DPlots
 
   
@@ -195,9 +197,26 @@ void DoAnalysis(bool OnlyDraw=false)
 	MakeTables(version, 0,   Region[iregion], false);
 	MakeTables(version, 11,  Region[iregion], false);
 	MakeTables(version, 13,  Region[iregion], false);
-        
+	if(Region[iregion] == "baseline"){
+	for(int nMJ=0;nMJ<2;nMJ++){
+	for(int nMET=0;nMET<2;nMET++){
+	  for(int nMT=0;nMT<2;nMT++){
+	    
+	      for(int nb=0;nb<3;nb++){
+		for(int nsj=0;nsj<2;nsj++){
+		  cout<<Form("MJ bin%i, MET bin%i, MT bin%i, nb bin%i, Nsj bin%i",nMJ,nMET,nMT,nb,nsj)<<endl;
+		  MakeTables_all(version, 0,   Region[iregion],nMJ,nMET,nMT,nb,nsj, false);
+		  MakeTables_all(version, 15,   Region[iregion],nMJ,nMET,nMT,nb,nsj, false);		  		  
+		}
+	      }
+	    
+	  }
+	}//nFJ, MJ, MET, MT, Nlep, NB
+      }
+        }
       }
   }//for(int iregion=0; iregion<2; iregion++)
+  OverlaySF(version,sysname[0]);
   gSystem->Exec(Form("cp DoAnalysis.C Out/v%i/",version));
   gSystem->Exec(Form("cp MakeHists.C Out/v%i/",version));
  gSystem->Exec(Form("cp Make1DPlots.C Out/v%i/",version));
@@ -205,4 +224,5 @@ void DoAnalysis(bool OnlyDraw=false)
  gSystem->Exec(Form("cp MakeSF.C Out/v%i/",version));
  gSystem->Exec(Form("cp MakeTables.C Out/v%i/",version));
  gSystem->Exec(Form("cp PassSelection.h Out/v%i/",version));
+ gSystem->Exec(Form("cp OverlaySF.C Out/v%i/",version));
 }

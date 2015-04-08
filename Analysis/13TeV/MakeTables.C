@@ -143,14 +143,14 @@ void MakeTables(int version, int lepflav=0, char* Region="", bool doLatex=false)
     TH1F *h1_f1500_100[7], *h1_f1200_800[7];
     for(int i=2; i<7; i++)
     {
-        h1_DATA[i]      = (TH1F*)HistFile->Get(Form("h1_DATA_%s_%ifatjet", HistName.Data(), i));
-        h1_T[i]         = (TH1F*)HistFile->Get(Form("h1_T_%s_%ifatjet", HistName.Data(), i));
-        h1_TT_sl[i]     = (TH1F*)HistFile->Get(Form("h1_TT_sl_%s_%ifatjet", HistName.Data(), i));
-        h1_TT_ll[i]     = (TH1F*)HistFile->Get(Form("h1_TT_ll_%s_%ifatjet", HistName.Data(), i));
-        h1_WJets[i]     = (TH1F*)HistFile->Get(Form("h1_WJets_%s_%ifatjet", HistName.Data(), i));
-        h1_DY[i]        = (TH1F*)HistFile->Get(Form("h1_DY_%s_%ifatjet", HistName.Data(), i));
-        h1_f1500_100[i] = (TH1F*)HistFile->Get(Form("h1_T1tttt_f1500_100_%s_%ifatjet", HistName.Data(), i));
-        h1_f1200_800[i] = (TH1F*)HistFile->Get(Form("h1_T1tttt_f1200_800_%s_%ifatjet", HistName.Data(), i));
+        h1_DATA[i]      = (TH1F*)HistFile->Get(Form("h1_DATA_%s_%s_%ifatjet", Region,HistName.Data(), i));
+        h1_T[i]         = (TH1F*)HistFile->Get(Form("h1_T_%s_%s_%ifatjet", Region,HistName.Data(), i));
+        h1_TT_sl[i]     = (TH1F*)HistFile->Get(Form("h1_TT_sl_%s_%s_%ifatjet", Region,HistName.Data(), i));
+        h1_TT_ll[i]     = (TH1F*)HistFile->Get(Form("h1_TT_ll_%s_%s_%ifatjet", Region,HistName.Data(), i));
+        h1_WJets[i]     = (TH1F*)HistFile->Get(Form("h1_WJets_%s_%s_%ifatjet", Region,HistName.Data(), i));
+        h1_DY[i]        = (TH1F*)HistFile->Get(Form("h1_DY_%s_%s_%ifatjet", Region,HistName.Data(), i));
+        h1_f1500_100[i] = (TH1F*)HistFile->Get(Form("h1_T1tttt_f1500_100_%s_%s_%ifatjet", Region,HistName.Data(), i));
+        h1_f1200_800[i] = (TH1F*)HistFile->Get(Form("h1_T1tttt_f1200_800_%s_%s_%ifatjet", Region,HistName.Data(), i));
 
         h1_MC[i] = (TH1F*)h1_TT_sl[i]->Clone("h1_MC");
         h1_MC[i]->Add(h1_TT_ll[i]);

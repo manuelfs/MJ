@@ -238,10 +238,10 @@ void MakeHists(int version, TChain *ch, char* Region, char* sys=(char*)"")
 { 
 
     InitBaby(ch); 
-    TString ChainName = Form("%s%s",ch->GetTitle(),sys);
-    vector<int> eventlist;
+    TString ChainName = Form("%s_%s%s",ch->GetTitle(),Region,sys);
+    //vector<int> eventlist;
     cout << "[MJ Analysis] " << ChainName << endl;  
-
+    
     //
     // Define histograms
     //
@@ -272,11 +272,18 @@ void MakeHists(int version, TChain *ch, char* Region, char* sys=(char*)"")
     TH1F *h1_nISR_incl;
     TH1F *h1_ttbarpT_incl;
     TH2F *h2_toppT_incl;
+    TH1F * h1_yields_binned[7][2][2][2][3][2];
+                          //nFJ, MJ, MET, MT, NB, NSJ
 
     TH1F *h1_MJ_coarse[7];
     Float_t xbins[] = {0,100,200,300,400,500,600,2000};
     const int nbin = 7;
     TH1F* h1_MJ_weights_by_bin[7][nbin];
+
+
+
+
+    
     
     h1_toppT1_incl = InitTH1F( Form("h1_%s_toppT1_incl", ChainName.Data()), 
 			       Form("h1_%s_toppT1_incl", ChainName.Data()), 
@@ -306,7 +313,22 @@ void MakeHists(int version, TChain *ch, char* Region, char* sys=(char*)"")
 			      30, 0, 1500,30, 0, 1500);
 
     for(int i=0; i<7; i++) 
-    {   
+    {
+      for(int nMJ=0;nMJ<2;nMJ++){
+	for(int nMET=0;nMET<2;nMET++){
+	  for(int nMT=0;nMT<2;nMT++){
+	    
+	      for(int nb=0;nb<3;nb++){
+		for(int nsj=0;nsj<2;nsj++){
+		  h1_yields_binned[i][nMJ][nMET][nMT][nb][nsj] = InitTH1F( Form("h1_%s_yields_%ifatjet_%iMJ_%iMET_%iMT_%inb_%insj", ChainName.Data(), i,nMJ,nMET,nMT,nb,nsj), 
+									   Form("h1_%s_yields_%ifatjet_%iMJ_%iMET_%iMT_%inb_%insj", ChainName.Data(), i,nMJ,nMET,nMT,nb,nsj), 
+                                 3, 0, 3);
+		}
+	      }
+	    
+	  }
+	}//nFJ, MJ, MET, MT, Nlep, NB
+      }
         //
         // yields : for table                   
         //
@@ -563,9 +585,9 @@ void MakeHists(int version, TChain *ch, char* Region, char* sys=(char*)"")
     Int_t nentries = (Int_t)ch->GetEntries();
     for(int i = 0; i<nentries; i++)
     {
-      bool flagged =false;
+      //bool flagged =false;
         ch->GetEntry(i);
-	if(event_==21962862 || event_==121299115 || event_==64381257) flagged = true;
+	//	if(event_==21962862 || event_==121299115 || event_==64381257) flagged = true;
 
         // Progress indicator begin --------------------------------
         int i_permille = (int)floor(1000 * i / float(nentries));
@@ -693,7 +715,7 @@ void MakeHists(int version, TChain *ch, char* Region, char* sys=(char*)"")
         // 
         // single-lepton events selection
         //
-	if(flagged) cout<<"flagged event HT40 NSJ NB RA4mus RA4els RA4musveto RA4elsveto "<<event_<<"   "<<HT40<<"   "<<RA4NSJ<<"   "<<RA4NB<<"   "<<RA4MusPt_->size()<<"   "<<RA4ElsPt_->size()<<"   "<<RA4MusVetoPt_->size()<<"   "<<RA4ElsVetoPt_->size()<<endl;
+	//if(flagged) cout<<"flagged event HT40 NSJ NB RA4mus RA4els RA4musveto RA4elsveto "<<event_<<"   "<<HT40<<"   "<<RA4NSJ<<"   "<<RA4NB<<"   "<<RA4MusPt_->size()<<"   "<<RA4ElsPt_->size()<<"   "<<RA4MusVetoPt_->size()<<"   "<<RA4ElsVetoPt_->size()<<endl;
         if(!(PassNLep(1) || PassNLep(2)))  continue; // need this upfront because of mT calculation
 
         // Nfatjet, MJ, mj sorting 
@@ -777,9 +799,7 @@ void MakeHists(int version, TChain *ch, char* Region, char* sys=(char*)"")
         //
         // baseline selection
 	// if( !PassBaselineSelection() ) continue; // now part of PassSelection
-        if( /*Region!="Baseline" &&*/ !PassSelection(Region, HT40, MET_, RA4NB, RA4NSJ, mT, MJ_thres)) continue;
- 
-        int NFJbin = -1;
+	int NFJbin = -1;
         if(Nfatjet_thres>4) NFJbin=5;
         else if(Nfatjet_thres>3) NFJbin=4;
         else if(Nfatjet_thres>2) NFJbin=3;
@@ -792,7 +812,33 @@ void MakeHists(int version, TChain *ch, char* Region, char* sys=(char*)"")
             cout << "[MJ Analysis] ERROR : NFJ is cannot be negative" << endl;
             continue;
         }
-        
+
+	if(ChainName.Contains("baseline")){
+	  // cout<<"Region == baseline"<<endl;
+	  if( !PassSelection((TString)"lobbaseline", HT40, MET_, RA4NB, RA4NSJ, mT, MJ_thres)) continue;
+
+	  int bMJ = 0;
+	  if(MJ_thres>600) bMJ=1;
+	  int bMET = 0;
+	  if(MET_>400) bMET=1;
+	  int bMT=0;
+	  if(mT>150) bMT=1;
+	  int bnb=0;
+	  if(RA4NB==2) bnb=1;
+	  if(RA4NB>2) bnb=2;
+	  int bsj = 0;
+	  if(RA4NSJ>7) bsj=1;
+
+	  float lepbin;
+	  if(PassNLep(1) && RA4ElsPt_->size()==1) lepbin = 0.5;
+	  if(PassNLep(1) && RA4MusPt_->size()==1) lepbin = 1.5;
+	  if(PassNLep(2)) lepbin=2.5;
+	  h1_yields_binned[NFJbin][bMJ][bMET][bMT][bnb][bsj]->Fill(lepbin,EventWeight_);
+	  h1_yields_binned[6][bMJ][bMET][bMT][bnb][bsj]->Fill(lepbin,EventWeight_);
+	}
+	if( !PassSelection(Region, HT40, MET_, RA4NB, RA4NSJ, mT, MJ_thres)) continue;
+	
+	
         //     
         // ttbar gen composition  
         //     
@@ -801,7 +847,7 @@ void MakeHists(int version, TChain *ch, char* Region, char* sys=(char*)"")
         int Nt=0;
         int Ntn=0; int Nen=0; int Nmn=0;
         for(unsigned int igen=0; igen<GenId_->size(); igen++)
-        { 
+	  { 
             if( TMath::Abs(GenMId_->at(igen))==24 && TMath::Abs(GenId_->at(igen))==11 ) Ne++;
             if( TMath::Abs(GenMId_->at(igen))==24 && TMath::Abs(GenId_->at(igen))==13 ) Nm++;
             if( TMath::Abs(GenMId_->at(igen))==24 && TMath::Abs(GenId_->at(igen))==15 ) Nt++;
@@ -832,7 +878,7 @@ void MakeHists(int version, TChain *ch, char* Region, char* sys=(char*)"")
         // yields
         if(RA4ElsPt_->size()==1) FillTH1FAll(h1_yields, NFJbin, 0.5, EventWeight_);   
         if(RA4MusPt_->size()==1) FillTH1FAll(h1_yields, NFJbin, 1.5, EventWeight_);
-	if(NFJbin==5 && ChainName.Contains("TT_ll") ) eventlist.push_back(event_);
+	//if(NFJbin==5 && ChainName.Contains("TT_ll") ) eventlist.push_back(event_);
         
         // plots
         if(RA4MusPt_->size()==1) {
@@ -996,6 +1042,22 @@ void MakeHists(int version, TChain *ch, char* Region, char* sys=(char*)"")
     for(int i=0; i<7; i++)  
     {
       if(ChainName.Contains("TT_sys")){ g1_SF_mc[i]->Write();}
+      if(ChainName.Contains("baseline")){
+	for(int nMJ=0;nMJ<2;nMJ++){
+	  for(int nMET=0;nMET<2;nMET++){
+	    for(int nMT=0;nMT<2;nMT++){
+	    
+	      for(int nb=0;nb<3;nb++){
+		for(int nsj=0;nsj<2;nsj++){
+		  
+		  h1_yields_binned[i][nMJ][nMET][nMT][nb][nsj]->SetDirectory(0);
+		  h1_yields_binned[i][nMJ][nMET][nMT][nb][nsj]->Write();
+		}
+	      }
+	    }
+	  }//nFJ, MJ, MET, MT, NB
+	}
+      }
         h1_yields[i]->SetDirectory(0);                      h1_yields[i]->Write();
         h1_MJ[i]->SetDirectory(0);                          h1_MJ[i]->Write();
 	h1_MJ_coarse[i]->SetDirectory(0);                   h1_MJ_coarse[i]->Write();
@@ -1058,8 +1120,8 @@ void MakeHists(int version, TChain *ch, char* Region, char* sys=(char*)"")
         h2_mj3vsmj4[i]->SetDirectory(0);                    h2_mj3vsmj4[i]->Write();
     }
     HistFile->Close();
-    for(unsigned int b =0;b<eventlist.size(); b++)
+    /*for(unsigned int b =0;b<eventlist.size(); b++)
       {
 	cout<<"5 FJ TT_ll event: "<<eventlist.at(b)<<endl;
-      }
+	}*/
 }

@@ -126,9 +126,12 @@ void Make1DPlots(int version, TString HistName, char* Region,  bool DoLog=1,char
     bool coarse = false;
     TString c_region[2] = {"1BCRincl","1B4SJCRincl"};
     /*char* Regions[] = {"1BCRincl","1B4SJCRincl","SRincl"};
-      int nregion = 3;*/
+      int nregion = 3;
     char* Regions[] = {"1BCRincl","1B4SJCRincl","1B45SJ","1B67SJ","1B8SJ","SRincl"};
-    int nregion =6;
+    int nregion =6;*/
+    char* Regions[] = {"baseline","1BCRincl","1B4SJCRincl","1B45SJ","1B67SJ","1B8SJ","SRincl"};
+    int nregion =7;
+ 
     TString corr_region = "";
     if(HistName.Contains("coarse")){
       coarse=true;
@@ -176,27 +179,46 @@ void Make1DPlots(int version, TString HistName, char* Region,  bool DoLog=1,char
 
       if(HistName.Contains("incl")){
 	if(i>3) break;
-	h1_T[i]         = (TH1F*)HistFile->Get(Form("h1_T_%s", HistName.Data()));
-        h1_TT_sl[i]     = (TH1F*)HistFile->Get(Form("h1_TT_sl_%s", HistName.Data()));
-        h1_TT_ll[i]     = (TH1F*)HistFile->Get(Form("h1_TT_ll_%s", HistName.Data()));
-	h1_TT_sys[i]     = (TH1F*)HistFile->Get(Form("h1_TT_sys%s_%s",sys, HistName.Data()));
-        h1_WJets[i]     = (TH1F*)HistFile->Get(Form("h1_WJets_%s", HistName.Data()));
-        h1_DY[i]        = (TH1F*)HistFile->Get(Form("h1_DY_%s", HistName.Data())); 
-        h1_f1500_100[i] = (TH1F*)HistFile->Get(Form("h1_T1tttt_f1500_100_%s", HistName.Data())); 
-        h1_f1200_800[i] = (TH1F*)HistFile->Get(Form("h1_T1tttt_f1200_800_%s", HistName.Data())); 
+	h1_T[i]         = (TH1F*)HistFile->Get(Form("h1_T_%s_%s", Region,HistName.Data()));
+
+        h1_TT_sl[i]     = (TH1F*)HistFile->Get(Form("h1_TT_sl_%s_%s", Region,HistName.Data()));
+
+        h1_TT_ll[i]     = (TH1F*)HistFile->Get(Form("h1_TT_ll_%s_%s", Region,HistName.Data()));
+
+	h1_TT_sys[i]     = (TH1F*)HistFile->Get(Form("h1_TT_sys_%s%s_%s", Region,sys,HistName.Data()));
+
+        h1_WJets[i]     = (TH1F*)HistFile->Get(Form("h1_WJets_%s_%s", Region,HistName.Data()));
+
+        h1_DY[i]        = (TH1F*)HistFile->Get(Form("h1_DY_%s_%s", Region,HistName.Data()));
+
+        h1_f1500_100[i] = (TH1F*)HistFile->Get(Form("h1_T1tttt_f1500_100_%s_%s", Region,HistName.Data()));
+
+        h1_f1200_800[i] = (TH1F*)HistFile->Get(Form("h1_T1tttt_f1200_800_%s_%s", Region,HistName.Data())); 
 
       }
       else{
       // h1_DATA[i]      = (TH1F*)HistFile->Get(Form("h1_DATA_%s_%ifatjet", HistName.Data(), i)); 
-        h1_T[i]         = (TH1F*)HistFile->Get(Form("h1_T_%s_%ifatjet", HistName.Data(), i));
-        h1_TT_sl[i]     = (TH1F*)HistFile->Get(Form("h1_TT_sl_%s_%ifatjet", HistName.Data(), i));
-        h1_TT_ll[i]     = (TH1F*)HistFile->Get(Form("h1_TT_ll_%s_%ifatjet", HistName.Data(), i));
-	h1_TT_sys[i]     = (TH1F*)HistFile->Get(Form("h1_TT_sys%s_%s_%ifatjet", sys,HistName.Data(), i));
-        h1_WJets[i]     = (TH1F*)HistFile->Get(Form("h1_WJets_%s_%ifatjet", HistName.Data(), i));
-        h1_DY[i]        = (TH1F*)HistFile->Get(Form("h1_DY_%s_%ifatjet", HistName.Data(), i)); 
-        h1_f1500_100[i] = (TH1F*)HistFile->Get(Form("h1_T1tttt_f1500_100_%s_%ifatjet", HistName.Data(), i)); 
-        h1_f1200_800[i] = (TH1F*)HistFile->Get(Form("h1_T1tttt_f1200_800_%s_%ifatjet", HistName.Data(), i)); 
+        h1_T[i]         = (TH1F*)HistFile->Get(Form("h1_T_%s_%s_%ifatjet", Region,HistName.Data(), i));
+        h1_TT_sl[i]     = (TH1F*)HistFile->Get(Form("h1_TT_sl_%s_%s_%ifatjet",Region, HistName.Data(), i));
+        h1_TT_ll[i]     = (TH1F*)HistFile->Get(Form("h1_TT_ll_%s_%s_%ifatjet", Region,HistName.Data(), i));
+	h1_TT_sys[i]     = (TH1F*)HistFile->Get(Form("h1_TT_sys_%s%s_%s_%ifatjet", Region,sys,HistName.Data(), i));
+        h1_WJets[i]     = (TH1F*)HistFile->Get(Form("h1_WJets_%s_%s_%ifatjet", Region,HistName.Data(), i));
+        h1_DY[i]        = (TH1F*)HistFile->Get(Form("h1_DY_%s_%s_%ifatjet", Region,HistName.Data(), i)); 
+        h1_f1500_100[i] = (TH1F*)HistFile->Get(Form("h1_T1tttt_f1500_100_%s_%s_%ifatjet", Region,HistName.Data(), i)); 
+        h1_f1200_800[i] = (TH1F*)HistFile->Get(Form("h1_T1tttt_f1200_800_%s_%s_%ifatjet", Region,HistName.Data(), i)); 
       }
+
+
+      
+	if(!h1_T[i]) cout<<"ERROR 1DPlots Histfile Get T"<<endl;    
+	if(!h1_TT_sl[i]) cout<<"ERROR 1DPlots Histfile Get TT sl"<<endl;  
+	if(!h1_TT_ll[i]) cout<<"ERROR 1DPlots Histfile Get TT ll"<<endl;
+	if(!h1_TT_sys[i]) cout<<"ERROR 1DPlots Histfile Get TT sys "<<endl;
+    	if(!h1_WJets[i]) cout<<"ERROR 1DPlots Histfile Get Wjets"<<endl;     
+	if(!h1_DY[i]) cout<<"ERROR 1DPlots Histfile Get DY"<<endl;
+	if(!h1_f1500_100[i]) cout<<"ERROR 1DPlots Histfile Get noncomp"<<endl;
+	if(!h1_f1200_800[i]) cout<<"ERROR 1DPlots Histfile Get compr"<<endl;
+	
         // merge bins
         //h1_DATA[i]->Rebin(NMergeBins);
         h1_T[i]->Rebin(NMergeBins);
