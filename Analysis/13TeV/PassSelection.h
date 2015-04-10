@@ -1,11 +1,18 @@
 // 
 bool PassNLep(unsigned int Nlep)
 {
-    if( (RA4MusPt_->size()+RA4ElsPt_->size())==Nlep 
-        && RA4MusVetoPt_->size()==0 
-        && RA4ElsVetoPt_->size()==0 
-      ) return true;
-    else return false;
+   
+  /* && RA4MusVetoPt_->size()==0 
+     && RA4ElsVetoPt_->size()==0 */
+  int nveto=0;
+  for(unsigned int i=0;i<RA4MusVetoPt_->size();i++){
+    if(RA4MusVetoPt_->at(i)>10) nveto++;
+  }
+  for(unsigned int i=0;i<RA4ElsVetoPt_->size();i++){
+    if(RA4ElsVetoPt_->at(i)>10) nveto++;
+  }
+  if( (RA4MusPt_->size()+RA4ElsPt_->size())==Nlep && nveto==0) return true;
+  else return false;
        
 }
 
@@ -43,10 +50,10 @@ bool PassSelection(TString Region,
 
 
     if(Region=="lobbaseline" && (PassNLep(1) || PassNLep(2))
-        && HT > 750 
+        && HT > 500 
         && MET > 250
         && Nb > 0 
-        && Njet > 5
+        && Njet > 3
         && mT > -1
         && MJ > -1 
     )  passed = true;

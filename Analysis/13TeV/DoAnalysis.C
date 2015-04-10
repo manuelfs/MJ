@@ -7,7 +7,7 @@ void DoAnalysis(bool OnlyDraw=false)
   // Style
   //gROOT->ProcessLine(".L /Users/jaehyeok/macros/rootlogon.C");
   // Load macros
-  int version = 14;
+  int version = 18;
   bool status =true;
   bool OnlyEssential=true;
   gROOT->LoadMacro("MakeHists.C+");
@@ -17,6 +17,7 @@ void DoAnalysis(bool OnlyDraw=false)
   gROOT->LoadMacro("MakeTables.C+");
   gROOT->LoadMacro("MakeTables_all.C+");
   gROOT->LoadMacro("OverlaySF.C+");
+  gROOT->LoadMacro("GetYields.C+");
   char* sysname[] = {"_nISR",/*"_toppT1",*/"_toppT2",/*"_ISRpT1",*/"_ISRpT2","_ISRpT3","_nISR"};
   int nsys=1;
   // if(!status) nsys=1;
@@ -37,7 +38,10 @@ void DoAnalysis(bool OnlyDraw=false)
   TChain *ch_f1500_100    = new TChain("tree", "T1tttt_f1500_100");
   TChain *ch_f1200_800    = new TChain("tree", "T1tttt_f1200_800");
   
-  TString BabyDir = "/Users/heller/Jae/ntuples/HT750MET250_JetPt20/";
+  TString BabyDir = "/Users/heller/Jae/ntuples/JetPt20_04April_NoSkim/";
+
+    //"/Users/heller/Jae/ntuples/HT750MET250_JetPt20_04April/";
+    //"/Users/heller/Jae/ntuples/HT750MET250_JetPt20/";
     //"/Users/heller/Jae/ntuples/HT750MET250/";
     //"/net/top/homes/rohan/MJ/Analysis/13TeV/Phys14/";
     //  "/net/cms26/cms26r0/jaehyeok/baby/Fatjet/13TeV/Phys14NoSkim/";
@@ -84,7 +88,7 @@ void DoAnalysis(bool OnlyDraw=false)
   //
     
   char* Region[] = {"baseline","1BCRincl","1B4SJCRincl","1B45SJ","1B67SJ","1B8SJ","SRincl"};
-  int nregion =7;
+  int nregion =1;
   int SRthres=5;
   //COPY TO MAKE1DPlots
 
@@ -125,6 +129,7 @@ void DoAnalysis(bool OnlyDraw=false)
       for(int isys=0;isys<nsys;isys++){
 	//	MakeSF(version, Region[iregion],"MJ",sysname[isys]);
 	MakeSF(version, Region[iregion],"MJ_coarse",sysname[isys]);
+	MakeSF(version, Region[iregion],"MJ_coarse",sysname[isys],true);
       }
     }
 
@@ -133,62 +138,63 @@ void DoAnalysis(bool OnlyDraw=false)
       {
 	for(int bo=0; bo<2;bo++){
 	  if(!OnlyDraw && !OnlyEssential){
-	    Make1DPlots(version,"muspT",        Region[iregion],bo,sysname[isys]);
-	    Make1DPlots(version,"musPhi",       Region[iregion],bo,sysname[isys]);
-	    Make1DPlots(version, "musEta",       Region[iregion],bo,sysname[isys]);
-	    Make1DPlots(version, "elspT",        Region[iregion],bo,sysname[isys]);
-	    Make1DPlots(version, "elsPhi",       Region[iregion],bo,sysname[isys]);
-	    Make1DPlots(version, "elsEta",       Region[iregion],bo,sysname[isys]);
-	    Make1DPlots(version, "mT",           Region[iregion],bo,sysname[isys]);
-	    Make1DPlots(version, "mj",           Region[iregion],bo,sysname[isys]);
+	    Make1DPlots(version,"muspT",        Region[iregion],bo,false,sysname[isys]);
+	    Make1DPlots(version,"musPhi",       Region[iregion],bo,false,sysname[isys]);
+	    Make1DPlots(version, "musEta",       Region[iregion],bo,false,sysname[isys]);
+	    Make1DPlots(version, "elspT",        Region[iregion],bo,false,sysname[isys]);
+	    Make1DPlots(version, "elsPhi",       Region[iregion],bo,false,sysname[isys]);
+	    Make1DPlots(version, "elsEta",       Region[iregion],bo,false,sysname[isys]);
+	    Make1DPlots(version, "mT",           Region[iregion],bo,false,sysname[isys]);
+	    Make1DPlots(version, "mj",           Region[iregion],bo,false,sysname[isys]);
 	   
 	  }
-	  Make1DPlots(version, "HT",           Region[iregion],bo,sysname[isys]);
-	  //Make1DPlots(version, "MJ",           Region[iregion],bo,sysname[isys]);
-	  Make1DPlots(version, "MJ_coarse",           Region[iregion],bo,sysname[isys]);
+	  Make1DPlots(version, "HT",           Region[iregion],bo,false,sysname[isys]);
+	  //Make1DPlots(version, "MJ",           Region[iregion],bo,false,sysname[isys]);
+	  Make1DPlots(version, "MJ_coarse",           Region[iregion],bo,false,sysname[isys]);
+	  Make1DPlots(version, "MJ_coarse",           Region[iregion],bo,true,sysname[isys]);
 	  if(iregion> SRthres){
 	    for(int icorr=0;icorr<nregion-1;icorr++){
-	      Make1DPlots(version, Form("MJ_coarse_corr%i",icorr), Region[iregion],bo,sysname[isys]);
-	      // Make1DPlots(version, Form("MJ_corr%i",icorr),  Region[iregion],bo,sysname[isys]);
+	      Make1DPlots(version, Form("MJ_coarse_corr%i",icorr), Region[iregion],bo,false,sysname[isys]);
+	      // Make1DPlots(version, Form("MJ_corr%i",icorr),  Region[iregion],bo,false,sysname[isys]);
 	    }
 	  }
 	  TString temp = Form("%s",sysname[isys]);
 	  if(temp.Contains("toppT")){
-	    Make1DPlots(version, "toppT",       Region[iregion],bo,sysname[isys]);
-	    if(bo) Make1DPlots(version, "toppT_incl",       Region[iregion],bo,sysname[isys]);}
+	    Make1DPlots(version, "toppT",       Region[iregion],bo,false,sysname[isys]);
+	    if(bo) Make1DPlots(version, "toppT_incl",       Region[iregion],bo,false,sysname[isys]);}
 	  if(temp.Contains("ISRpT")){
-	    Make1DPlots(version, "ttbarpT",       Region[iregion],bo,sysname[isys]);
-	    if(bo)Make1DPlots(version, "ttbarpT_incl",       Region[iregion],bo,sysname[isys]);}
+	    Make1DPlots(version, "ttbarpT",       Region[iregion],bo,false,sysname[isys]);
+	    if(bo)Make1DPlots(version, "ttbarpT_incl",       Region[iregion],bo,false,sysname[isys]);}
 	  if(temp.Contains("nISR")){
-	    Make1DPlots(version, "nISR",       Region[iregion],bo,sysname[isys]);
-	    if(bo)Make1DPlots(version, "nISR_incl",       Region[iregion],bo,sysname[isys]);}
-	  //Make1DPlots(version, "toppT1",       Region[iregion],bo,sysname[isys]);
-	  //Make1DPlots(version, "toppT2",       Region[iregion],bo,sysname[isys]);
+	    Make1DPlots(version, "nISR",       Region[iregion],bo,false,sysname[isys]);
+	    if(bo)Make1DPlots(version, "nISR_incl",       Region[iregion],bo,false,sysname[isys]);}
+	  //Make1DPlots(version, "toppT1",       Region[iregion],bo,false,sysname[isys]);
+	  //Make1DPlots(version, "toppT2",       Region[iregion],bo,false,sysname[isys]);
 	  if(!OnlyDraw && !OnlyEssential){
-	    Make1DPlots(version, "Nfatjet",      Region[iregion],bo,sysname[isys]);
-	    Make1DPlots(version, "Nskinnyjet",   Region[iregion],bo,sysname[isys]);
-	    Make1DPlots(version, "Ncsvm",        Region[iregion],bo,sysname[isys]);
-	      Make1DPlots(version, "MET",          Region[iregion],bo,sysname[isys]);
-	      Make1DPlots(version, "METPhi",       Region[iregion],bo,sysname[isys]);
-	      Make1DPlots(version, "WpT",          Region[iregion],bo,sysname[isys]);
-	      Make1DPlots(version, "FatjetPt1"     ,Region[iregion],bo,sysname[isys]);
-	      Make1DPlots(version, "FatjetPt2"     ,Region[iregion],bo,sysname[isys]);
-	      Make1DPlots(version, "FatjetPt3"     ,Region[iregion],bo,sysname[isys]);
-	      Make1DPlots(version, "FatjetPt4"     ,Region[iregion],bo,sysname[isys]);
-	      Make1DPlots(version, "FatjetPhi1"    ,Region[iregion],bo,sysname[isys]);
-	      Make1DPlots(version, "FatjetPhi2"    ,Region[iregion],bo,sysname[isys]);
-	      Make1DPlots(version, "FatjetPhi3"    ,Region[iregion],bo,sysname[isys]);
-	      Make1DPlots(version, "FatjetPhi4"    ,Region[iregion],bo,sysname[isys]);
-	      Make1DPlots(version, "FatjetEta1"    ,Region[iregion],bo,sysname[isys]);
-	      Make1DPlots(version, "FatjetEta2"    ,Region[iregion],bo,sysname[isys]);
-	      Make1DPlots(version, "FatjetEta3"    ,Region[iregion],bo,sysname[isys]);
-	      Make1DPlots(version, "FatjetEta4"    ,Region[iregion],bo,sysname[isys]);
-	      Make1DPlots(version, "mj1",          Region[iregion],bo,sysname[isys]);
-	      Make1DPlots(version, "mj2",          Region[iregion],bo,sysname[isys]);
-	      Make1DPlots(version, "mj3",          Region[iregion],bo,sysname[isys]);
-	      Make1DPlots(version, "mj4",          Region[iregion],bo,sysname[isys]);
-	      Make1DPlots(version, "mj3overmj2",   Region[iregion],bo,sysname[isys]);
-	      Make1DPlots(version, "mj2overmj1",   Region[iregion],bo,sysname[isys]);}
+	    Make1DPlots(version, "Nfatjet",      Region[iregion],bo,false,sysname[isys]);
+	    Make1DPlots(version, "Nskinnyjet",   Region[iregion],bo,false,sysname[isys]);
+	    Make1DPlots(version, "Ncsvm",        Region[iregion],bo,false,sysname[isys]);
+	      Make1DPlots(version, "MET",          Region[iregion],bo,false,sysname[isys]);
+	      Make1DPlots(version, "METPhi",       Region[iregion],bo,false,sysname[isys]);
+	      Make1DPlots(version, "WpT",          Region[iregion],bo,false,sysname[isys]);
+	      Make1DPlots(version, "FatjetPt1"     ,Region[iregion],bo,false,sysname[isys]);
+	      Make1DPlots(version, "FatjetPt2"     ,Region[iregion],bo,false,sysname[isys]);
+	      Make1DPlots(version, "FatjetPt3"     ,Region[iregion],bo,false,sysname[isys]);
+	      Make1DPlots(version, "FatjetPt4"     ,Region[iregion],bo,false,sysname[isys]);
+	      Make1DPlots(version, "FatjetPhi1"    ,Region[iregion],bo,false,sysname[isys]);
+	      Make1DPlots(version, "FatjetPhi2"    ,Region[iregion],bo,false,sysname[isys]);
+	      Make1DPlots(version, "FatjetPhi3"    ,Region[iregion],bo,false,sysname[isys]);
+	      Make1DPlots(version, "FatjetPhi4"    ,Region[iregion],bo,false,sysname[isys]);
+	      Make1DPlots(version, "FatjetEta1"    ,Region[iregion],bo,false,sysname[isys]);
+	      Make1DPlots(version, "FatjetEta2"    ,Region[iregion],bo,false,sysname[isys]);
+	      Make1DPlots(version, "FatjetEta3"    ,Region[iregion],bo,false,sysname[isys]);
+	      Make1DPlots(version, "FatjetEta4"    ,Region[iregion],bo,false,sysname[isys]);
+	      Make1DPlots(version, "mj1",          Region[iregion],bo,false,sysname[isys]);
+	      Make1DPlots(version, "mj2",          Region[iregion],bo,false,sysname[isys]);
+	      Make1DPlots(version, "mj3",          Region[iregion],bo,false,sysname[isys]);
+	      Make1DPlots(version, "mj4",          Region[iregion],bo,false,sysname[isys]);
+	      Make1DPlots(version, "mj3overmj2",   Region[iregion],bo,false,sysname[isys]);
+	      Make1DPlots(version, "mj2overmj1",   Region[iregion],bo,false,sysname[isys]);}
 	  }
 	// ----------------------------------------
 	//  Make table of yields 
@@ -204,9 +210,11 @@ void DoAnalysis(bool OnlyDraw=false)
 	    
 	      for(int nb=0;nb<3;nb++){
 		for(int nsj=0;nsj<2;nsj++){
-		  cout<<Form("MJ bin%i, MET bin%i, MT bin%i, nb bin%i, Nsj bin%i",nMJ,nMET,nMT,nb,nsj)<<endl;
-		  MakeTables_all(version, 0,   Region[iregion],nMJ,nMET,nMT,nb,nsj, false);
-		  MakeTables_all(version, 15,   Region[iregion],nMJ,nMET,nMT,nb,nsj, false);		  		  
+		  for(int nHT=0;nHT<2;nHT++){
+		    cout<<Form("MJ bin%i, MET bin%i, MT bin%i, nb bin%i, Nsj bin%i, HT bin%i",nMJ,nMET,nMT,nb,nsj,nHT)<<endl;
+		  MakeTables_all(version, 0,   Region[iregion],nMJ,nMET,nMT,nb,nsj,nHT, false);
+		  MakeTables_all(version, 15,   Region[iregion],nMJ,nMET,nMT,nb,nsj,nHT, false);
+		  }
 		}
 	      }
 	    
@@ -216,7 +224,8 @@ void DoAnalysis(bool OnlyDraw=false)
         }
       }
   }//for(int iregion=0; iregion<2; iregion++)
-  OverlaySF(version,sysname[0]);
+  //OverlaySF(version,sysname[0]);
+  GetYields(version);
   gSystem->Exec(Form("cp DoAnalysis.C Out/v%i/",version));
   gSystem->Exec(Form("cp MakeHists.C Out/v%i/",version));
  gSystem->Exec(Form("cp Make1DPlots.C Out/v%i/",version));

@@ -5,6 +5,7 @@
     bool status = true;
     int             event_;
     float           EventWeight_;
+    float           EventWeightNeg_;
     float           Npu_;
     int             Npv_;
     int             Nfatjet_;
@@ -43,6 +44,7 @@
     
     TBranch         *b_event;   //!
     TBranch         *b_EventWeight;   //!
+    TBranch         *b_EventWeightNeg;   //!
     TBranch         *b_Npu;   //!
     TBranch         *b_Npv;   //!
     TBranch         *b_Nfatjet;   //!
@@ -104,6 +106,7 @@ void InitBaby(TChain *ch)
 
     ch->SetBranchAddress("event",           &event_,         &b_event);
     ch->SetBranchAddress("EventWeight",     &EventWeight_,   &b_EventWeight);
+    ch->SetBranchAddress("EventWeightNeg",     &EventWeightNeg_,   &b_EventWeightNeg);
     ch->SetBranchAddress("Npu",             &Npu_,           &b_Npu);
     ch->SetBranchAddress("Npv",             &Npv_,           &b_Npv);
     ch->SetBranchAddress("Nfatjet_pT30",    &Nfatjet_,       &b_Nfatjet);

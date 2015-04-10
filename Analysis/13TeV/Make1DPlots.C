@@ -17,6 +17,7 @@
 #include "TLatex.h"
 #include "TMath.h"
 #include "TGraphErrors.h"
+#include "TRandom3.h"
 
 using namespace std;
 //bool DoLog          = 1;
@@ -53,7 +54,7 @@ void h2cosmetic(TH2F* &h2, char* title, TString Xvar="", TString Yvar="", TStrin
 //
 // Stacks
 //
-void Make1DPlots(int version, TString HistName, char* Region,  bool DoLog=1,char* sys=(char*)"",int NMergeBins=1) 
+void Make1DPlots(int version, TString HistName, char* Region,  bool DoLog=1,bool fluctuate=false,char* sys=(char*)"",int NMergeBins=1) 
 { 
   //gInterpreter->ExecuteMacro("~/macros/JaeStyle.C"); 
    
@@ -130,7 +131,7 @@ void Make1DPlots(int version, TString HistName, char* Region,  bool DoLog=1,char
     char* Regions[] = {"1BCRincl","1B4SJCRincl","1B45SJ","1B67SJ","1B8SJ","SRincl"};
     int nregion =6;*/
     char* Regions[] = {"baseline","1BCRincl","1B4SJCRincl","1B45SJ","1B67SJ","1B8SJ","SRincl"};
-    int nregion =7;
+    int nregion =1;
  
     TString corr_region = "";
     if(HistName.Contains("coarse")){
@@ -237,7 +238,10 @@ void Make1DPlots(int version, TString HistName, char* Region,  bool DoLog=1,char
         h1_DATA[i]->Add(h1_DY[i]);
 	
 	//restore poisson errors on data
+	TRandom3 rand;
+	rand.SetSeed(0);
 	for(int b=0;b<((int)h1_DATA[i]->GetXaxis()->GetNbins()+1);b++){
+	  if(fluctuate) h1_DATA[i]->SetBinContent(b,rand.Poisson(h1_DATA[i]->GetBinContent(b)));
 	  h1_DATA[i]->SetBinError(b,pow(h1_DATA[i]->GetBinContent(b),0.5));
 
 	}
@@ -385,6 +389,7 @@ void Make1DPlots(int version, TString HistName, char* Region,  bool DoLog=1,char
 
     // 
     if(HistName=="mj") HistName="JetMass";
+    if(fluctuate) HistName = HistName+"_fluc";
     //if(corr) c->Print( Form("Figures/v%i/corr_%s_sys_CompareDataMC_%s_%s%s_v%i.pdf",version,corr_region.Data(),HistName.Data(), Region, DoLog?"_log":"",version) );
     if(corr) c->Print( Form("Out/v%i/Figures/%s_%s_in_%s_corrected_by_%s%s_v%i.pdf",version,sys,HistName.Data(),Region, corr_region.Data(), DoLog?"_log":"",version) );
     //else if(corr2)c->Print( Form("Figures/v%i/corr_%s_sys_CompareDataMC_%s_%s%s_v%i.pdf",version, c_region[1].Data(),HistName.Data(), Region, DoLog?"_log":"",version) );

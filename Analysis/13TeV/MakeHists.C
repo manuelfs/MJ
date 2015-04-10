@@ -272,12 +272,12 @@ void MakeHists(int version, TChain *ch, char* Region, char* sys=(char*)"")
     TH1F *h1_nISR_incl;
     TH1F *h1_ttbarpT_incl;
     TH2F *h2_toppT_incl;
-    TH1F * h1_yields_binned[7][2][2][2][3][2];
-                          //nFJ, MJ, MET, MT, NB, NSJ
-
+    TH1F * h1_yields_binned[7][2][2][2][3][3][2];
+                          //nFJ, MJ, MET, MT, NB, NSJ, HT
+    //nsj 45,67,89
     TH1F *h1_MJ_coarse[7];
-    Float_t xbins[] = {0,100,200,300,400,500,600,2000};
-    const int nbin = 7;
+    Float_t xbins[] = {0,200,300,400,500,600,2000};
+    const int nbin = 6;
     TH1F* h1_MJ_weights_by_bin[7][nbin];
 
 
@@ -319,10 +319,12 @@ void MakeHists(int version, TChain *ch, char* Region, char* sys=(char*)"")
 	  for(int nMT=0;nMT<2;nMT++){
 	    
 	      for(int nb=0;nb<3;nb++){
-		for(int nsj=0;nsj<2;nsj++){
-		  h1_yields_binned[i][nMJ][nMET][nMT][nb][nsj] = InitTH1F( Form("h1_%s_yields_%ifatjet_%iMJ_%iMET_%iMT_%inb_%insj", ChainName.Data(), i,nMJ,nMET,nMT,nb,nsj), 
-									   Form("h1_%s_yields_%ifatjet_%iMJ_%iMET_%iMT_%inb_%insj", ChainName.Data(), i,nMJ,nMET,nMT,nb,nsj), 
+		for(int nsj=0;nsj<3;nsj++){
+		  for(int nHT=0;nHT<2;nHT++){
+		    h1_yields_binned[i][nMJ][nMET][nMT][nb][nsj][nHT] = InitTH1F( Form("h1_%s_yields_%ifatjet_%iMJ_%iMET_%iMT_%inb_%insj_%inHT", ChainName.Data(), i,nMJ,nMET,nMT,nb,nsj,nHT), 
+										  Form("h1_%s_yields_%ifatjet_%iMJ_%iMET_%iMT_%inb_%insj_%inHT", ChainName.Data(), i,nMJ,nMET,nMT,nb,nsj,nHT), 
                                  3, 0, 3);
+		  }
 		}
 	      }
 	    
@@ -634,10 +636,11 @@ void MakeHists(int version, TChain *ch, char* Region, char* sys=(char*)"")
 	    if(JetCSV_->at(a)>=0.814) RA4NB++;
 	  }
 	}
-	if(HT40<=750 || RA4NB==0) continue;
+	//if(HT40<=750 || RA4NB==0) continue;
 	
 	int nISR=0;
 	if(status)EventWeight_ = EventWeight_*5000.;
+	if(EventWeightNeg_<0) EventWeight_*= (-1.0);
         // 
         // weights 
         // 
@@ -827,14 +830,17 @@ void MakeHists(int version, TChain *ch, char* Region, char* sys=(char*)"")
 	  if(RA4NB==2) bnb=1;
 	  if(RA4NB>2) bnb=2;
 	  int bsj = 0;
-	  if(RA4NSJ>7) bsj=1;
+	  if(RA4NSJ>5) bsj=1;
+	  if(RA4NSJ>7) bsj=2;
+	  int nHT=0;
+	  if(HT40>750) nHT=1;
 
 	  float lepbin;
 	  if(PassNLep(1) && RA4ElsPt_->size()==1) lepbin = 0.5;
 	  if(PassNLep(1) && RA4MusPt_->size()==1) lepbin = 1.5;
 	  if(PassNLep(2)) lepbin=2.5;
-	  h1_yields_binned[NFJbin][bMJ][bMET][bMT][bnb][bsj]->Fill(lepbin,EventWeight_);
-	  h1_yields_binned[6][bMJ][bMET][bMT][bnb][bsj]->Fill(lepbin,EventWeight_);
+	  h1_yields_binned[NFJbin][bMJ][bMET][bMT][bnb][bsj][nHT]->Fill(lepbin,EventWeight_);
+	  h1_yields_binned[6][bMJ][bMET][bMT][bnb][bsj][nHT]->Fill(lepbin,EventWeight_);
 	}
 	if( !PassSelection(Region, HT40, MET_, RA4NB, RA4NSJ, mT, MJ_thres)) continue;
 	
@@ -1048,10 +1054,11 @@ void MakeHists(int version, TChain *ch, char* Region, char* sys=(char*)"")
 	    for(int nMT=0;nMT<2;nMT++){
 	    
 	      for(int nb=0;nb<3;nb++){
-		for(int nsj=0;nsj<2;nsj++){
-		  
-		  h1_yields_binned[i][nMJ][nMET][nMT][nb][nsj]->SetDirectory(0);
-		  h1_yields_binned[i][nMJ][nMET][nMT][nb][nsj]->Write();
+		for(int nsj=0;nsj<3;nsj++){
+		  for(int nHT=0; nHT<2; nHT++){		  
+		    h1_yields_binned[i][nMJ][nMET][nMT][nb][nsj][nHT]->SetDirectory(0);
+		    h1_yields_binned[i][nMJ][nMET][nMT][nb][nsj][nHT]->Write();
+		  }
 		}
 	      }
 	    }

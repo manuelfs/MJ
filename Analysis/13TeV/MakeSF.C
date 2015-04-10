@@ -17,10 +17,11 @@
 #include "TInterpreter.h"
 #include "TLatex.h"
 #include "TMath.h"
+#include "TRandom3.h"
 
 using namespace std;
 
-void MakeSF( int version, char* Region, TString HistName, char* sys)
+void MakeSF( int version, char* Region, TString HistName, char* sys, bool fluctuate=false)
 {
   int NMergeBins=1;
   TFile* HistFile = TFile::Open(Form("Out/v%i/HistFiles/Hist_%s_v%i.root",version, Region, version));
@@ -82,9 +83,11 @@ void MakeSF( int version, char* Region, TString HistName, char* sys)
         h1_DATA[i]->Add(h1_T[i]);
         h1_DATA[i]->Add(h1_DY[i]);
 
-	
+	TRandom3 rand;
+	rand.SetSeed(0);	 
 	//restore poisson errors on data
 	for(int b=0;b<((int)h1_DATA[i]->GetXaxis()->GetNbins()+1);b++){
+	  if(fluctuate) h1_DATA[i]->SetBinContent(b,rand.Poisson(h1_DATA[i]->GetBinContent(b)));
 	  h1_DATA[i]->SetBinError(b,pow(h1_DATA[i]->GetBinContent(b),0.5));
 	}
 
@@ -211,6 +214,7 @@ void MakeSF( int version, char* Region, TString HistName, char* sys)
         TexCMS->Draw("SAME");
 	if(i!=6)TexExt->Draw("SAME");
   }
+  if(fluctuate) HistName +="_fluc";
   c->Print( Form("Out/v%i/Figures/toy_SF_%s%s_%s_v%i.pdf",version, HistName.Data(),sys, Region, version) ); 
     
     // 
