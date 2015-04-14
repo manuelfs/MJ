@@ -44,7 +44,7 @@ bool PassLowSJ1BBaselineSelection()
 
 // 
 bool PassSelection(TString Region, 
-                   float HT, float MET, int Nb, int Njet, float mT, float MJ)
+                   float HT, float MET, int Nb, int Njet, float mT, float MJ, TString ChainName="" ,int Ngenlep =0)
 {
     bool passed=false;
 
@@ -105,7 +105,7 @@ bool PassSelection(TString Region,
 
     
     if(Region=="SRincl" && PassBaselineSelection() &&  PassNLep(1)
-        && HT > 750
+        && HT > 500
         && MET > 250 
         && Nb > 1 
         && Njet > 5 
@@ -113,24 +113,78 @@ bool PassSelection(TString Region,
         && MJ > -1 
     )  passed = true;
 
-    if(Region=="1BSR1"&& Pass1BBaselineSelection() &&  PassNLep(1)
-       && HT > 750
+    if(Region=="1B_hi_mT"&& Pass1BBaselineSelection() &&  PassNLep(1)
+       && HT > 500
         && MET > 250 
         && Nb ==1 
         && Njet > 5
-        && mT < 150
-        && MJ > -1 
-    )  passed = true;
-   
-    
-    if(Region=="1BCR0" && Pass1BBaselineSelection() &&  PassNLep(1)
-       && HT > 750
-        && MET > 250 
-        && Nb ==1 
-        && Njet > 5 
         && mT > 150
         && MJ > -1 
     )  passed = true;
+
+    if(Region=="1B_sl"&& Pass1BBaselineSelection() &&  PassNLep(1) && ChainName.Contains("TT") && Ngenlep == 1
+       && HT > 500
+        && MET > 250 
+        && Nb ==1 
+        && Njet > 5
+        && mT > -1
+        && MJ > -1 
+    )  passed = true;
+
+    if(Region=="1B_ll"&& Pass1BBaselineSelection() &&  PassNLep(1) && ChainName.Contains("TT") && Ngenlep == 2
+       && HT > 500
+        && MET > 250 
+        && Nb ==1 
+        && Njet > 5
+        && mT > -1
+        && MJ > -1 
+    )  passed = true;
+    
+    if(Region=="1B_lo_mT" && Pass1BBaselineSelection() &&  PassNLep(1)
+       && HT >500
+        && MET > 250 
+        && Nb >1 
+        && Njet > 5 
+        && mT < 150
+        && MJ > -1 
+    )  passed = true;
+
+    if(Region=="2B_hi_mT" &&  PassNLep(1)
+       && HT > 500
+        && MET > 250 
+        && Nb >1 
+        && Njet > 5
+        && mT > 150
+        && MJ > -1 
+    )  passed = true;
+
+    if(Region=="2B_sl" &&  PassNLep(1) && ChainName.Contains("TT") && Ngenlep == 1
+       && HT > 500
+        && MET > 250 
+        && Nb >1 
+        && Njet > 5
+        && mT > -1
+        && MJ > -1 
+    )  passed = true;
+
+    if(Region=="2B_ll"&&  PassNLep(1) && ChainName.Contains("TT") && Ngenlep == 2
+       && HT > 500
+        && MET > 250 
+        && Nb >1 
+        && Njet > 5
+        && mT > -1
+        && MJ > -1 
+    )  passed = true;
+    
+    if(Region=="2B_lo_mT"  &&  PassNLep(1)
+       && HT >500
+        && MET > 250 
+        && Nb >1 
+        && Njet > 5 
+        && mT < 150
+        && MJ > -1 
+    )  passed = true;
+
 
     if(Region=="1B2lCR0" && Pass1BBaselineSelection() &&  PassNLep(2)
        && HT > 750
@@ -142,7 +196,7 @@ bool PassSelection(TString Region,
     )  passed = true;
 
       if(Region=="1BCRincl" && Pass1BBaselineSelection() &&  PassNLep(1)
-       && HT > 750
+       && HT > 500
         && MET > 250 
         && Nb ==1
         && Njet > 5 

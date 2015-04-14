@@ -7,7 +7,7 @@ void DoAnalysis(bool OnlyDraw=false)
   // Style
   //gROOT->ProcessLine(".L /Users/jaehyeok/macros/rootlogon.C");
   // Load macros
-  int version = 19;
+  int version = 21;
   bool status =true;
   bool OnlyEssential=true;
   gROOT->LoadMacro("MakeHists.C+");
@@ -16,10 +16,10 @@ void DoAnalysis(bool OnlyDraw=false)
   gROOT->LoadMacro("Make2DPlots.C+");
   gROOT->LoadMacro("MakeTables.C+");
   gROOT->LoadMacro("MakeTables_all.C+");
-  gROOT->LoadMacro("OverlaySF.C+");
+  gROOT->LoadMacro("OverlaySF_TT.C+");
   gROOT->LoadMacro("GetYields.C+");
-  char* sysname[] = {"","_nISR",/*"_toppT1",*/"_toppT2",/*"_ISRpT1",*/"_ISRpT2","_ISRpT3","_nISR"};
-  int nsys=1;
+  char* sysname[] = {/*"",*/"_nISR",/*"_toppT1","_toppT2","_ISRpT1","_ISRpT2",*/"_ISRpT3"};
+  int nsys=2;
   // if(!status) nsys=1;
   gSystem->Exec(Form("mkdir -p Out/v%i/Figures/",version));
   gSystem->Exec(Form("mkdir -p Out/v%i/HistFiles/",version));
@@ -87,9 +87,12 @@ void DoAnalysis(bool OnlyDraw=false)
   // Loop over SR and CR : make sure that these regions exist in "PassSelection.h"
   //
     
-  char* Region[] = {"SRstats1","SR0","SR1","baseline","1BCRincl","1B4SJCRincl","1B45SJ","1B67SJ","1B8SJ","SRincl"};
-  int nregion =3;
-  int SRthres=5;
+  // char* Region[] = {"1B_hi_mT","1B_lo_mT","1B_sl","1B_ll",/*"SRstats1","SR0","SR1","baseline",*/"1BCRincl",/*"1B4SJCRincl","1B45SJ","1B67SJ","1B8SJ",*/"SRincl"};
+  int nregion=4;
+  char* Region[] = {"2B_hi_mT","2B_lo_mT","2B_sl","2B_ll",/*"SRstats1","SR0","SR1","baseline",*/"1BCRincl",/*"1B4SJCRincl","1B45SJ","1B67SJ","1B8SJ",*/"SRincl"};
+  int SRthres=4;
+  //iRegion>SRthres
+  
   //COPY TO MAKE1DPlots
 
   
@@ -226,8 +229,9 @@ void DoAnalysis(bool OnlyDraw=false)
         }
       }
   }//for(int iregion=0; iregion<2; iregion++)
-  //OverlaySF(version,sysname[0]);
-  GetYields(version);
+  OverlaySF_TT(version,2,sysname[0]);
+  OverlaySF_TT(version,2,sysname[1]);
+  //GetYields(version);
   gSystem->Exec(Form("cp DoAnalysis.C Out/v%i/",version));
   gSystem->Exec(Form("cp MakeHists.C Out/v%i/",version));
  gSystem->Exec(Form("cp Make1DPlots.C Out/v%i/",version));

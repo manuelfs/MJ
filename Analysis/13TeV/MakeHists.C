@@ -364,7 +364,7 @@ void MakeHists(int version, TChain *ch, char* Region, char* sys=(char*)"")
 
 	h1_mindPhi_B_met[i] = InitTH1F( Form("h1_%s_mindPhi_B_met_%ifatjet", ChainName.Data(), i), 
                                      Form("h1_%s_mindPhi_B_met_%ifatjet", ChainName.Data(), i), 
-                                     10, 0, 3.1416);
+                                     5, 0, 3.1416);
 	
         h1_mj[i] = InitTH1F( Form("h1_%s_mj_%ifatjet", ChainName.Data(), i), 
                              Form("h1_%s_mj_%ifatjet", ChainName.Data(), i), 
@@ -853,7 +853,7 @@ void MakeHists(int version, TChain *ch, char* Region, char* sys=(char*)"")
 	  h1_yields_binned[NFJbin][bMJ][bMET][bMT][bnb][bsj][nHT]->Fill(lepbin,EventWeight_);
 	  h1_yields_binned[6][bMJ][bMET][bMT][bnb][bsj][nHT]->Fill(lepbin,EventWeight_);
 	}
-	if( !PassSelection(Region, HT40, MET_, RA4NB, RA4NSJ, mT, MJ_thres)) continue;
+	if( !PassSelection(Region, HT40, MET_, RA4NB, RA4NSJ, mT, MJ_thres,ChainName,Ngenlep)) continue;
 	
 	
         //     

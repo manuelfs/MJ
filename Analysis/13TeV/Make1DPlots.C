@@ -131,8 +131,10 @@ void Make1DPlots(int version, TString HistName, char* Region,  bool DoLog=1,bool
       int nregion = 3;
     char* Regions[] = {"1BCRincl","1B4SJCRincl","1B45SJ","1B67SJ","1B8SJ","SRincl"};
     int nregion =6;*/
-    char* Regions[] = {"SR0","SR1","baseline","1BCRincl","1B4SJCRincl","1B45SJ","1B67SJ","1B8SJ","SRincl"};
-    int nregion =2;
+    // char* Regions[] = {"SR0","SR1","baseline","1BCRincl","1B4SJCRincl","1B45SJ","1B67SJ","1B8SJ","SRincl"};
+    // int nregion =2;
+    char* Regions[] = {/*"SRstats1","SR0","SR1","baseline",*/"1BCRincl",/*"1B4SJCRincl","1B45SJ","1B67SJ","1B8SJ",*/"SRincl"};
+  int nregion =2;
  
     TString corr_region = "";
     if(HistName.Contains("coarse")){

@@ -18,14 +18,23 @@
 #include "TLatex.h"
 #include "TMath.h"
 
-void OverlaySF(int version, char* sys=(char*)"")
+void OverlaySF_TT(int version, int nB, char* sys=(char*)"")
 {
 
-  char* Region[] = {"baseline","1BCRincl","1B4SJCRincl","1B45SJ","1B67SJ","1B8SJ","SRincl"};
-  TString RegionNames[] = {"","6+ SJ","4+SJ","4 or 5 SJ","6 or 7 SJ","8+ SJ", "2B SR, 6+ SJ"};
-  int colors[] = {0,2,3,4,5,6,1};
-  int nregion =7;
-  int start = 1;
+  //char* Region[] = {"baseline","1BCRincl","1B4SJCRincl","1B45SJ","1B67SJ","1B8SJ","SRincl"};
+  // TString RegionNames[] = {"","6+ SJ","4+SJ","4 or 5 SJ","6 or 7 SJ","8+ SJ", "2B SR, 6+ SJ"};
+  //int colors[] = {/*0,*/2,3,4,5,6,1};
+  int colors[] = {kRed,kOrange-3,kBlue,kGreen+2};
+
+ 
+
+  char* Region[] = {Form("%iB_ll",nB),Form("%iB_hi_mT",nB),Form("%iB_sl",nB),Form("%iB_lo_mT",nB)};
+  TString RegionNames[] = {Form("%iB dilepton ttbar",nB),Form("%iB, high mT",nB),Form("%iB single-lepton ttbar",nB),Form("%iB, low mT",nB)};
+
+  
+  
+  int nregion =4;
+  int start = 0;
   TFile* SFFile[nregion];
   TFile* HistFile[nregion];
   TGraphErrors *MJ_SF[7][nregion];
@@ -101,6 +110,7 @@ void OverlaySF(int version, char* sys=(char*)"")
     l1->Draw();
   }
 
- c->Print( Form("Out/v%i/Figures/Overlay_SF_%s%s_v%i.pdf",version, HistName.Data(),sys, version) ); 
+  c->Print( Form("Out/v%i/Figures/Overlay_SF_%s%s_%iB_v%i.pdf",version, HistName.Data(),sys,nB, version) );
+ delete c;
   
 }
