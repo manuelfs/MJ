@@ -32,12 +32,12 @@ void GetYields(int version/*, char* Region=(char*)"baseline"*/){
     TFile* HistFile = TFile::Open(Form("Out/v%i/HistFiles/Hist_%s_v%i.root", version,Region,version));
    
         
-    TH1F *h1_DATA[7][2][2][2][3][3][2], *h1_T[7][2][2][2][3][3][2], *h1_TT_sl[7][2][2][2][3][3][2], *h1_TT_ll[7][2][2][2][3][3][2], *h1_WJets[7][2][2][2][3][3][2], *h1_DY[7][2][2][2][3][3][2], *h1_MC[7][2][2][2][3][3][2];
-    TH1F *h1_f1500_100[7][2][2][2][3][3][2], *h1_f1200_800[7][2][2][2][3][3][2];
+    TH1F *h1_DATA[7][2][3][2][3][3][2], *h1_T[7][2][3][2][3][3][2], *h1_TT_sl[7][2][3][2][3][3][2], *h1_TT_ll[7][2][3][2][3][3][2], *h1_WJets[7][2][3][2][3][3][2], *h1_DY[7][2][3][2][3][3][2], *h1_MC[7][2][3][2][3][3][2];
+    TH1F *h1_f1500_100[7][2][3][2][3][3][2], *h1_f1200_800[7][2][3][2][3][3][2];
     for(int i=2; i<7; i++)
       {
 	for(int nMJ=0;nMJ<2;nMJ++){
-	  for(int nMET=0;nMET<2;nMET++){
+	  for(int nMET=0;nMET<3;nMET++){
 	    for(int nMT=0;nMT<2;nMT++){	    
 	      for(int nb=0;nb<3;nb++){
 		for(int nsj=0;nsj<3;nsj++){
@@ -77,7 +77,7 @@ void GetYields(int version/*, char* Region=(char*)"baseline"*/){
     int nsjbegin[] = {0,1};
     int nHTbegin[] = {0,1};
     for(int m=0;m<2;m++){
-      for(int h=0;h<2;h++){
+      for(int h=0;h<1;h++){
     TH1F* oneB[4],*twoB[4],*dilep[4];
     oneB[0]=(TH1F*) h1_MC[6][0][0][0][0][nsjbegin[m]][nHTbegin[h]]->Clone("oneB0");
     oneB[1]= (TH1F*)h1_MC[6][1][0][0][0][nsjbegin[m]][nHTbegin[h]]->Clone("oneB1");
@@ -88,7 +88,7 @@ void GetYields(int version/*, char* Region=(char*)"baseline"*/){
     twoB[2]= (TH1F*)h1_MC[6][0][0][1][1][nsjbegin[m]][nHTbegin[h]]->Clone("twoB2");
     twoB[3]= (TH1F*)h1_MC[6][1][0][1][1][nsjbegin[m]][nHTbegin[h]]->Clone("twoB3");
     for(int nsj=nsjbegin[m];nsj<3;nsj++){
-      for(int nMET=0;nMET<2;nMET++){
+      for(int nMET=0;nMET<3;nMET++){
 	for(int nHT=nHTbegin[h];nHT<2;nHT++){
 	  if(!(nsj==nsjbegin[m]&&nMET==0&&nHT==nHTbegin[h])){
 	    oneB[0]->Add( h1_MC[6][0][nMET][0][0][nsj][nHT]);
@@ -147,7 +147,7 @@ void GetYields(int version/*, char* Region=(char*)"baseline"*/){
     twoB_sig[2]= (TH1F*)h1_f1500_100[6][0][0][1][1][nsjbegin[m]][nHTbegin[h]]->Clone("twoB_sig2");
     twoB_sig[3]= (TH1F*)h1_f1500_100[6][1][0][1][1][nsjbegin[m]][nHTbegin[h]]->Clone("twoB_sig3");
     for(int nsj=nsjbegin[m];nsj<3;nsj++){
-      for(int nMET=0;nMET<2;nMET++){
+      for(int nMET=0;nMET<3;nMET++){
 	for(int nHT=nHTbegin[h];nHT<2;nHT++){
 	if(!(nsj==nsjbegin[m]&&nMET==0&&nHT==nHTbegin[h])){
 	  oneB_sig[0]->Add( h1_f1500_100[6][0][nMET][0][0][nsj][nHT]);
@@ -205,7 +205,7 @@ void GetYields(int version/*, char* Region=(char*)"baseline"*/){
     twoB_sig_comp[2]= (TH1F*)h1_f1200_800[6][0][0][1][1][nsjbegin[m]][nHTbegin[h]]->Clone("twoB_sig_comp2");
     twoB_sig_comp[3]= (TH1F*)h1_f1200_800[6][1][0][1][1][nsjbegin[m]][nHTbegin[h]]->Clone("twoB_sig_comp3");
     for(int nsj=nsjbegin[m];nsj<3;nsj++){
-      for(int nMET=0;nMET<2;nMET++){
+      for(int nMET=0;nMET<3;nMET++){
 	for(int nHT=nHTbegin[h];nHT<2;nHT++){
 	if(!(nsj==nsjbegin[m]&&nMET==0&&nHT==nHTbegin[h])){
 	  oneB_sig_comp[0]->Add( h1_f1200_800[6][0][nMET][0][0][nsj][nHT]);

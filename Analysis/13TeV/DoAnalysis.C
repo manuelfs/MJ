@@ -7,7 +7,7 @@ void DoAnalysis(bool OnlyDraw=false)
   // Style
   //gROOT->ProcessLine(".L /Users/jaehyeok/macros/rootlogon.C");
   // Load macros
-  int version = 18;
+  int version = 19;
   bool status =true;
   bool OnlyEssential=true;
   gROOT->LoadMacro("MakeHists.C+");
@@ -18,7 +18,7 @@ void DoAnalysis(bool OnlyDraw=false)
   gROOT->LoadMacro("MakeTables_all.C+");
   gROOT->LoadMacro("OverlaySF.C+");
   gROOT->LoadMacro("GetYields.C+");
-  char* sysname[] = {"_nISR",/*"_toppT1",*/"_toppT2",/*"_ISRpT1",*/"_ISRpT2","_ISRpT3","_nISR"};
+  char* sysname[] = {"","_nISR",/*"_toppT1",*/"_toppT2",/*"_ISRpT1",*/"_ISRpT2","_ISRpT3","_nISR"};
   int nsys=1;
   // if(!status) nsys=1;
   gSystem->Exec(Form("mkdir -p Out/v%i/Figures/",version));
@@ -87,8 +87,8 @@ void DoAnalysis(bool OnlyDraw=false)
   // Loop over SR and CR : make sure that these regions exist in "PassSelection.h"
   //
     
-  char* Region[] = {"baseline","1BCRincl","1B4SJCRincl","1B45SJ","1B67SJ","1B8SJ","SRincl"};
-  int nregion =1;
+  char* Region[] = {"SRstats1","SR0","SR1","baseline","1BCRincl","1B4SJCRincl","1B45SJ","1B67SJ","1B8SJ","SRincl"};
+  int nregion =3;
   int SRthres=5;
   //COPY TO MAKE1DPlots
 
@@ -152,6 +152,10 @@ void DoAnalysis(bool OnlyDraw=false)
 	  //Make1DPlots(version, "MJ",           Region[iregion],bo,false,sysname[isys]);
 	  Make1DPlots(version, "MJ_coarse",           Region[iregion],bo,false,sysname[isys]);
 	  Make1DPlots(version, "MJ_coarse",           Region[iregion],bo,true,sysname[isys]);
+	  Make1DPlots(version, "mj1",          Region[iregion],bo,false,sysname[isys]);
+	  Make1DPlots(version, "mj2",          Region[iregion],bo,false,sysname[isys]);
+	  Make1DPlots(version, "mj3",          Region[iregion],bo,false,sysname[isys]);
+	  Make1DPlots(version, "mindPhi_B_met",          Region[iregion],bo,false,sysname[isys]);
 	  if(iregion> SRthres){
 	    for(int icorr=0;icorr<nregion-1;icorr++){
 	      Make1DPlots(version, Form("MJ_coarse_corr%i",icorr), Region[iregion],bo,false,sysname[isys]);
@@ -189,9 +193,7 @@ void DoAnalysis(bool OnlyDraw=false)
 	      Make1DPlots(version, "FatjetEta2"    ,Region[iregion],bo,false,sysname[isys]);
 	      Make1DPlots(version, "FatjetEta3"    ,Region[iregion],bo,false,sysname[isys]);
 	      Make1DPlots(version, "FatjetEta4"    ,Region[iregion],bo,false,sysname[isys]);
-	      Make1DPlots(version, "mj1",          Region[iregion],bo,false,sysname[isys]);
-	      Make1DPlots(version, "mj2",          Region[iregion],bo,false,sysname[isys]);
-	      Make1DPlots(version, "mj3",          Region[iregion],bo,false,sysname[isys]);
+	      
 	      Make1DPlots(version, "mj4",          Region[iregion],bo,false,sysname[isys]);
 	      Make1DPlots(version, "mj3overmj2",   Region[iregion],bo,false,sysname[isys]);
 	      Make1DPlots(version, "mj2overmj1",   Region[iregion],bo,false,sysname[isys]);}
@@ -203,9 +205,9 @@ void DoAnalysis(bool OnlyDraw=false)
 	MakeTables(version, 0,   Region[iregion], false);
 	MakeTables(version, 11,  Region[iregion], false);
 	MakeTables(version, 13,  Region[iregion], false);
-	if(Region[iregion] == "baseline"){
-	for(int nMJ=0;nMJ<2;nMJ++){
-	for(int nMET=0;nMET<2;nMET++){
+	if(Region[iregion] == "baseline" && false){
+	 	for(int nMJ=0;nMJ<2;nMJ++){
+	for(int nMET=0;nMET<3;nMET++){
 	  for(int nMT=0;nMT<2;nMT++){
 	    
 	      for(int nb=0;nb<3;nb++){
@@ -234,4 +236,5 @@ void DoAnalysis(bool OnlyDraw=false)
  gSystem->Exec(Form("cp MakeTables.C Out/v%i/",version));
  gSystem->Exec(Form("cp PassSelection.h Out/v%i/",version));
  gSystem->Exec(Form("cp OverlaySF.C Out/v%i/",version));
+ gSystem->Exec(Form("cp babytree_mi.h Out/v%i/",version));
 }

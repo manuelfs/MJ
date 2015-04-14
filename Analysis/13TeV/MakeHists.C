@@ -12,7 +12,7 @@
 #include "TMath.h"
 #include "TGraphErrors.h"
 
-#include "babytree.h"
+#include "babytree_mi.h"
 #include "PassSelection.h"
 
 using namespace std;
@@ -58,6 +58,8 @@ void FillTH1F(TH1F* &h1, double var, double weight)
         var=h1->GetXaxis()->GetBinLowEdge(1)+0.00001;
     h1->Fill(var, weight);        
 }
+
+
 void FillTH1FAll(TH1F* h1[7], int NFJ, double var, double weight)
 {
     FillTH1F(h1[NFJ], var,  weight);
@@ -258,6 +260,7 @@ void MakeHists(int version, TChain *ch, char* Region, char* sys=(char*)"")
          *h1_FatjetEta1[7], *h1_FatjetEta2[7], *h1_FatjetEta3[7], *h1_FatjetEta4[7],
          *h1_dRFJ[7], *h1_dPhiFJ[7], *h1_dEtaFJ[7],
          *h1_HT[7], *h1_MET[7], *h1_METPhi[7], *h1_METx[7], *h1_METy[7], *h1_DPhi[7], *h1_Nfatjet[7], *h1_WpT[7];
+    TH1F *h1_mindPhi_B_met[7];
     TH2F *h2_mj1vsmj2[7], *h2_mj2vsmj3[7], *h2_mj3vsmj4[7];
     TH2F *h2_HTMET[7], *h2_MJmT[7];
     TH2F *h2_HTmT[7], *h2_MJMET[7];
@@ -272,7 +275,7 @@ void MakeHists(int version, TChain *ch, char* Region, char* sys=(char*)"")
     TH1F *h1_nISR_incl;
     TH1F *h1_ttbarpT_incl;
     TH2F *h2_toppT_incl;
-    TH1F * h1_yields_binned[7][2][2][2][3][3][2];
+    TH1F * h1_yields_binned[7][2][3][2][3][3][2];
                           //nFJ, MJ, MET, MT, NB, NSJ, HT
     //nsj 45,67,89
     TH1F *h1_MJ_coarse[7];
@@ -315,7 +318,7 @@ void MakeHists(int version, TChain *ch, char* Region, char* sys=(char*)"")
     for(int i=0; i<7; i++) 
     {
       for(int nMJ=0;nMJ<2;nMJ++){
-	for(int nMET=0;nMET<2;nMET++){
+	for(int nMET=0;nMET<3;nMET++){
 	  for(int nMT=0;nMT<2;nMT++){
 	    
 	      for(int nb=0;nb<3;nb++){
@@ -359,6 +362,9 @@ void MakeHists(int version, TChain *ch, char* Region, char* sys=(char*)"")
                              nbin,xbins);
 
 
+	h1_mindPhi_B_met[i] = InitTH1F( Form("h1_%s_mindPhi_B_met_%ifatjet", ChainName.Data(), i), 
+                                     Form("h1_%s_mindPhi_B_met_%ifatjet", ChainName.Data(), i), 
+                                     10, 0, 3.1416);
 	
         h1_mj[i] = InitTH1F( Form("h1_%s_mj_%ifatjet", ChainName.Data(), i), 
                              Form("h1_%s_mj_%ifatjet", ChainName.Data(), i), 
@@ -479,10 +485,10 @@ void MakeHists(int version, TChain *ch, char* Region, char* sys=(char*)"")
                                     20, 0, 500);
         h1_mj1[i] = InitTH1F( Form("h1_%s_mj1_%ifatjet", ChainName.Data(), i), 
                                     Form("h1_%s_mj1_%ifatjet", ChainName.Data(), i), 
-                                    20, 0, 500);
+                                    40, 0, 1000);
         h1_mj2[i] = InitTH1F( Form("h1_%s_mj2_%ifatjet", ChainName.Data(), i), 
                                     Form("h1_%s_mj2_%ifatjet", ChainName.Data(), i), 
-                                    20, 0, 500);
+                                    30, 0, 750);
         h1_mj3[i] = InitTH1F( Form("h1_%s_mj3_%ifatjet", ChainName.Data(), i), 
                                     Form("h1_%s_mj3_%ifatjet", ChainName.Data(), i), 
                                     20, 0, 500);
@@ -629,17 +635,21 @@ void MakeHists(int version, TChain *ch, char* Region, char* sys=(char*)"")
 	float HT40 =0.0;
 	int RA4NSJ=0;
 	int RA4NB=0;
+	float dphimin=10.;
 	for(unsigned int a=0;a<JetPt_->size();a++){
 	  if(JetPt_->at(a)>=40. && TMath::Abs(JetEta_->at(a))<=2.5){ 
 	    HT40+=JetPt_->at(a);
 	    RA4NSJ++;
-	    if(JetCSV_->at(a)>=0.814) RA4NB++;
+	    if(JetCSV_->at(a)>=0.814) {
+	      RA4NB++;
+	      if( getDPhi(JetPhi_->at(a), METPhi_)<dphimin) dphimin = getDPhi(JetPhi_->at(a), METPhi_);
+	    }
 	  }
 	}
 	//if(HT40<=750 || RA4NB==0) continue;
 	
 	int nISR=0;
-	if(status)EventWeight_ = EventWeight_*5000.;
+	if(status)EventWeight_ = EventWeight_*4000.;
 	if(EventWeightNeg_<0) EventWeight_*= (-1.0);
         // 
         // weights 
@@ -823,7 +833,8 @@ void MakeHists(int version, TChain *ch, char* Region, char* sys=(char*)"")
 	  int bMJ = 0;
 	  if(MJ_thres>600) bMJ=1;
 	  int bMET = 0;
-	  if(MET_>400) bMET=1;
+	  if(MET_>250) bMET=1;
+	  if(MET_>400) bMET=2;
 	  int bMT=0;
 	  if(mT>150) bMT=1;
 	  int bnb=0;
@@ -906,20 +917,26 @@ void MakeHists(int version, TChain *ch, char* Region, char* sys=(char*)"")
             }
         }
 
-        if(NFJbin>1) FillTH2FAll(h2_mj1vsmj2, NFJbin, mj_thres_sorted.at(0), mj_thres_sorted.at(1), EventWeight_);           
-        if(NFJbin>2) FillTH2FAll(h2_mj2vsmj3, NFJbin, mj_thres_sorted.at(1), mj_thres_sorted.at(2), EventWeight_);           
-        if(NFJbin>3) FillTH2FAll(h2_mj3vsmj4, NFJbin, mj_thres_sorted.at(2), mj_thres_sorted.at(3), EventWeight_);           
-        FillTH2FAll(h2_HTMET, NFJbin, HT40, MET_, EventWeight_);         
-        FillTH2FAll(h2_MJmT, NFJbin, MJ_thres, mT, EventWeight_);       
-        FillTH2FAll(h2_HTmT, NFJbin, HT40, mT, EventWeight_);            
-        FillTH2FAll(h2_MJMET, NFJbin, MJ_thres, MET_, EventWeight_);    
-        FillTH2FAll(h2_HTMJ, NFJbin, HT40, MJ_thres,EventWeight_);       
-        FillTH2FAll(h2_METmT, NFJbin, MET_, mT, EventWeight_);           
-        FillTH1FAll(h1_mT,  NFJbin, mT, EventWeight_);                 
-        FillTH1FAll(h1_WpT, NFJbin, WpT, EventWeight_);               
-        FillTH1FAll(h1_HT, NFJbin, HT40, EventWeight_);   
-        FillTH1FAll(h1_MJ, NFJbin, MJ_thres, EventWeight_);
-	FillTH1FAll(h1_MJ_coarse, NFJbin, MJ_thres, EventWeight_);
+
+	
+	 
+	  FillTH1FAll(h1_mindPhi_B_met, NFJbin, dphimin,EventWeight_);
+
+
+	  if(NFJbin>1) FillTH2FAll(h2_mj1vsmj2, NFJbin, mj_thres_sorted.at(0), mj_thres_sorted.at(1), EventWeight_);           
+	  if(NFJbin>2) FillTH2FAll(h2_mj2vsmj3, NFJbin, mj_thres_sorted.at(1), mj_thres_sorted.at(2), EventWeight_);           
+	  if(NFJbin>3) FillTH2FAll(h2_mj3vsmj4, NFJbin, mj_thres_sorted.at(2), mj_thres_sorted.at(3), EventWeight_);           
+	  FillTH2FAll(h2_HTMET, NFJbin, HT40, MET_, EventWeight_);         
+	  FillTH2FAll(h2_MJmT, NFJbin, MJ_thres, mT, EventWeight_);       
+	  FillTH2FAll(h2_HTmT, NFJbin, HT40, mT, EventWeight_);            
+	  FillTH2FAll(h2_MJMET, NFJbin, MJ_thres, MET_, EventWeight_);    
+	  FillTH2FAll(h2_HTMJ, NFJbin, HT40, MJ_thres,EventWeight_);       
+	  FillTH2FAll(h2_METmT, NFJbin, MET_, mT, EventWeight_);           
+	  FillTH1FAll(h1_mT,  NFJbin, mT, EventWeight_);                 
+	  FillTH1FAll(h1_WpT, NFJbin, WpT, EventWeight_);               
+	  FillTH1FAll(h1_HT, NFJbin, HT40, EventWeight_);   
+	  FillTH1FAll(h1_MJ, NFJbin, MJ_thres, EventWeight_);
+	  FillTH1FAll(h1_MJ_coarse, NFJbin, MJ_thres, EventWeight_);
 
 	if(ChainName.Contains("TT_sys")){
 	  if(MJ_thres<0) cout<<"MJ IS LESS THAN ZERO"<<endl;
@@ -1050,7 +1067,7 @@ void MakeHists(int version, TChain *ch, char* Region, char* sys=(char*)"")
       if(ChainName.Contains("TT_sys")){ g1_SF_mc[i]->Write();}
       if(ChainName.Contains("baseline")){
 	for(int nMJ=0;nMJ<2;nMJ++){
-	  for(int nMET=0;nMET<2;nMET++){
+	  for(int nMET=0;nMET<3;nMET++){
 	    for(int nMT=0;nMT<2;nMT++){
 	    
 	      for(int nb=0;nb<3;nb++){
@@ -1065,6 +1082,7 @@ void MakeHists(int version, TChain *ch, char* Region, char* sys=(char*)"")
 	  }//nFJ, MJ, MET, MT, NB
 	}
       }
+        h1_mindPhi_B_met[i]->SetDirectory(0);                 h1_mindPhi_B_met[i]->Write(); 
         h1_yields[i]->SetDirectory(0);                      h1_yields[i]->Write();
         h1_MJ[i]->SetDirectory(0);                          h1_MJ[i]->Write();
 	h1_MJ_coarse[i]->SetDirectory(0);                   h1_MJ_coarse[i]->Write();

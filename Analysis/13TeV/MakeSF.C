@@ -188,7 +188,7 @@ void MakeSF( int version, char* Region, TString HistName, char* sys, bool fluctu
 	 // CMS Labels 
         float textSize = 0.04;
 
-        TLatex *TexEnergyLumi = new TLatex(0.9,0.92,Form("#sqrt{s}=13 TeV, L = %i fb^{-1}", 5));
+        TLatex *TexEnergyLumi = new TLatex(0.9,0.92,Form("#sqrt{s}=13 TeV, L = %i fb^{-1}", 4));
         TexEnergyLumi->SetNDC();
         TexEnergyLumi->SetTextSize(textSize);
         TexEnergyLumi->SetTextAlign (31);

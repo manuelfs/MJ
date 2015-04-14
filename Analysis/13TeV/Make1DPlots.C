@@ -58,7 +58,8 @@ void Make1DPlots(int version, TString HistName, char* Region,  bool DoLog=1,bool
 { 
   //gInterpreter->ExecuteMacro("~/macros/JaeStyle.C"); 
    
-    char *var; 
+    char *var;
+     if(HistName=="mindPhi_B_met")            	var=(char*)"min #Delta#phi(MET,closest B)";
     if(HistName=="MET")                 	var=(char*)"MET [GeV]";
     if(HistName=="METPhi")              	var=(char*)"#phi(MET)";
     if(HistName=="METx")              	    var=(char*)"METx [GeV]";
@@ -130,8 +131,8 @@ void Make1DPlots(int version, TString HistName, char* Region,  bool DoLog=1,bool
       int nregion = 3;
     char* Regions[] = {"1BCRincl","1B4SJCRincl","1B45SJ","1B67SJ","1B8SJ","SRincl"};
     int nregion =6;*/
-    char* Regions[] = {"baseline","1BCRincl","1B4SJCRincl","1B45SJ","1B67SJ","1B8SJ","SRincl"};
-    int nregion =1;
+    char* Regions[] = {"SR0","SR1","baseline","1BCRincl","1B4SJCRincl","1B45SJ","1B67SJ","1B8SJ","SRincl"};
+    int nregion =2;
  
     TString corr_region = "";
     if(HistName.Contains("coarse")){
@@ -156,6 +157,9 @@ void Make1DPlots(int version, TString HistName, char* Region,  bool DoLog=1,bool
     if(corr && coarse){
 	HistName+="_coarse";
     }
+    TString syst = Form("%s",sys);
+    if(syst=="") doData=false;
+   
     
     TGraphErrors *MJ_SF[7];
     TGraphErrors *MJ_SF_non_pois[7];
@@ -304,7 +308,7 @@ void Make1DPlots(int version, TString HistName, char* Region,  bool DoLog=1,bool
 //         st[i]->Add(h1_TT[i]);
          st[i]->Add(h1_TT_ll[i]);
          st[i]->Add(h1_TT_sl[i]);
-        st[i]->SetMaximum(h1_MC[i]->GetMaximum()*(DoLogOne?200:1.6));
+	 st[i]->SetMaximum(max(h1_MC[i]->GetMaximum(), h1_f1500_100[i]->GetMaximum())*(DoLogOne?200:1.6));
         //st[i]->SetMinimum(h1_MC[i]->GetMinimum()*(DoLogOne?1:0));
         if(!HistName.Contains("incl")) st[i]->SetMinimum((DoLogOne?0.05:0));
 	else st[i]->SetMinimum((DoLogOne?1:0));
@@ -360,7 +364,7 @@ void Make1DPlots(int version, TString HistName, char* Region,  bool DoLog=1,bool
         // CMS Labels 
         float textSize = 0.04;
 
-        TLatex *TexEnergyLumi = new TLatex(0.9,0.92,Form("#sqrt{s}=13 TeV, L = %i fb^{-1}", 5));
+        TLatex *TexEnergyLumi = new TLatex(0.9,0.92,Form("#sqrt{s}=13 TeV, L = %i fb^{-1}", 4));
         TexEnergyLumi->SetNDC();
         TexEnergyLumi->SetTextSize(textSize);
         TexEnergyLumi->SetTextAlign (31);
