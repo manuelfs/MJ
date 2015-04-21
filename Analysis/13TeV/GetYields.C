@@ -17,10 +17,11 @@
 #include "TInterpreter.h"
 #include "TLatex.h"
 #include "TMath.h"
+#include "Configuration.h"
 
 ofstream fout;
 
-void GetYields(int version/*, char* Region=(char*)"baseline"*/){
+void GetYields(/*, char* Region=(char*)"baseline"*/){
   /* if(lepflav==0)  cout << "[MJ Table] Yields for Electron+Muon" << endl;
     if(lepflav==11) cout << "[MJ Table] Yields for Electron" << endl;
     if(lepflav==13) cout << "[MJ Table] Yields for Muon" << endl;
@@ -29,7 +30,7 @@ void GetYields(int version/*, char* Region=(char*)"baseline"*/){
   //int version =14;
     TString HistName="yields";
     char* Region = (char*)"baseline";
-    TFile* HistFile = TFile::Open(Form("Out/v%i/HistFiles/Hist_%s_v%i.root", version,Region,version));
+    TFile* HistFile = TFile::Open(Form("Out/%s_v%i/HistFiles/Hist_%s_v%i.root", study.Data(),version,Region,version));
    
         
     TH1F *h1_DATA[7][2][3][2][3][3][2], *h1_T[7][2][3][2][3][3][2], *h1_TT_sl[7][2][3][2][3][3][2], *h1_TT_ll[7][2][3][2][3][3][2], *h1_WJets[7][2][3][2][3][3][2], *h1_DY[7][2][3][2][3][3][2], *h1_MC[7][2][3][2][3][3][2];

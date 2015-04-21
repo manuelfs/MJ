@@ -17,18 +17,19 @@
 #include "TInterpreter.h"
 #include "TLatex.h"
 #include "TMath.h"
+#include "Configuration.h"
 
-void OverlaySF_TT(int version, int nB, char* sys=(char*)"")
+void OverlaySF_TT(int nB, char* sys=(char*)"")
 {
 
-  //char* Region[] = {"baseline","1BCRincl","1B4SJCRincl","1B45SJ","1B67SJ","1B8SJ","SRincl"};
+  //char* Regions[] = {"baseline","1BCRincl","1B4SJCRincl","1B45SJ","1B67SJ","1B8SJ","SRincl"};
   // TString RegionNames[] = {"","6+ SJ","4+SJ","4 or 5 SJ","6 or 7 SJ","8+ SJ", "2B SR, 6+ SJ"};
   //int colors[] = {/*0,*/2,3,4,5,6,1};
   int colors[] = {kRed,kOrange-3,kBlue,kGreen+2};
 
  
 
-  char* Region[] = {Form("%iB_ll",nB),Form("%iB_hi_mT",nB),Form("%iB_sl",nB),Form("%iB_lo_mT",nB)};
+  //char* Regions[] = {Form("%iB_ll",nB),Form("%iB_hi_mT",nB),Form("%iB_sl",nB),Form("%iB_lo_mT",nB)};
   TString RegionNames[] = {Form("%iB dilepton ttbar",nB),Form("%iB, high mT",nB),Form("%iB single-lepton ttbar",nB),Form("%iB, low mT",nB)};
 
   
@@ -47,13 +48,13 @@ void OverlaySF_TT(int version, int nB, char* sys=(char*)"")
   if(syst.Contains("nISR")) axistitle = "nISR SF";
   for(int r=start;r<nregion;r++){
     //actually using MC error, not data error.
-    SFFile[r] = TFile::Open(Form("Out/v%i/HistFiles/%s%s_SF_%s_v%i.root",version,HistName.Data(),sys ,Region[r],version));
-    HistFile[r] = TFile::Open(Form("Out/v%i/HistFiles/Hist_%s_v%i.root",version, Region[r], version));
+    SFFile[r] = TFile::Open(Form("Out/%s_v%i/HistFiles/%s%s_SF_%s_v%i.root",study.Data(),version,HistName.Data(),sys ,Regions[r],version));
+    HistFile[r] = TFile::Open(Form("Out/%s_v%i/HistFiles/Hist_%s_v%i.root",study.Data(),version, Regions[r], version));
     for(int j=2;j<7;j++){
       MJ_SF_err[j][r] = (TGraphErrors*)SFFile[r]->Get(Form("SF_%i",j));
       // MJ_SF_err[j][r] = (TGraphErrors*)SFFile[r]->Get(Form("SF_mc_err_%i",j));
       if(!MJ_SF_err[j][r]) cout<<"Overlay error Get SF"<<endl;
-       MJ_SF[j][r] = (TGraphErrors*)HistFile[r]->Get(Form("%s_%s%s_mcSF_%i","TT_sys",Region[r],sys,j));
+       MJ_SF[j][r] = (TGraphErrors*)HistFile[r]->Get(Form("%s_%s%s_mcSF_%i","TT_sys",Regions[r],sys,j));
        if(!MJ_SF[j][r]) cout<<"Overlay error Get SF err"<<endl;
     }
     SFFile[r]->Close();
@@ -110,7 +111,7 @@ void OverlaySF_TT(int version, int nB, char* sys=(char*)"")
     l1->Draw();
   }
 
-  c->Print( Form("Out/v%i/Figures/Overlay_SF_%s%s_%iB_v%i.pdf",version, HistName.Data(),sys,nB, version) );
+  c->Print( Form("Out/%s_v%i/Figures/Overlay_SF_%s%s_%iB_v%i.pdf",study.Data(),version, HistName.Data(),sys,nB, version) );
  delete c;
   
 }

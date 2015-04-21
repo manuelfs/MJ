@@ -2,7 +2,7 @@
 #include <string>
 #include "TChain.h"
 
-    bool status = true;
+// bool status = true;
     int             event_;
     float           EventWeight_;
     float           EventWeightNeg_;

@@ -18,13 +18,14 @@
 #include "TLatex.h"
 #include "TMath.h"
 #include "TRandom3.h"
+#include "Configuration.h"
 
 using namespace std;
 
-void MakeSF( int version, char* Region, TString HistName, char* sys, bool fluctuate=false)
+void MakeSF(char* Region, TString HistName, char* sys, bool fluctuate=false)
 {
   int NMergeBins=1;
-  TFile* HistFile = TFile::Open(Form("Out/v%i/HistFiles/Hist_%s_v%i.root",version, Region, version));
+  TFile* HistFile = TFile::Open(Form("Out/%s_v%i/HistFiles/Hist_%s_v%i.root",study.Data(),version, Region, version));
   TString axistitle="blank";
   TString syst = Form("%s",sys);
   if(syst.Contains("toppT")) axistitle = "Top pT SF";
@@ -215,13 +216,13 @@ void MakeSF( int version, char* Region, TString HistName, char* sys, bool fluctu
 	if(i!=6)TexExt->Draw("SAME");
   }
   if(fluctuate) HistName +="_fluc";
-  c->Print( Form("Out/v%i/Figures/toy_SF_%s%s_%s_v%i.pdf",version, HistName.Data(),sys, Region, version) ); 
+  c->Print( Form("Out/%s_v%i/Figures/toy_SF_%s%s_%s_v%i.pdf",study.Data(),version, HistName.Data(),sys, Region, version) ); 
     
     // 
   HistFile->Close();
   delete c; 
   //TString HistFileName = Form("%s_SF",HistName.Data());
-  TString HistFileName = Form("Out/v%i/HistFiles/%s%s_SF_%s_v%i.root",version, HistName.Data(),sys, Region, version);
+  TString HistFileName = Form("Out/%s_v%i/HistFiles/%s%s_SF_%s_v%i.root",study.Data(),version, HistName.Data(),sys, Region, version);
   TFile *HistFile2 = new TFile(HistFileName, "RECREATE");
   gROOT->cd();
   HistFile2->cd();

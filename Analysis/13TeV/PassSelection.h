@@ -48,7 +48,16 @@ bool PassSelection(TString Region,
 {
     bool passed=false;
 
+    if(Region=="nothing" 
+        && HT > 500 
+        && MET > 200
+        && Nb > -1 
+        && Njet > -1
+        && mT > -1
+        && MJ > -1 
+    )  passed = true;
 
+    
     if(Region=="lobbaseline" && (PassNLep(1) || PassNLep(2))
         && HT > 500 
         && MET > 200
@@ -106,7 +115,7 @@ bool PassSelection(TString Region,
     
     if(Region=="SRincl" && PassBaselineSelection() &&  PassNLep(1)
         && HT > 500
-        && MET > 250 
+        && MET > 200 
         && Nb > 1 
         && Njet > 5 
         && mT > -1
@@ -115,7 +124,7 @@ bool PassSelection(TString Region,
 
     if(Region=="1B_hi_mT"&& Pass1BBaselineSelection() &&  PassNLep(1)
        && HT > 500
-        && MET > 250 
+        && MET > 200 
         && Nb ==1 
         && Njet > 5
         && mT > 150
@@ -124,7 +133,7 @@ bool PassSelection(TString Region,
 
     if(Region=="1B_sl"&& Pass1BBaselineSelection() &&  PassNLep(1) && ChainName.Contains("TT") && Ngenlep == 1
        && HT > 500
-        && MET > 250 
+        && MET > 200 
         && Nb ==1 
         && Njet > 5
         && mT > -1
@@ -133,7 +142,7 @@ bool PassSelection(TString Region,
 
     if(Region=="1B_ll"&& Pass1BBaselineSelection() &&  PassNLep(1) && ChainName.Contains("TT") && Ngenlep == 2
        && HT > 500
-        && MET > 250 
+        && MET > 200 
         && Nb ==1 
         && Njet > 5
         && mT > -1
@@ -142,7 +151,7 @@ bool PassSelection(TString Region,
     
     if(Region=="1B_lo_mT" && Pass1BBaselineSelection() &&  PassNLep(1)
        && HT >500
-        && MET > 250 
+        && MET > 200 
         && Nb >1 
         && Njet > 5 
         && mT < 150
@@ -151,7 +160,7 @@ bool PassSelection(TString Region,
 
     if(Region=="2B_hi_mT" &&  PassNLep(1)
        && HT > 500
-        && MET > 250 
+        && MET > 200 
         && Nb >1 
         && Njet > 5
         && mT > 150
@@ -160,7 +169,7 @@ bool PassSelection(TString Region,
 
     if(Region=="2B_sl" &&  PassNLep(1) && ChainName.Contains("TT") && Ngenlep == 1
        && HT > 500
-        && MET > 250 
+        && MET > 200 
         && Nb >1 
         && Njet > 5
         && mT > -1
@@ -169,7 +178,7 @@ bool PassSelection(TString Region,
 
     if(Region=="2B_ll"&&  PassNLep(1) && ChainName.Contains("TT") && Ngenlep == 2
        && HT > 500
-        && MET > 250 
+        && MET > 200 
         && Nb >1 
         && Njet > 5
         && mT > -1
@@ -178,7 +187,7 @@ bool PassSelection(TString Region,
     
     if(Region=="2B_lo_mT"  &&  PassNLep(1)
        && HT >500
-        && MET > 250 
+        && MET > 200 
         && Nb >1 
         && Njet > 5 
         && mT < 150

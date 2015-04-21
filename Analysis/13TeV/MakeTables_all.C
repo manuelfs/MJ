@@ -17,6 +17,7 @@
 #include "TInterpreter.h"
 #include "TLatex.h"
 #include "TMath.h"
+#include "Configuration.h"
 
 ofstream fout;
 
@@ -129,7 +130,7 @@ void PrintTableOneLine(TString Process, TH1F* h1[7], int lepflav=0, bool doLatex
     }
 }
 
-void MakeTables_all(int version, int lepflav=0, char* Region="",int nMJ=0,int nMET=0,int nMT=0,int nb=0,int nsj=0,int nHT=0, bool doLatex=false)
+void MakeTables_all(int lepflav=0, char* Region="",int nMJ=0,int nMET=0,int nMT=0,int nb=0,int nsj=0,int nHT=0, bool doLatex=false)
 { 
     if(lepflav==0)  cout << "[MJ Table] Yields for Electron+Muon" << endl;
     if(lepflav==11) cout << "[MJ Table] Yields for Electron" << endl;
@@ -138,7 +139,7 @@ void MakeTables_all(int version, int lepflav=0, char* Region="",int nMJ=0,int nM
 
     TString HistName="yields";
 
-    TFile* HistFile = TFile::Open(Form("Out/v%i/HistFiles/Hist_%s_v%i.root", version,Region,version));
+    TFile* HistFile = TFile::Open(Form("Out/%s_v%i/HistFiles/Hist_%s_v%i.root", study.Data(),version,Region,version));
     
         
     TH1F *h1_DATA[7], *h1_T[7], *h1_TT_sl[7], *h1_TT_ll[7], *h1_WJets[7], *h1_DY[7], *h1_MC[7];

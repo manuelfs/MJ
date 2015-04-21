@@ -18,6 +18,7 @@
 #include "TMath.h"
 #include "TGraphErrors.h"
 #include "TRandom3.h"
+#include "Configuration.h"
 
 using namespace std;
 //bool DoLog          = 1;
@@ -54,13 +55,21 @@ void h2cosmetic(TH2F* &h2, char* title, TString Xvar="", TString Yvar="", TStrin
 //
 // Stacks
 //
-void Make1DPlots(int version, TString HistName, char* Region,  bool DoLog=1,bool fluctuate=false,char* sys=(char*)"",int NMergeBins=1) 
+void Make1DPlots(TString HistName, char* Region,  bool DoLog=1,bool fluctuate=false,char* sys=(char*)"",int NMergeBins=1) 
 { 
   //gInterpreter->ExecuteMacro("~/macros/JaeStyle.C"); 
    
     char *var;
-     if(HistName=="mindPhi_B_met")            	var=(char*)"min #Delta#phi(MET,closest B)";
+    if(HistName=="mindPhi_B_met")            	var=(char*)"min #Delta#phi(MET,closest B)";
     if(HistName=="MET")                 	var=(char*)"MET [GeV]";
+    if(HistName=="nBSJ_perFJ")                  var=(char*)"N B-tags per FJ";
+    if(HistName=="max_nBSJ_perEvent")           var=(char*)"Max N B-tags per FJ";
+    if(HistName=="sumCSV_perFJ")                  var=(char*)"sum CSV per FJ";
+    if(HistName=="max_sumCSV_perEvent")           var=(char*)"Max sum CSV per FJ";
+    if(HistName=="mj_BFJ")                       var=(char*)"mJ, B-tagged FJ";
+    if(HistName=="mj1_BFJ")                       var=(char*)"mJ, most massive B-tagged FJ";
+    if(HistName=="sumMJ_BFJ")                     var=(char*)"MJ, B-tagged FJs";
+    if(HistName=="max_nBSJ_perEvent")           var=(char*)"Max N B-tags per FJ";
     if(HistName=="METPhi")              	var=(char*)"#phi(MET)";
     if(HistName=="METx")              	    var=(char*)"METx [GeV]";
     if(HistName=="METy")              	    var=(char*)"METy [GeV]";
@@ -133,8 +142,8 @@ void Make1DPlots(int version, TString HistName, char* Region,  bool DoLog=1,bool
     int nregion =6;*/
     // char* Regions[] = {"SR0","SR1","baseline","1BCRincl","1B4SJCRincl","1B45SJ","1B67SJ","1B8SJ","SRincl"};
     // int nregion =2;
-    char* Regions[] = {/*"SRstats1","SR0","SR1","baseline",*/"1BCRincl",/*"1B4SJCRincl","1B45SJ","1B67SJ","1B8SJ",*/"SRincl"};
-  int nregion =2;
+    //  char* Regions[] = {/*"SRstats1","SR0","SR1","baseline",*/"1BCRincl",/*"1B4SJCRincl","1B45SJ","1B67SJ","1B8SJ",*/"SRincl"};
+    // int nregion =2;
  
     TString corr_region = "";
     if(HistName.Contains("coarse")){
@@ -167,7 +176,7 @@ void Make1DPlots(int version, TString HistName, char* Region,  bool DoLog=1,bool
     TGraphErrors *MJ_SF_non_pois[7];
     if(corr){
       TFile* SFFile;
-      SFFile = TFile::Open(Form("Out/v%i/HistFiles/%s%s_SF_%s_v%i.root",version,HistName.Data(),sys ,corr_region.Data(),version));
+      SFFile = TFile::Open(Form("Out/%s_v%i/HistFiles/%s%s_SF_%s_v%i.root",study.Data(),version,HistName.Data(),sys ,corr_region.Data(),version));
       // else SFFile = TFile::Open(Form("HistFiles/v%i/%s_SF_%s_v%i.root",version,HistName.Data() ,c_region[1].Data(),version));  
       for(int j=2;j<7;j++){
 	MJ_SF[j] = (TGraphErrors*)SFFile->Get(Form("SF_%i",j));
@@ -176,7 +185,7 @@ void Make1DPlots(int version, TString HistName, char* Region,  bool DoLog=1,bool
       SFFile->Close();
     }
 
-    TFile* HistFile = TFile::Open(Form("Out/v%i/HistFiles/Hist_%s_v%i.root",version,Region,version));
+    TFile* HistFile = TFile::Open(Form("Out/%s_v%i/HistFiles/Hist_%s_v%i.root",study.Data(),version,Region,version));
     //TCanvas *c = new TCanvas("c","c",1500,300);  
     //c->Divide(5,1);
     TCanvas *c = new TCanvas("c","c",1200,800);  
@@ -397,9 +406,9 @@ void Make1DPlots(int version, TString HistName, char* Region,  bool DoLog=1,bool
     if(HistName=="mj") HistName="JetMass";
     if(fluctuate) HistName = HistName+"_fluc";
     //if(corr) c->Print( Form("Figures/v%i/corr_%s_sys_CompareDataMC_%s_%s%s_v%i.pdf",version,corr_region.Data(),HistName.Data(), Region, DoLog?"_log":"",version) );
-    if(corr) c->Print( Form("Out/v%i/Figures/%s_%s_in_%s_corrected_by_%s%s_v%i.pdf",version,sys,HistName.Data(),Region, corr_region.Data(), DoLog?"_log":"",version) );
+    if(corr) c->Print( Form("Out/%s_v%i/Figures/%s_%s_in_%s_corrected_by_%s%s_v%i.pdf",study.Data(),version,sys,HistName.Data(),Region, corr_region.Data(), DoLog?"_log":"",version) );
     //else if(corr2)c->Print( Form("Figures/v%i/corr_%s_sys_CompareDataMC_%s_%s%s_v%i.pdf",version, c_region[1].Data(),HistName.Data(), Region, DoLog?"_log":"",version) );
-    else c->Print( Form("Out/v%i/Figures/%s_%s_in_%s%s_v%i.pdf",version,sys,HistName.Data(), Region, DoLog?"_log":"",version) ); 
+    else c->Print( Form("Out/%s_v%i/Figures/%s_%s_in_%s%s_v%i.pdf",study.Data(),version,sys,HistName.Data(), Region, DoLog?"_log":"",version) ); 
     
     // 
     HistFile->Close();
