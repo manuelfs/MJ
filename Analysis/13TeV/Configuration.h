@@ -15,7 +15,7 @@
 #include "TGraphErrors.h"
 
 
-int version = 26;
+int version = 29;
 bool OnlyEssential=true;
 TString BabyDir = "/Users/heller/Jae/ntuples/Phys14_13_Apr2015/";
 bool status =true;
@@ -44,14 +44,28 @@ int nregion=8;
 char* Regions[] = {"1B_hi_mT","1B_lo_mT","1B_sl","1B_ll","2B_hi_mT","2B_lo_mT","2B_sl","2B_ll"};
 //int SRthres=8;
 */
+/*
 TString study = "B_FJ";
 
 char* sysname[] = {""};
 int nsys=1;
 
-int nregion=5;
-char* Regions[] = {"SRincl","SR0","SR1","SRstats1","SRstats"};
-int SRthres=5;
+int nregion=4;
+char* Regions[] = {"SR0_lowmT","SR1_lowmT","SRstats1_lowmT","SRstats_lowmT"};
+//"SRincl","SR0","SR1","SRstats1","SRstats"
+int SRthres=5; */
+
+TString study = "counts";
+
+char* sysname[] = {""};
+int nsys=1;
+
+int nregion=1;
+char* Regions[] = {"baseline_1B"};
+int SRthres=2;
+
+
+
 
 /*
 TString study = "weird_event_dump";

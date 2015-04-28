@@ -4,14 +4,15 @@ bool PassNLep(unsigned int Nlep)
    
   /* && RA4MusVetoPt_->size()==0 
      && RA4ElsVetoPt_->size()==0 */
-  int nveto=0;
+  /*int nveto=0;
   for(unsigned int i=0;i<RA4MusVetoPt_->size();i++){
     if(RA4MusVetoPt_->at(i)>10) nveto++;
   }
   for(unsigned int i=0;i<RA4ElsVetoPt_->size();i++){
     if(RA4ElsVetoPt_->at(i)>10) nveto++;
-  }
-  if( (RA4MusPt_->size()+RA4ElsPt_->size())==Nlep && nveto==0) return true;
+    }*/
+  if( (RA4MusPt_->size()+RA4ElsPt_->size())==Nlep && RA4MusVetoPt_->size()==0 
+     && RA4ElsVetoPt_->size()==0 ) return true;
   else return false;
        
 }
@@ -75,6 +76,25 @@ bool PassSelection(TString Region,
         && mT > -1
         && MJ > -1 
     )  passed = true;
+
+      if(Region=="baseline_1B" && PassNLep(1) 
+        && HT > 500 
+        && MET > 200 && MET < 400
+        && Nb == 1 
+        && Njet > 5 && Njet < 8
+        && mT > 150
+        && MJ < 600 
+    )  passed = true;
+
+
+      if(Region=="baseline_2B" && PassNLep(1) 
+        && HT > 500 
+        && MET > 200 && MET < 400
+        && Nb == 2 
+        && Njet > 5 && Njet < 8
+        && mT < 150
+        && MJ < 600 
+    )  passed = true;
      
     if(Region=="SR0" && PassBaselineSelection() &&  PassNLep(1)
         && HT > 500 
@@ -91,6 +111,24 @@ bool PassSelection(TString Region,
         && Nb > 1 
         && Njet > 5
         && mT > 150 
+        && MJ > 600 
+    )  passed = true;
+
+    if(Region=="SR0_lowmT" && PassBaselineSelection() &&  PassNLep(1)
+        && HT > 500 
+        && MET > 400
+        && Nb > 1 
+        && Njet > 5
+        && mT < 150 
+        && MJ > 600 
+    )  passed = true;
+    
+    if(Region=="SR1_lowmT" && PassBaselineSelection() &&  PassNLep(1)
+        && HT > 500
+        && MET > 250 
+        && Nb > 1 
+        && Njet > 5
+        && mT < 150 
         && MJ > 600 
     )  passed = true;
 
@@ -112,6 +150,24 @@ bool PassSelection(TString Region,
         && MJ > 400 
     )  passed = true;
 
+  if(Region=="SRstats_lowmT" && PassBaselineSelection() &&  PassNLep(1)
+        && HT > 500
+        && MET > 250 
+        && Nb > 1 
+        && Njet > 5
+        && mT < 150 
+        && MJ > 400 
+    )  passed = true;
+
+ if(Region=="SRstats1_lowmT" && PassBaselineSelection() &&  PassNLep(1)
+        && HT > 500
+        && MET > 400 
+        && Nb > 1 
+        && Njet > 5
+        && mT < 150 
+        && MJ > 400 
+    )  passed = true;
+ 
     
     if(Region=="SRincl" && PassBaselineSelection() &&  PassNLep(1)
         && HT > 500

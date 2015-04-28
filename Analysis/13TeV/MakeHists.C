@@ -99,8 +99,22 @@ double nPUScaleFactor2012(TH1F* h1PU, float npu){
 
 void MCDump(){
   for(unsigned int igen=0; igen<GenId_->size(); igen++)
-    { 
-      cout<<"STATUS   ID   MID   GMID   pT  eta  phi  E  p  "<<GenStatus_->at(igen)<<"  "<<fabs(GenId_->at(igen))<<"  "<<fabs(GenMId_->at(igen))<<"  "<<fabs(GenGMId_->at(igen))<<endl;
+    {
+      
+      float p = GenPt_->at(igen) * TMath::CosH(GenEta_->at(igen));
+      //float m = sqrt(pow(GenE_->at(igen),2)-pow(p,2));
+
+      cout << "Printing contents of mc_doc..." << endl;
+      // if (mc_doc_status->at(igen)==3||mc_doc_status->at(igen)==22||mc_doc_status->at(igen)==23) {  // hard scatter
+      cout<<igen<<": ID "<<static_cast<int>(GenId_->at(igen))<<",   \tMom ID "<<static_cast<int>(GenMId_->at(igen))
+ 
+	  <<",   \tpT "<<GenPt_->at(igen)
+	  <<",   \teta "<<GenEta_->at(igen)
+	  <<",   \tphi "<<GenPhi_->at(igen)
+	//  <<",   \tmass "<<m
+	  <<",   \tstatus "<<GenStatus_->at(igen)
+	  <<", \tGMom ID "<<static_cast<int>(GenGMId_->at(igen)) <<endl;
+    
     }
 }
 
@@ -448,7 +462,8 @@ void MakeHists(TChain *ch, char* Region, char* sys=(char*)"")
   TH1F *h1_mj_BFJ[7];
   TH1F *h1_MJ_BFJ[7];
   TH1F *h1_mj1_BFJ[7];
-
+  TH1F *h1_mj2_BFJ[7];
+  TH1F *h1_mj3_BFJ[7];
   
   //nFJ, MJ, MET, MT, NB, NSJ, HT
   //nsj 45,67,89
@@ -559,6 +574,13 @@ void MakeHists(TChain *ch, char* Region, char* sys=(char*)"")
        
        h1_mj1_BFJ[i]=InitTH1F( Form("h1_%s_mj1_BFJ_%ifatjet", ChainName.Data(), i), 
 			   Form("h1_%s_mj1_BFJ_%ifatjet", ChainName.Data(), i), 
+			   10, 0, 1000);
+ h1_mj2_BFJ[i]=InitTH1F( Form("h1_%s_mj2_BFJ_%ifatjet", ChainName.Data(), i), 
+			   Form("h1_%s_mj2_BFJ_%ifatjet", ChainName.Data(), i), 
+			   10, 0, 1000);
+
+  h1_mj3_BFJ[i]=InitTH1F( Form("h1_%s_mj3_BFJ_%ifatjet", ChainName.Data(), i), 
+			   Form("h1_%s_mj3_BFJ_%ifatjet", ChainName.Data(), i), 
 			   10, 0, 1000);
 
 
@@ -847,6 +869,9 @@ void MakeHists(TChain *ch, char* Region, char* sys=(char*)"")
 	  }
 	}
       }
+
+      //REMOVE THIS
+      // RA4NSJ = JetPt_->size();
       //if(HT40<=750 || RA4NB==0) continue;
 	
       int nISR=0;
@@ -1131,7 +1156,9 @@ void MakeHists(TChain *ch, char* Region, char* sys=(char*)"")
 
       int max_nBSJ = 0;
       float max_sumCSV=0.0;
-      float m1_BFJ = 0;
+      float m1_BFJ = -1;
+      float m2_BFJ = -1;
+      float m3_BFJ = -1;
       float MJ_BFJ=0;
       for(int ifj=0; ifj<(int)FatjetPt_->size(); ifj++)
 	{   
@@ -1155,8 +1182,11 @@ void MakeHists(TChain *ch, char* Region, char* sys=(char*)"")
 	  if(nBSJ>max_nBSJ) max_nBSJ = nBSJ;
 	  if(nBSJ>0){
 	    FillTH1FAll(h1_mj_BFJ, NFJbin, mj_->at(ifj), EventWeight_);
-	    if(mj_->at(ifj) > m1_BFJ) m1_BFJ = mj_->at(ifj);
 	    MJ_BFJ+= mj_->at(ifj);
+
+	    if(mj_->at(ifj) > m1_BFJ){ m3_BFJ=m2_BFJ; m2_BFJ = m1_BFJ; m1_BFJ = mj_->at(ifj); }
+	    else if(mj_->at(ifj) > m2_BFJ){m3_BFJ=m2_BFJ; m2_BFJ = mj_->at(ifj);}
+	    else if(mj_->at(ifj) > m3_BFJ) m3_BFJ=mj_->at(ifj);
 	  }
 
 	  FillTH1FAll(h1_nBSJ_perFJ, NFJbin, nBSJ, EventWeight_);
@@ -1165,6 +1195,8 @@ void MakeHists(TChain *ch, char* Region, char* sys=(char*)"")
 	  
 	}
       FillTH1FAll(h1_mj1_BFJ, NFJbin, m1_BFJ, EventWeight_);
+      FillTH1FAll(h1_mj2_BFJ, NFJbin, m2_BFJ, EventWeight_);
+      FillTH1FAll(h1_mj3_BFJ, NFJbin, m3_BFJ, EventWeight_);
       FillTH1FAll(h1_MJ_BFJ, NFJbin, MJ_BFJ, EventWeight_);
       FillTH1FAll(h1_max_nBSJ_perEvent, NFJbin, max_nBSJ, EventWeight_);
       FillTH1FAll(h1_max_sumCSV_perEvent, NFJbin, max_sumCSV, EventWeight_);
@@ -1342,9 +1374,13 @@ void MakeHists(TChain *ch, char* Region, char* sys=(char*)"")
       h1_mj_BFJ[i]->SetDirectory(0);
       h1_MJ_BFJ[i]->SetDirectory(0);
       h1_mj1_BFJ[i]->SetDirectory(0);
+      h1_mj2_BFJ[i]->SetDirectory(0);
+      h1_mj3_BFJ[i]->SetDirectory(0);
       h1_mj_BFJ[i]->Write();
       h1_MJ_BFJ[i]->Write();
       h1_mj1_BFJ[i]->Write();
+      h1_mj2_BFJ[i]->Write();
+      h1_mj3_BFJ[i]->Write();
       h1_mindPhi_B_met[i]->SetDirectory(0);                 h1_mindPhi_B_met[i]->Write(); 
       h1_yields[i]->SetDirectory(0);                      h1_yields[i]->Write();
       h1_MJ[i]->SetDirectory(0);                          h1_MJ[i]->Write();

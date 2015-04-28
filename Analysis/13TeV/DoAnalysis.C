@@ -245,13 +245,14 @@ void DoAnalysis(bool OnlyDraw=false)
   OverlaySF_TT(2,sysname[0]);
   OverlaySF_TT(2,sysname[1]);
   OverlaySF_TT(2,sysname[2]);*/
-  //GetYields(version);
+  // GetYields();
   gSystem->Exec(Form("cp DoAnalysis.C Out/%s_v%i/",study.Data(),version));
   gSystem->Exec(Form("cp Configuration.h Out/%s_v%i/",study.Data(),version));
   gSystem->Exec(Form("cp MakeHists.C Out/%s_v%i/",study.Data(),version));
   gSystem->Exec(Form("cp Make1DPlots.C Out/%s_v%i/",study.Data(),version));
   gSystem->Exec(Form("cp Make2DPlots.C Out/%s_v%i/",study.Data(),version));
   gSystem->Exec(Form("cp MakeSF.C Out/%s_v%i/",study.Data(),version));
+  gSystem->Exec(Form("cp GetYields.C Out/%s_v%i/",study.Data(),version));
   gSystem->Exec(Form("cp MakeTables.C Out/%s_v%i/",study.Data(),version));
   gSystem->Exec(Form("cp PassSelection.h Out/%s_v%i/",study.Data(),version));
   gSystem->Exec(Form("cp OverlaySF.C Out/%s_v%i/",study.Data(),version));
