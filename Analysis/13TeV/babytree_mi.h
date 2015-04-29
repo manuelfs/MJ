@@ -129,10 +129,10 @@ void InitBaby(TChain *ch)
     ch->SetBranchAddress("MET",             &MET_,           &b_MET);
     ch->SetBranchAddress("HT",              &HT_,            &b_HT);
     ch->SetBranchAddress("METPhi",          &METPhi_,        &b_METPhi);
-    ch->SetBranchAddress("mj_R1p2_pT30_Eta2p5",         &mj_,            &b_mj);
-    ch->SetBranchAddress("FatjetPt_R1p2_pT30_Eta2p5",   &FatjetPt_,      &b_FatjetPt);
-    ch->SetBranchAddress("FatjetEta_R1p2_pT30_Eta2p5",  &FatjetEta_,     &b_FatjetEta);
-    ch->SetBranchAddress("FatjetPhi_R1p2_pT30_Eta2p5",  &FatjetPhi_,     &b_FatjetPhi);
+    ch->SetBranchAddress("mj_pT30",         &mj_,            &b_mj);
+    ch->SetBranchAddress("FatjetPt_pT30",   &FatjetPt_,      &b_FatjetPt);
+    ch->SetBranchAddress("FatjetEta_pT30",  &FatjetEta_,     &b_FatjetEta);
+    ch->SetBranchAddress("FatjetPhi_pT30",  &FatjetPhi_,     &b_FatjetPhi);
     ch->SetBranchAddress("RA4MusPt_mi",        &RA4MusPt_,      &b_RA4MusPt);
     ch->SetBranchAddress("RA4MusPhi_mi",       &RA4MusPhi_,     &b_RA4MusPhi);
     ch->SetBranchAddress("RA4MusEta_mi",       &RA4MusEta_,     &b_RA4MusEta);

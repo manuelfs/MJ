@@ -152,25 +152,16 @@ void DoAnalysis(bool OnlyDraw=false)
 	    Make1DPlots("mj",           Regions[iregion],bo,false,sysname[isys]);
 	   
 	  }
-	  Make1DPlots("HT",           Regions[iregion],bo,false,sysname[isys]);
+	  //Make1DPlots("HT",           Regions[iregion],bo,false,sysname[isys]);
 	  //Make1DPlots("MJ",           Regions[iregion],bo,false,sysname[isys]);
 	  Make1DPlots("MJ_coarse",           Regions[iregion],bo,false,sysname[isys]);
-	  Make1DPlots("MJ_coarse",           Regions[iregion],bo,true,sysname[isys]);
+	  Make1DPlots("MJ_coarse",           Regions[iregion],bo,false,sysname[isys]);
 	  Make1DPlots("Nfatjet",      Regions[iregion],bo,false,sysname[isys]);
 	  Make1DPlots("mj1",          Regions[iregion],bo,false,sysname[isys]);
-	  Make1DPlots("mj2",          Regions[iregion],bo,false,sysname[isys]);
-	  Make1DPlots("mj3",          Regions[iregion],bo,false,sysname[isys]);
-	  Make1DPlots("mindPhi_B_met",          Regions[iregion],bo,false,sysname[isys]);
-	  Make1DPlots("nBSJ_perFJ",          Regions[iregion],bo,false,sysname[isys]);
-	  Make1DPlots("max_nBSJ_perEvent",          Regions[iregion],bo,false,sysname[isys]);
-	  Make1DPlots("sumCSV_perFJ",          Regions[iregion],bo,false,sysname[isys]);
-	  Make1DPlots("max_sumCSV_perEvent",          Regions[iregion],bo,false,sysname[isys]);
-	  Make1DPlots("mj_BFJ",          Regions[iregion],bo,false,sysname[isys]);
-	  Make1DPlots("mj1_BFJ",          Regions[iregion],bo,false,sysname[isys]);
-	  Make1DPlots("sumMJ_BFJ",          Regions[iregion],bo,false,sysname[isys]);
+
 	   
 	  if(iregion> SRthres){
-	    for(int icorr=0;icorr<nregion-1;icorr++){
+	    for(int icorr=0;icorr<=SRthres;icorr++){
 	      Make1DPlots(Form("MJ_coarse_corr%i",icorr), Regions[iregion],bo,false,sysname[isys]);
 	      // Make1DPlots(Form("MJ_corr%i",icorr),  Regions[iregion],bo,false,sysname[isys]);
 	    }
@@ -188,7 +179,16 @@ void DoAnalysis(bool OnlyDraw=false)
 	  //Make1DPlots("toppT1",       Regions[iregion],bo,false,sysname[isys]);
 	  //Make1DPlots("toppT2",       Regions[iregion],bo,false,sysname[isys]);
 	  if(!OnlyDraw && !OnlyEssential){
-	   
+	    Make1DPlots("mj2",          Regions[iregion],bo,false,sysname[isys]);
+	    Make1DPlots("mj3",          Regions[iregion],bo,false,sysname[isys]);
+	    Make1DPlots("mindPhi_B_met",          Regions[iregion],bo,false,sysname[isys]);
+	    Make1DPlots("nBSJ_perFJ",          Regions[iregion],bo,false,sysname[isys]);
+	    Make1DPlots("max_nBSJ_perEvent",          Regions[iregion],bo,false,sysname[isys]);
+	    Make1DPlots("sumCSV_perFJ",          Regions[iregion],bo,false,sysname[isys]);
+	    Make1DPlots("max_sumCSV_perEvent",          Regions[iregion],bo,false,sysname[isys]);
+	    Make1DPlots("mj_BFJ",          Regions[iregion],bo,false,sysname[isys]);
+	    Make1DPlots("mj1_BFJ",          Regions[iregion],bo,false,sysname[isys]);
+	    Make1DPlots("sumMJ_BFJ",          Regions[iregion],bo,false,sysname[isys]);
 	    Make1DPlots("Nskinnyjet",   Regions[iregion],bo,false,sysname[isys]);
 	    Make1DPlots("Ncsvm",        Regions[iregion],bo,false,sysname[isys]);
 	    Make1DPlots("MET",          Regions[iregion],bo,false,sysname[isys]);
