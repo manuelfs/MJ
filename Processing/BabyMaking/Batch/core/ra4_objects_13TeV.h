@@ -206,7 +206,7 @@ bool IsSignalMuon(int imu, bool doMiniIso)
 
     bool passIso=false; 
     if(!doMiniIso)  passIso = GetMuonIsolation(imu)<0.12;  
-    if(doMiniIso)   passIso = GetIsolation(imu, 13, 0.2, false, true, true, true, false)<0.2;  
+    if(doMiniIso)   passIso = GetIsolation(imu, 13, 0.2, true, true, true, true, false)<0.2;  
     
     return (IsBasicMuon(imu) && passIso); 
 }
@@ -220,7 +220,7 @@ bool IsVetoMuon(int imu, bool doMiniIso)
     
     bool passIso=false; 
     if(!doMiniIso)  passIso = GetMuonIsolation(imu)<0.2;  
-    if(doMiniIso)   passIso = GetIsolation(imu, 13, 0.2, false, true, true, true, false)<0.2;  // FIXME : make sure the cut value here  
+    if(doMiniIso)   passIso = GetIsolation(imu, 13, 0.2, true, true, true, true, false)<0.2;  // FIXME : make sure the cut value here  
 /*
     return ((mus_isGlobalMuon->at(imu) >0 || mus_isTrackerMuon->at(imu) >0)
             && mus_isPF->at(imu) 
@@ -316,7 +316,7 @@ bool IsSignalElectron(int iel, bool doMiniIso)
     float isocut=0.2179;  // Medium working point 
     if(els_isEE->at(iel)) isocut=0.254;
     if(!doMiniIso)  passIso=GetElectronIsolation(iel)<isocut;
-    if(doMiniIso)   passIso=GetIsolation(iel, 11, 0.2, false, true, true, true, false)<0.1;
+    if(doMiniIso)   passIso=GetIsolation(iel, 11, 0.2, true, true, true, true, false)<0.1;
     
     return (IsBasicElectron(iel) && passIso);
 }
@@ -332,7 +332,7 @@ bool IsVetoElectron(int iel, bool doMiniIso)
     float isocut=0.3313;   
     if(els_isEE->at(iel)) isocut=0.3816;
     if(!doMiniIso)  passIso=GetElectronIsolation(iel)<isocut;
-    if(doMiniIso)   passIso=GetIsolation(iel, 11, 0.2, false, true, true, true, false)<0.1;
+    if(doMiniIso)   passIso=GetIsolation(iel, 11, 0.2, true, true, true, true, false)<0.1;
 
     return (els_pt->at(iel) > MinVetoLeptonPt
             && fabs(els_scEta->at(iel)) < 2.5
