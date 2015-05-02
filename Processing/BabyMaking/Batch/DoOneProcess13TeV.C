@@ -226,8 +226,11 @@ void DoOneProcess13TeV(TString InputName, TString ProcessName, int ibegin, int i
     bool TrigHTMuon_;  
     int Nfatjet_pT30_; 
     int Nskinnyjet_; 
+    int Nskinnyjet_mini_; 
     int NBtagCSVM_; 
     int NBtagCSVL_; 
+    int NBtagCSVM_mini_; 
+    int NBtagCSVL_mini_; 
     int Npv_; 
     int Npuminusone_; 
     int Npuplusone_; 
@@ -239,6 +242,7 @@ void DoOneProcess13TeV(TString InputName, TString ProcessName, int ibegin, int i
     float METPhi_;  
     float GenMET_;  
     float HT_;  
+    float HT_mini_;  
     float top1pT_;  
     float top1Eta_;  
     float top1Phi_;  
@@ -451,8 +455,11 @@ void DoOneProcess13TeV(TString InputName, TString ProcessName, int ibegin, int i
     babyTree_->Branch("TrigHTMuon",       	&TrigHTMuon_);     
     babyTree_->Branch("Nfatjet_pT30",   	&Nfatjet_pT30_);   
     babyTree_->Branch("Nskinnyjet",     	&Nskinnyjet_);
+    babyTree_->Branch("Nskinnyjet_mini",     	&Nskinnyjet_mini_);
     babyTree_->Branch("NBtagCSVM",     	    &NBtagCSVM_);
     babyTree_->Branch("NBtagCSVL",     	    &NBtagCSVL_);
+    babyTree_->Branch("NBtagCSVM_mini",     	    &NBtagCSVM_mini_);
+    babyTree_->Branch("NBtagCSVL_mini",     	    &NBtagCSVL_mini_);
     babyTree_->Branch("Npv",            	&Npv_);       
     babyTree_->Branch("Npuminusone",       	&Npuminusone_);       
     babyTree_->Branch("Npuplusone",        	&Npuplusone_);       
@@ -464,6 +471,7 @@ void DoOneProcess13TeV(TString InputName, TString ProcessName, int ibegin, int i
     babyTree_->Branch("METPhi",            	&METPhi_);        
     babyTree_->Branch("GenMET",            	&GenMET_);        
     babyTree_->Branch("HT",             	&HT_);        
+    babyTree_->Branch("HT_mini",             	&HT_mini_);        
     babyTree_->Branch("top1pT",          	&top1pT_);        
     babyTree_->Branch("top1Eta",          	&top1Eta_);        
     babyTree_->Branch("top1Phi",          	&top1Phi_);        
@@ -731,8 +739,11 @@ void DoOneProcess13TeV(TString InputName, TString ProcessName, int ibegin, int i
         TrigHTMuon_         =   1;
         Nfatjet_pT30_       =   -1;
         Nskinnyjet_         =   -1;
+        Nskinnyjet_mini_         =   -1;
         NBtagCSVM_          =   -1;
         NBtagCSVL_          =   -1;
+        NBtagCSVM_mini_          =   -1;
+        NBtagCSVL_mini_          =   -1;
         Npv_                =   -1;
         Npuminusone_        =   -1;
         Npuplusone_         =   -1;
@@ -744,6 +755,7 @@ void DoOneProcess13TeV(TString InputName, TString ProcessName, int ibegin, int i
         METPhi_             =-999.;
         GenMET_             =-999.;
         HT_                 =-999.;
+        HT_mini_            =-999.;
         top1pT_             =-999.;
         top1Phi_            =-999.;
         top1Eta_            =-999.;
@@ -995,7 +1007,8 @@ void DoOneProcess13TeV(TString InputName, TString ProcessName, int ibegin, int i
         vector<int> RA4Elec_mini     = GetElectrons(true,   true);
         // Get good skinny jets, HT and B-tagged jets 
         float HT_mini=-999.; 
-        vector<int> GoodJets_AK4_mini = GetJets(RA4Elec_mini,RA4Muon_mini,RA4ElecVeto_mini,RA4MuonVeto_mini,HT_mini);
+	// Not using veto leptons for now
+        vector<int> GoodJets_AK4_mini = GetJets(RA4Elec_mini,RA4Muon_mini,RA4Elec_mini,RA4Muon_mini,HT_mini);
         // Nbtag 
         int Ncsvm_mini=0;
         int Ncsvl_mini=0;
@@ -1041,7 +1054,7 @@ void DoOneProcess13TeV(TString InputName, TString ProcessName, int ibegin, int i
         */
 
         vector<float> Vector_mj_pT30;   // mj
-        for(int ifj=0; ifj<fjets30_m->size(); ifj++) 
+        for(unsigned int ifj=0; ifj<fjets30_m->size(); ifj++) 
         {
             Vector_mj_pT30.push_back(fjets30_m->at(ifj));
         }
@@ -1265,7 +1278,7 @@ void DoOneProcess13TeV(TString InputName, TString ProcessName, int ibegin, int i
         // Cluster GenJet to make FJ 
         //
         vector<TLorentzVector> GenFatJetConstituent; 
-        for(int imcjet=0; imcjet<mc_jets_pt->size(); imcjet++) 
+        for(unsigned int imcjet=0; imcjet<mc_jets_pt->size(); imcjet++) 
         {
             float px_tmp = mc_jets_pt->at(imcjet)*TMath::Cos(mc_jets_phi->at(imcjet));; 
             float py_tmp = mc_jets_pt->at(imcjet)*TMath::Sin(mc_jets_phi->at(imcjet));; 
@@ -1366,14 +1379,18 @@ void DoOneProcess13TeV(TString InputName, TString ProcessName, int ibegin, int i
         //TrigSingleMuon_     =   PassSingleMuonTrig(); 
         Nfatjet_pT30_       =   Nfatjet_pT30;
         Nskinnyjet_         =   GoodJets_AK4.size();
+        Nskinnyjet_mini_         =   GoodJets_AK4_mini.size();
         NBtagCSVM_          =   Ncsvm;
         NBtagCSVL_          =   Ncsvl;
+        NBtagCSVM_mini_          =   Ncsvm_mini;
+        NBtagCSVL_mini_          =   Ncsvl_mini;
         EventWeight_        =   EventWeight;
         EventWeightNeg_     =   EventWeightNeg;
         MJ_pT30_            =   MJ_pT30;
         MET_                =   pfType1mets_et->at(0);
         METPhi_             =   pfType1mets_phi->at(0);
         HT_                 =   HT;
+        HT_mini_            =   HT_mini;
         Npv_                =   Npv;
         for(unsigned int bc(0); bc<PU_bunchCrossing->size(); ++bc)
         {
@@ -1523,14 +1540,14 @@ void DoOneProcess13TeV(TString InputName, TString ProcessName, int ibegin, int i
                 }
             }
         }
-        for(int igenjet=0; igenjet<jets_AK4_gen_pt->size(); igenjet++) 
+        for(unsigned int igenjet=0; igenjet<jets_AK4_gen_pt->size(); igenjet++) 
         { 
             GenJetPt_.push_back(jets_AK4_gen_pt->at(igenjet)); 
             //GenJetEta_.push_back(jets_AK4_gen_eta->at(igenjet)); 
             //GenJetPhi_.push_back(jets_AK4_gen_phi->at(igenjet)); 
         }
         GenMET_                =   pfType1mets_gen_et->at(0);
-        for(int imcjet=0; imcjet<mc_jets_pt->size(); imcjet++) 
+        for(unsigned int imcjet=0; imcjet<mc_jets_pt->size(); imcjet++) 
         { 
             MCJetE_.push_back(mc_jets_energy->at(imcjet)); 
             MCJetPt_.push_back(mc_jets_pt->at(imcjet)); 

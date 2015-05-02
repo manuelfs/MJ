@@ -50,7 +50,8 @@ double GetIsolation(const int ilep, const int ParticleType, const double rmax, c
         lep_eta = els_eta->at(ilep);
         lep_phi = els_phi->at(ilep);
         ptThresh = 0;
-        if (fabs(lep_eta)>1.479) {deadcone_ch = 0.015; deadcone_pu = 0.015; deadcone_ph = 0.08;}
+        if (els_isEE->at(ilep)) {deadcone_ch = 0.015; deadcone_pu = 0.015; deadcone_ph = 0.08;}
+        //if (fabs(els_scEta->at(ilep))>1.479) {deadcone_ch = 0.015; deadcone_pu = 0.015; deadcone_ph = 0.08;}
     }else if(ParticleType==13){
         lep_pt = mus_pt->at(ilep);
         lep_eta = mus_eta->at(ilep);
@@ -90,7 +91,7 @@ double GetIsolation(const int ilep, const int ParticleType, const double rmax, c
 
     for (unsigned int icand = 0; icand < pfcand_pt->size(); icand++) {
         if (icand==match_index) continue;
-        uint pdgId = TMath::Nint(pfcand_pdgId->at(icand));
+	int pdgId = abs(TMath::Nint(pfcand_pdgId->at(icand)));
         if (pdgId<7) continue;
         if(isnan(pfcand_pt->at(icand))
                 || isnan(pfcand_eta->at(icand))
