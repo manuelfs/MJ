@@ -424,8 +424,7 @@ void GetIsoTracks(std::vector<std::pair<int,double> > &eCands,
         double pt = pfcand_pt->at(itk);
         if (pt<5) continue;
         //  int type = static_cast<int>(pfcand_pdgId->at(itk));
-        double iso = GetPFCandIsolation(itk);
-        double relIso=iso/pfcand_pt->at(itk);
+	double relIso = GetIsolation(itk, 0, 0.3, false, true, false, false, false);
         // note: not cutting here on isolation!
         switch (abs(TMath::Nint(pfcand_pdgId->at(itk)))) {
             case 11:
